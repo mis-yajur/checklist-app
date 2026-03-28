@@ -478,7 +478,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 // ── CONFIG (loaded from config.json) ─────────────────────────
 let SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
 let SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg";
-let supabase      = null;
+let sb = null;
 
 const APP_CONFIG = {
   APP_NAME:      "CheckList",
@@ -501,7 +501,7 @@ window.addEventListener('load', async () => {
   setLoadStatus("Connecting to database...");
 
   try {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     setLoadStatus("Initializing tables...");
     await initSupabaseTables();
     setLoadStatus("Ready!");
@@ -532,9 +532,9 @@ function showLogin() {
 // Tables are created via Supabase SQL editor (see setup guide)
 // This function just verifies connectivity
 async function initSupabaseTables() {
-  if (!supabase) return;
+  if (!sb) return;
   // Test connection by querying doers table
-  await supabase.from('doers').select('id').limit(1);
+  await sb.from('doers').select('id').limit(1);
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────
@@ -565,7 +565,7 @@ async function doLogin() {
   // User login — check against doers table
   if (p === APP_CONFIG.USER_PASS) {
     if (supabase) {
-      const { data } = await supabase.from('doers')
+      const { data } = await sb.from('doers')
         .select('*').ilike('name', u).limit(1);
       if (data && data.length > 0) {
         SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id };
@@ -621,11 +621,11 @@ function showPage(page) {
 
 // ── DASHBOARD ─────────────────────────────────────────────────
 async function loadDashboard() {
-  if (!supabase) return;
+  if (!sb) return;
   const [{ count: dCount }, { data: master }, { data: done }] = await Promise.all([
-    supabase.from('doers').select('*', { count: 'exact', head: true }),
-    supabase.from('master_schedule').select('status, planned_date'),
-    supabase.from('done_list').select('id', { count: 'exact', head: false }),
+    sb.from('doers').select('*', { count: 'exact', head: true }),
+    sb.from('master_schedule').select('status, planned_date'),
+    sb.from('done_list').select('id', { count: 'exact', head: false }),
   ]);
   const now = new Date();
   let pending = 0, overdue = 0;
@@ -640,7 +640,7 @@ async function loadDashboard() {
   document.getElementById('st-overdue').textContent = overdue;
 
   // Charts
-  const { data: scoring } = await supabase.from('scoring').select('*');
+  const { data: scoring } = await sb.from('scoring').select('*');
   const sc = scoring || [];
   const onT = sc.filter(r => r.on_time).length;
   const late = sc.filter(r => !r.on_time).length;
@@ -703,8 +703,8 @@ function renderLeaderboard(data, containerId) {
 
 // ── DOERS ─────────────────────────────────────────────────────
 async function loadDoers() {
-  if (!supabase) return;
-  const { data } = await supabase.from('doers').select('*').order('created_at', { ascending: true });
+  if (!sb) return;
+  const { data } = await sb.from('doers').select('*').order('created_at', { ascending: true });
   DOERS_CACHE = data || [];
   const tbody = document.getElementById('doerTbody');
   tbody.innerHTML = DOERS_CACHE.map((r, i) => `
@@ -752,10 +752,10 @@ async function saveDoer() {
   const id = document.getElementById('doerEditId').value;
   bootstrap.Modal.getInstance(document.getElementById('doerModal')).hide();
   if (id) {
-    const { error } = await supabase.from('doers').update(row).eq('id', id);
+    const { error } = await sb.from('doers').update(row).eq('id', id);
     error ? toast('Update failed: '+error.message,'error') : toast('Doer updated','success');
   } else {
-    const { error } = await supabase.from('doers').insert(row);
+    const { error } = await sb.from('doers').insert(row);
     error ? toast('Insert failed: '+error.message,'error') : toast('Doer added','success');
   }
   loadDoers();
@@ -763,15 +763,15 @@ async function saveDoer() {
 
 async function deleteDoer(id) {
   if (!confirm('Delete this doer?')) return;
-  await supabase.from('doers').delete().eq('id', id);
+  await sb.from('doers').delete().eq('id', id);
   toast('Doer deleted','info');
   loadDoers();
 }
 
 // ── TASKS ─────────────────────────────────────────────────────
 async function loadTasks() {
-  if (!supabase) return;
-  const { data } = await supabase.from('tasks').select('*').order('id', { ascending: true });
+  if (!sb) return;
+  const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
   TASKS_CACHE = data || [];
   const tbody = document.getElementById('taskTbody');
   tbody.innerHTML = TASKS_CACHE.map((r, i) => `
@@ -811,8 +811,8 @@ async function openTaskModal(id) {
 function editTask(id) { openTaskModal(id); }
 
 async function loadDoersForSelect() {
-  if (!supabase) return;
-  const { data } = await supabase.from('doers').select('name, department').order('name');
+  if (!sb) return;
+  const { data } = await sb.from('doers').select('name, department').order('name');
   const sel = document.getElementById('t_doer');
   sel.innerHTML = '<option value="">— Select Doer —</option>' +
     (data||[]).map(d => `<option value="${d.name}" data-dept="${d.department}">${d.name} (${d.department})</option>`).join('');
@@ -837,10 +837,10 @@ async function saveTask() {
   const id = document.getElementById('taskEditId').value;
   bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide();
   if (id) {
-    const { error } = await supabase.from('tasks').update(row).eq('id', id);
+    const { error } = await sb.from('tasks').update(row).eq('id', id);
     error ? toast('Update failed: '+error.message,'error') : toast('Task updated','success');
   } else {
-    const { error } = await supabase.from('tasks').insert(row);
+    const { error } = await sb.from('tasks').insert(row);
     error ? toast('Insert failed: '+error.message,'error') : toast('Task added','success');
   }
   loadTasks();
@@ -848,7 +848,7 @@ async function saveTask() {
 
 async function deleteTask(id) {
   if (!confirm('Delete this task?')) return;
-  await supabase.from('tasks').delete().eq('id', id);
+  await sb.from('tasks').delete().eq('id', id);
   toast('Task deleted','info');
   loadTasks();
 }
@@ -858,11 +858,11 @@ async function generateMaster() {
   if (!confirm('This will regenerate the entire Master schedule (2 years). Continue?')) return;
   toast('Generating schedule...','info');
 
-  const { data: tasks } = await supabase.from('tasks').select('*');
+  const { data: tasks } = await sb.from('tasks').select('*');
   if (!tasks || !tasks.length) { toast('No tasks found.','error'); return; }
 
   // Clear existing master
-  await supabase.from('master_schedule').delete().neq('id', 0);
+  await sb.from('master_schedule').delete().neq('id', 0);
 
   const rows = [];
   for (const t of tasks) {
@@ -886,7 +886,7 @@ async function generateMaster() {
 
   // Insert in batches of 500
   for (let i = 0; i < rows.length; i += 500) {
-    const { error } = await supabase.from('master_schedule').insert(rows.slice(i, i+500));
+    const { error } = await sb.from('master_schedule').insert(rows.slice(i, i+500));
     if (error) { toast('Error: '+error.message,'error'); return; }
   }
   toast(`Generated ${rows.length} schedule rows!`,'success');
@@ -905,8 +905,8 @@ function generateDates(startDate, freq, totalDays) {
 
 // ── MASTER DISPLAY ────────────────────────────────────────────
 async function loadMaster() {
-  if (!supabase) return;
-  const { data } = await supabase.from('master_schedule').select('*').order('planned_date', { ascending: true });
+  if (!sb) return;
+  const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
   const tbody = document.getElementById('masterTbody');
   (data||[]).forEach(r => {
     const st = (r.status||'').trim();
@@ -937,8 +937,8 @@ async function loadMaster() {
 
 // ── DONE LIST ─────────────────────────────────────────────────
 async function loadDoneList() {
-  if (!supabase) return;
-  const { data } = await supabase.from('done_list').select('*').order('submitted_on', { ascending: false });
+  if (!sb) return;
+  const { data } = await sb.from('done_list').select('*').order('submitted_on', { ascending: false });
   const tbody = document.getElementById('doneTbody');
   tbody.innerHTML = (data||[]).map(r => {
     const st = (r.status||'').trim();
@@ -951,8 +951,8 @@ async function loadDoneList() {
 
 // ── SCORING ───────────────────────────────────────────────────
 async function loadScoring() {
-  if (!supabase) return;
-  const { data: sc } = await supabase.from('scoring').select('*').order('submitted_on', { ascending: false });
+  if (!sb) return;
+  const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
   const scoring = sc || [];
 
   // Leaderboard
@@ -986,7 +986,7 @@ async function loadScoring() {
 
 // ── MY TASKS (USER) ───────────────────────────────────────────
 async function loadMyTasks() {
-  if (!supabase) { showNoTaskMsg(); return; }
+  if (!sb) { showNoTaskMsg(); return; }
   const now   = new Date();
   const limit = new Date(now.getTime() + 10 * 86400000);
 
@@ -1116,11 +1116,11 @@ async function confirmSubmit() {
   };
 
   // 1. Update master_schedule
-  const { error: masterErr } = await supabase.from('master_schedule').update(update).eq('id', t.id);
+  const { error: masterErr } = await sb.from('master_schedule').update(update).eq('id', t.id);
   if (masterErr) { toast('Error updating master: '+masterErr.message,'error'); return; }
 
   // 2. Insert into done_list
-  const { error: doneErr } = await supabase.from('done_list').insert({
+  const { error: doneErr } = await sb.from('done_list').insert({
     doer_name:    t.doer_name,
     department:   t.department,
     task_name:    t.task_name,
@@ -1135,7 +1135,7 @@ async function confirmSubmit() {
   if (doneErr) console.warn('done_list insert:', doneErr.message);
 
   // 3. Insert into scoring
-  const { error: scoreErr } = await supabase.from('scoring').insert({
+  const { error: scoreErr } = await sb.from('scoring').insert({
     doer_name:    t.doer_name,
     department:   t.department,
     task_name:    t.task_name,
@@ -1156,7 +1156,7 @@ async function confirmSubmit() {
 async function sendNotification(taskId, type) {
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
-  const { data: doers } = await supabase.from('doers').select('*').ilike('name', t.doer_name).limit(1);
+  const { data: doers } = await sb.from('doers').select('*').ilike('name', t.doer_name).limit(1);
   const doer = doers && doers[0];
   if (!doer) { toast('Doer contact not found','error'); return; }
 
@@ -1174,8 +1174,8 @@ async function sendNotification(taskId, type) {
 
 // ── CSV EXPORT ────────────────────────────────────────────────
 async function exportCsv(table) {
-  if (!supabase) return;
-  const { data } = await supabase.from(table).select('*');
+  if (!sb) return;
+  const { data } = await sb.from(table).select('*');
   if (!data || !data.length) { toast('No data to export','error'); return; }
   const keys = Object.keys(data[0]);
   const csv  = [keys.join(','), ...data.map(r => keys.map(k => `"${r[k]??''}"`).join(','))].join('\n');
