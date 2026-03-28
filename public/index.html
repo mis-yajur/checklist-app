@@ -777,11 +777,11 @@ async function loadTasks() {
   tbody.innerHTML = TASKS_CACHE.map((r, i) => `
     <tr>
       <td>${r.id}</td>
-      <td><strong>${r.task_name||''}</strong></td>
-      <td>${r.doer_name||''}</td>
-      <td>${r.department||''}</td>
-      <td><span class="badge-freq">${r.frequency||''}</span></td>
-      <td>${r.start_date||''}</td>
+      <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
+      <td>${r.Doer_Name||r.doer_name||''}</td>
+      <td>${r.Department||r.department||''}</td>
+      <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
+      <td>${r.Start_Date||r.start_date||''}</td>
       <td>
         <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
         <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
@@ -795,11 +795,11 @@ async function openTaskModal(id) {
   if (id) {
     const r = TASKS_CACHE.find(t => t.id === id);
     if (r) {
-      document.getElementById('t_name').value = r.task_name||'';
-      document.getElementById('t_doer').value = r.doer_name||'';
-      document.getElementById('t_dept').value = r.department||'';
-      document.getElementById('t_freq').value = r.frequency||'2W';
-      document.getElementById('t_date').value = r.start_date||'';
+      document.getElementById('t_name').value = r.Task_Name||r.task_name||'';
+      document.getElementById('t_doer').value = r.Doer_Name||r.doer_name||'';
+      document.getElementById('t_dept').value = r.Department||r.department||'';
+      document.getElementById('t_freq').value = r.Frequency||r.frequency||'2W';
+      document.getElementById('t_date').value = r.Start_Date||r.start_date||'';
     }
   } else {
     ['t_name','t_dept'].forEach(id => document.getElementById(id).value='');
@@ -812,10 +812,13 @@ function editTask(id) { openTaskModal(id); }
 
 async function loadDoersForSelect() {
   if (!sb) return;
-  const { data } = await sb.from('doers').select('name, department').order('name');
+  const { data } = await sb.from('doers').select('name, department, Name, Department').order('name');
   const sel = document.getElementById('t_doer');
   sel.innerHTML = '<option value="">— Select Doer —</option>' +
-    (data||[]).map(d => `<option value="${d.name}" data-dept="${d.department}">${d.name} (${d.department})</option>`).join('');
+    (data||[]).map(d => {
+      const n = d.name||d.Name||''; const dep = d.department||d.Department||'';
+      return `<option value="${n}" data-dept="${dep}">${n} (${dep})</option>`;
+    }).join('');
 }
 
 function autoFillDept() {
@@ -829,10 +832,11 @@ async function saveTask() {
   const doer_name = document.getElementById('t_doer').value;
   if (!task_name || !doer_name) { toast('Task name and doer required','error'); return; }
   const row = {
-    task_name, doer_name,
-    department: document.getElementById('t_dept').value.trim(),
-    frequency:  document.getElementById('t_freq').value,
-    start_date: document.getElementById('t_date').value
+    Task_Name:  task_name,
+    Doer_Name:  doer_name,
+    Department: document.getElementById('t_dept').value.trim(),
+    Frequency:  document.getElementById('t_freq').value,
+    Start_Date: document.getElementById('t_date').value
   };
   const id = document.getElementById('taskEditId').value;
   bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide();
@@ -866,14 +870,16 @@ async function generateMaster() {
 
   const rows = [];
   for (const t of tasks) {
-    const dates = generateDates(new Date(t.start_date), t.frequency, 730);
+    const startDate = t.Start_Date || t.start_date;
+    const freq      = t.Frequency  || t.frequency;
+    const dates = generateDates(new Date(startDate), freq, 730);
     for (const d of dates) {
       rows.push({
-        doer_name:    t.doer_name,
-        department:   t.department,
+        doer_name:    t.Doer_Name   || t.doer_name,
+        department:   t.Department  || t.department,
         task_ref_id:  t.id,
-        frequency:    t.frequency,
-        task_name:    t.task_name,
+        frequency:    freq,
+        task_name:    t.Task_Name   || t.task_name,
         planned_date: d.toISOString(),
         actual_date:  null,
         status:       null,
