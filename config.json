@@ -1,0 +1,12 @@
+{
+  "supabase_url":      "https://xfecmmhabdjnudqfyrqz.supabase.co",
+  "supabase_anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg",
+  "app": {
+    "APP_NAME":      "CheckList",
+    "ADMIN_USER":    "admin",
+    "ADMIN_PASS":    "Admin@1234",
+    "USER_PASS":     "User@1234",
+    "SCORE_ON_TIME": 1,
+    "SCORE_LATE":    0
+  }
+}
