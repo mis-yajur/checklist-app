@@ -70,7 +70,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* SIDEBAR */
 .app-layout{display:flex;min-height:calc(100vh - 62px);}
-.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);padding:20px 12px;flex-shrink:0;box-shadow:2px 0 12px rgba(21,101,192,.06); transition: transform 0.3s ease; z-index: 1050;}
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);padding:20px 12px;flex-shrink:0;box-shadow:2px 0 12px rgba(21,101,192,.06);}
 .section-label{font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:1.5px;padding:14px 12px 6px;}
 .sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:.88rem;font-weight:500;color:var(--text-muted);transition:all .2s;}
 .sidebar-item:hover{background:var(--accent2);color:var(--primary);}
@@ -78,7 +78,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .sidebar-item i{font-size:1rem;width:20px;text-align:center;}
 
 /* MAIN */
-.main-content{flex:1;padding:28px;overflow-x:hidden;}
+.main-content{flex:1;padding:28px;overflow-x:hidden;overflow-y:auto;}
 .page{display:none;}.page.active{display:block;}
 .page-title{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--primary-dark);margin-bottom:4px;}
 .page-sub{color:var(--text-muted);font-size:.85rem;margin-bottom:24px;}
@@ -92,8 +92,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* TABLES */
 .card-table{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow:hidden;}
-.card-table .table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:linear-gradient(90deg,var(--accent2) 0%,#fff 100%);}
-.card-table .table-title{font-weight:700;color:var(--primary-dark);font-size:.95rem;}
+.card-table .table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:linear-gradient(90deg,var(--accent2) 0%,#fff 100%);gap:10px;flex-wrap:wrap;}
+.card-table .table-title{font-weight:700;color:var(--primary-dark);font-size:.95rem;white-space:nowrap;}
 .table{margin-bottom:0;font-size:.83rem;}
 .table thead th{background:var(--primary);color:#fff;font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;border:none;padding:10px 12px;position:sticky;top:0;}
 .table tbody tr{transition:background .15s;}
@@ -122,6 +122,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .badge-late{background:#FFEBEE;color:#C62828;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
 .badge-pending{background:#FFF3E0;color:#E65100;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
 .badge-freq{background:var(--accent2);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:600;}
+.badge-admin{background:#FFE082;color:#F57F17;border-radius:20px;padding:2px 8px;font-size:.7rem;font-weight:700;}
 
 /* SCORE CARDS */
 .score-card{border-radius:var(--radius);padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-sm);}
@@ -153,7 +154,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .check-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border);}
 .check-item:last-child{border-bottom:none;}
 
-/* MOBILE COMPATIBILITY OVERRIDES */
+/* MOBILE COMPATIBILITY */
 .menu-toggle-btn {
   display: none;
   background: transparent;
@@ -166,17 +167,24 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 @media (max-width: 991.98px) {
   .menu-toggle-btn { display: block; }
+  
   .sidebar {
     position: fixed;
     top: 62px;
     left: 0;
+    width: 240px;
     height: calc(100vh - 62px);
     transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1050;
+    border-right: 1px solid var(--border);
+    box-shadow: 2px 0 12px rgba(21,101,192,.15);
   }
+  
   .sidebar.show {
     transform: translateX(0);
   }
-  .main-content { padding: 15px; }
+  
   .sidebar-overlay {
     display: none;
     position: fixed;
@@ -185,11 +193,41 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     background: rgba(0,0,0,0.4);
     z-index: 1040;
   }
-  .sidebar-overlay.show { display: block; }
-  .login-card { width: 90%; padding: 30px 20px; }
-  .stat-card { padding: 15px; }
-  .stat-val { font-size: 1.5rem; }
-  .btn-start { padding: 12px 24px; font-size: 0.9rem; }
+  
+  .sidebar-overlay.show { 
+    display: block; 
+  }
+  
+  .main-content { 
+    padding: 15px; 
+  }
+  
+  .login-card { 
+    width: 90%; 
+    padding: 30px 20px; 
+  }
+  
+  .stat-card { 
+    padding: 15px; 
+  }
+  
+  .stat-val { 
+    font-size: 1.5rem; 
+  }
+  
+  .btn-start { 
+    padding: 12px 24px; 
+    font-size: 0.9rem; 
+  }
+  
+  .table-header {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+  
+  .table-header input {
+    width: 100% !important;
+  }
 }
 </style>
 </head>
@@ -470,8 +508,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <input type="hidden" id="taskEditId"/>
       <div class="row g-3">
         <div class="col-12"><label class="form-label">Task Name *</label><input type="text" class="form-control" id="t_name" placeholder="B. Card-1 Machine Maintenance"/></div>
-        <div class="col-md-6"><label class="form-label">Assign Doer *</label><select class="form-select" id="t_doer" onchange="autoFillDept()"><option value="">— Select Doer —</option></select></div>
-        <div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control" id="t_dept" placeholder="Auto-filled"/></div>
+        <div class="col-md-6">
+          <label class="form-label">Assign Doer * <span class="badge-admin" style="font-size: .65rem;">Loading...</span></label>
+          <select class="form-select" id="t_doer" onchange="autoFillDept()">
+            <option value="">— Select Doer —</option>
+          </select>
+        </div>
+        <div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control" id="t_dept" placeholder="Auto-filled" readonly/></div>
         <div class="col-md-6">
           <label class="form-label">Frequency *</label>
           <select class="form-select" id="t_freq">
@@ -513,22 +556,22 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <script>
 // ══════════════════════════════════════════════════════════════
-//  CHECKLIST — Supabase Web App
+//  CHECKLIST — Supabase Web App (UPDATED)
 // ══════════════════════════════════════════════════════════════
 
-// ── CONFIG (loaded from config.json) ─────────────────────────
+// ── CONFIG ─────────────────────────────────────────────────
 let SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
 let SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg";
 let sb = null;
 
 const APP_CONFIG = {
   APP_NAME:      "CheckList",
-  // Score formula: (onTime/total*100)-100  → range -100 to 0
-  SCORE_ON_TIME: 1,   // stored as 1/0 boolean-int; formula applied in buildLeaderboard
+  SCORE_ON_TIME: 1,
   SCORE_LATE:    0,
   ADMIN_USER:    "admin",
   ADMIN_PASS:    "Admin@1234",
   USER_PASS:     "User@1234",
+  EMAIL_FROM:    "mis@yajurfibres.com", // Admin email
 };
 
 let SESSION = { role: null, name: null, dept: null };
@@ -570,11 +613,8 @@ function showLogin() {
 }
 
 // ── SUPABASE TABLE INIT ───────────────────────────────────────
-// Tables are created via Supabase SQL editor (see setup guide)
-// This function just verifies connectivity
 async function initSupabaseTables() {
   if (!sb) return;
-  // Test connection by querying doers table
   await sb.from('doers').select('id').limit(1);
 }
 
@@ -603,9 +643,9 @@ async function doLogin() {
     return;
   }
 
-  // User login — check against doers table
+  // User login
   if (p === APP_CONFIG.USER_PASS) {
-    if (supabase) {
+    if (sb) {
       const { data } = await sb.from('doers')
         .select('*').ilike('name', u).limit(1);
       if (data && data.length > 0) {
@@ -614,13 +654,12 @@ async function doLogin() {
         return;
       }
     } else {
-      // No DB: demo mode
       SESSION = { role: 'user', name: u, dept: 'Demo' };
       startApp();
       return;
     }
   }
-  document.getElementById('loginError').textContent = 'Invalid credentials. Check username/password.';
+  document.getElementById('loginError').textContent = 'Invalid credentials.';
 }
 
 document.addEventListener('keydown', e => {
@@ -647,7 +686,6 @@ function doLogout() {
 
 // ── PAGE ROUTING ──────────────────────────────────────────────
 function showPage(page) {
-  // Mobile Support: Auto hide sidebar on selection
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
   if(sidebar) sidebar.classList.remove('show');
@@ -686,7 +724,6 @@ async function loadDashboard() {
   document.getElementById('st-pending').textContent = pending;
   document.getElementById('st-overdue').textContent = overdue;
 
-  // Charts
   const { data: scoring } = await sb.from('scoring').select('*');
   const sc = scoring || [];
   const onT = sc.filter(r => r.on_time).length;
@@ -708,13 +745,11 @@ function buildLeaderboard(scoring) {
     map[n].totalTasks++;
     r.on_time ? map[n].onTime++ : map[n].late++;
   });
-  // Formula: (onTime / totalTasks * 100) - 100
-  // -100 = all late, 0 = all on time
   Object.values(map).forEach(p => {
     p.score = p.totalTasks > 0
       ? Math.round((p.onTime / p.totalTasks) * 100) - 100
       : 0;
-    p.total = p.score; // alias for leaderboard display
+    p.total = p.score;
   });
   return Object.values(map).sort((a, b) => b.score - a.score);
 }
@@ -850,6 +885,7 @@ async function openTaskModal(id) {
     }
   } else {
     ['t_name','t_dept'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('t_doer').value = '';
     document.getElementById('t_freq').value = '2W';
     document.getElementById('t_date').value = new Date().toISOString().split('T')[0];
   }
@@ -859,12 +895,13 @@ function editTask(id) { openTaskModal(id); }
 
 async function loadDoersForSelect() {
   if (!sb) return;
-  const { data } = await sb.from('doers').select('name, department, Name, Department').order('name');
+  const { data } = await sb.from('doers').select('id, name, department').order('name');
   const sel = document.getElementById('t_doer');
   sel.innerHTML = '<option value="">— Select Doer —</option>' +
     (data||[]).map(d => {
-      const n = d.name||d.Name||''; const dep = d.department||d.Department||'';
-      return `<option value="${n}" data-dept="${dep}">${n} (${dep})</option>`;
+      const n = d.name||'';
+      const dep = d.department||'';
+      return `<option value="${n}" data-dept="${dep}" data-id="${d.id}">${n} (${dep})</option>`;
     }).join('');
 }
 
@@ -912,7 +949,6 @@ async function generateMaster() {
   const { data: tasks } = await sb.from('tasks').select('*');
   if (!tasks || !tasks.length) { toast('No tasks found.','error'); return; }
 
-  // Clear existing master
   await sb.from('master_schedule').delete().neq('id', 0);
 
   const rows = [];
@@ -937,7 +973,6 @@ async function generateMaster() {
     }
   }
 
-  // Insert in batches of 500
   for (let i = 0; i < rows.length; i += 500) {
     const { error } = await sb.from('master_schedule').insert(rows.slice(i, i+500));
     if (error) { toast('Error: '+error.message,'error'); return; }
@@ -960,7 +995,6 @@ function generateDates(startDate, freq, totalDays) {
 async function loadMaster() {
   if (!sb) return;
   const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
-  // Use a fresh tbody
   const t = document.getElementById('masterTbody');
   t.innerHTML = '';
   (data||[]).forEach(r => {
@@ -995,11 +1029,9 @@ async function loadScoring() {
   const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
   const scoring = sc || [];
 
-  // Leaderboard
   const lb = buildLeaderboard(scoring);
   renderLeaderboard(lb, 'scoringLeaderboard');
 
-  // Score chart
   const ctx = document.getElementById('chartScore').getContext('2d');
   if (chartScore) chartScore.destroy();
   const top10 = lb.slice(0, 10);
@@ -1012,7 +1044,6 @@ async function loadScoring() {
     options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
   });
 
-  // Score table
   const tbody = document.getElementById('scoreTbody');
   tbody.innerHTML = scoring.map(r => `
     <tr>
@@ -1060,12 +1091,6 @@ async function loadMyTasks() {
           </div>
         </div>
         <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
-            <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
-          </button>
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
-            <i class="bi bi-whatsapp" style="color:#25D366;"></i>
-          </button>
           <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
              Complete
           </button>
@@ -1074,7 +1099,6 @@ async function loadMyTasks() {
     </div>`;
   }).join('');
 
-  // Store tasks for submit
   window._pendingTasks = tasks;
 }
 
@@ -1132,11 +1156,9 @@ async function confirmSubmit() {
   const now = new Date();
   const planned = new Date(t.planned_date);
 
-  // On time = submitted before or on planned date (end of day)
   const plannedEOD = new Date(planned);
   plannedEOD.setHours(23, 59, 59, 999);
   const onTime = now <= plannedEOD;
-  // score column stores 1=ontime, 0=late; leaderboard uses formula
   const score  = onTime ? 1 : 0;
   const status = onTime ? 'Done On Time' : 'Done Late';
 
@@ -1155,11 +1177,9 @@ async function confirmSubmit() {
     remarks:       getV('chk_remarks'),
   };
 
-  // 1. Update master_schedule
   const { error: masterErr } = await sb.from('master_schedule').update(update).eq('id', t.id);
   if (masterErr) { toast('Error updating master: '+masterErr.message,'error'); return; }
 
-  // 2. Insert into done_list
   const { error: doneErr } = await sb.from('done_list').insert({
     doer_name:    t.doer_name,
     department:   t.department,
@@ -1174,7 +1194,6 @@ async function confirmSubmit() {
   });
   if (doneErr) console.warn('done_list insert:', doneErr.message);
 
-  // 3. Insert into scoring
   const { error: scoreErr } = await sb.from('scoring').insert({
     doer_name:    t.doer_name,
     department:   t.department,
@@ -1192,8 +1211,14 @@ async function confirmSubmit() {
   loadMyTasks();
 }
 
-// ── NOTIFICATIONS ─────────────────────────────────────────────
+// ── NOTIFICATIONS (ADMIN ONLY) ────────────────────────────────
 async function sendNotification(taskId, type) {
+  // Only admin can send notifications
+  if (SESSION.role !== 'admin') {
+    toast('Only admin can send notifications','error');
+    return;
+  }
+
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
   const { data: doers } = await sb.from('doers').select('*').ilike('name', t.doer_name).limit(1);
@@ -1202,9 +1227,11 @@ async function sendNotification(taskId, type) {
 
   if (type === 'email') {
     if (!doer.email) { toast('No email on file','error'); return; }
-    toast(`Email reminder sent to ${doer.email}`, 'success');
-    // In production: call a backend API / Supabase Edge Function to send email
-  } else {
+    // In production: call a backend API to send actual email from mis@yajurfibres.com
+    // For demo: show confirmation
+    toast(`Email reminder ready to send to ${doer.email}`, 'success');
+    // Here you would call: sendEmailViaBackend(doer.email, emailSubject, emailBody)
+  } else if (type === 'whatsapp') {
     const phone = (doer.whatsapp||'').replace(/\D/g,'');
     if (!phone) { toast('No WhatsApp number on file','error'); return; }
     const msg = encodeURIComponent(`Hello ${t.doer_name}, pending maintenance task:\n*Task:* ${t.task_name}\n*Planned:* ${fmtDate(t.planned_date)}\nPlease complete on time. — CheckList`);
@@ -1251,7 +1278,7 @@ function toast(msg, type='info') {
   setTimeout(() => div.remove(), 4500);
 }
 
-// Mobile Toggle Functionality
+// Mobile Toggle
 function toggleSidebar() {
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
