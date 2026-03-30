@@ -53,12 +53,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* LOGIN */
 #loginScreen{display:none;position:fixed;inset:0;background:linear-gradient(135deg,var(--primary-dark) 0%,#1565C0 50%,#1E88E5 100%);align-items:center;justify-content:center;z-index:1000;}
-.login-card{background:#fff;border-radius:20px;padding:48px 40px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .4s ease;}
+.login-card{background:#fff;border-radius:20px;padding:48px 40px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .4s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
 .login-logo{font-family:'Playfair Display',serif;color:var(--primary);font-size:2rem;text-align:center;margin-bottom:6px;}
 .login-sub{text-align:center;color:var(--text-muted);font-size:.82rem;margin-bottom:28px;letter-spacing:1px;text-transform:uppercase;}
 .login-tabs{display:flex;gap:0;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:24px;}
-.login-tab{flex:1;padding:8px;text-align:center;font-size:.84rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text-muted);transition:all .2s;border:none;}
+.login-tab{flex:1;padding:8px;text-align:center;font-size:.78rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text-muted);transition:all .2s;border:none;}
 .login-tab.active{background:var(--primary);color:#fff;}
 
 /* NAVBAR */
@@ -214,7 +214,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <i class="bi bi-shield-lock me-1"></i>Admin
       </button>
       <button class="login-tab" id="tabSuperAdmin" onclick="switchLoginTab('super_admin')">
-        <i class="bi bi-star me-1"></i>Super Admin
+        <i class="bi bi-person-badge me-1"></i>Super Admin
       </button>
       <button class="login-tab" id="tabUser" onclick="switchLoginTab('user')">
         <i class="bi bi-person me-1"></i>User
@@ -250,9 +250,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="app-layout">
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar" id="appSidebar">
-      <div id="adminMenuGroup" style="display:none;">
+      <div id="adminMenuGroup">
         <div class="section-label">Management</div>
-        <div class="sidebar-item" onclick="showPage('dashboard')" id="menu-dashboard"><i class="bi bi-speedometer2"></i>Dashboard</div>
+        <div class="sidebar-item active" onclick="showPage('dashboard')" id="menu-dashboard"><i class="bi bi-speedometer2"></i>Dashboard</div>
         <div class="sidebar-item" onclick="showPage('doers')" id="menu-doers"><i class="bi bi-people-fill"></i>Doers</div>
         <div class="sidebar-item" onclick="showPage('tasks')" id="menu-tasks"><i class="bi bi-list-task"></i>Tasks</div>
         <div class="sidebar-item" onclick="showPage('master')" id="menu-master"><i class="bi bi-table"></i>Master Schedule</div>
@@ -263,20 +263,49 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="section-label">My Work</div>
         <div class="sidebar-item active" onclick="showPage('myTasks')" id="menu-myTasks"><i class="bi bi-card-checklist"></i>My Tasks</div>
         <div class="sidebar-item" onclick="showPage('donelist')" id="menu-myDone"><i class="bi bi-check2-all"></i>Done List</div>
-        <div class="sidebar-item" id="menu-scoringUser" onclick="showPage('scoring')"><i class="bi bi-trophy-fill"></i>Scoring</div>
+        <div class="sidebar-item" onclick="showPage('scoring')" id="menu-myScoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
     </aside>
 
     <main class="main-content">
-      <!-- DASHBOARD (ADMIN) -->
-      <div class="page" id="page-dashboard">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
         <div class="page-title">Dashboard</div>
         <div class="page-sub">Maintenance Overview</div>
         <div class="row g-3 mb-4">
-          <div class="col-6 col-md-3"><div class="stat-card"><div class="d-flex align-items-center gap-2 gap-md-3"><div class="icon-wrap d-none d-md-flex" style="background:#E3F2FD;"><i class="bi bi-people-fill" style="color:var(--primary);"></i></div><div><div class="stat-val" id="st-doers">—</div><div class="stat-lbl">Doers</div></div></div></div></div>
-          <div class="col-6 col-md-3"><div class="stat-card"><div class="d-flex align-items-center gap-2 gap-md-3"><div class="icon-wrap d-none d-md-flex" style="background:#E8F5E9;"><i class="bi bi-check2-all" style="color:#2E7D32;"></i></div><div><div class="stat-val" id="st-done">—</div><div class="stat-lbl">Done</div></div></div></div></div>
-          <div class="col-6 col-md-3"><div class="stat-card"><div class="d-flex align-items-center gap-2 gap-md-3"><div class="icon-wrap d-none d-md-flex" style="background:#FFF3E0;"><i class="bi bi-clock-history" style="color:#E65100;"></i></div><div><div class="stat-val" id="st-pending">—</div><div class="stat-lbl">Pending</div></div></div></div></div>
-          <div class="col-6 col-md-3"><div class="stat-card"><div class="d-flex align-items-center gap-2 gap-md-3"><div class="icon-wrap d-none d-md-flex" style="background:#FFEBEE;"><i class="bi bi-exclamation-triangle-fill" style="color:#C62828;"></i></div><div><div class="stat-val" id="st-overdue">—</div><div class="stat-lbl">Overdue</div></div></div></div></div>
+          <div class="col-6 col-md-3">
+            <div class="stat-card">
+              <div class="d-flex align-items-center gap-2 gap-md-3">
+                <div class="icon-wrap d-none d-md-flex" style="background:#E3F2FD;"><i class="bi bi-people-fill" style="color:var(--primary);"></i></div>
+                <div><div class="stat-val" id="st-doers">—</div><div class="stat-lbl">Doers</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-card">
+              <div class="d-flex align-items-center gap-2 gap-md-3">
+                <div class="icon-wrap d-none d-md-flex" style="background:#E8F5E9;"><i class="bi bi-check2-all" style="color:#2E7D32;"></i></div>
+                <div><div class="stat-val" id="st-done">—</div><div class="stat-lbl">Done</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-card">
+              <div class="d-flex align-items-center gap-2 gap-md-3">
+                <div class="icon-wrap d-none d-md-flex" style="background:#FFF3E0;"><i class="bi bi-clock-history" style="color:#E65100;"></i></div>
+                <div><div class="stat-val" id="st-pending">—</div><div class="stat-lbl">Pending</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-card">
+              <div class="d-flex align-items-center gap-2 gap-md-3">
+                <div class="icon-wrap d-none d-md-flex" style="background:#FFEBEE;"><i class="bi bi-exclamation-triangle-fill" style="color:#C62828;"></i></div>
+                <div><div class="stat-val" id="st-overdue">—</div><div class="stat-lbl">Overdue</div></div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="row g-3">
           <div class="col-md-6"><div class="chart-card"><div class="chart-title"><i class="bi bi-pie-chart-fill me-2" style="color:var(--primary);"></i>Compliance Rate</div><canvas id="chartCompliance" height="200"></canvas></div></div>
@@ -285,189 +314,1000 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
 
-      <!-- DOERS (ADMIN) -->
+      <!-- DOERS -->
       <div class="page" id="page-doers">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div><div class="page-title">Doers</div><div class="page-sub">Manage maintenance personnel</div></div>
-          <div class="d-flex gap-2"><button class="btn-primary-custom" onclick="openDoerModal()"><i class="bi bi-plus-lg me-1"></i>Add</button><button class="btn-sm-icon" onclick="exportCsv('doers')" title="Export CSV"><i class="bi bi-download"></i></button></div>
+          <div class="d-flex gap-2">
+            <button class="btn-primary-custom" onclick="openDoerModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
+            <button class="btn-sm-icon" onclick="exportCsv('doers')" title="Export CSV"><i class="bi bi-download"></i></button>
+          </div>
         </div>
-        <div class="card-table"><div class="table-header"><span class="table-title"><i class="bi bi-people me-2"></i>Doer List</span><input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('doerTable',this.value)"/></div><div class="table-scroll"><table class="table" id="doerTable"><thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>User Type</th><th>Actions</th></tr></thead><tbody id="doerTbody"></tbody></table></div></div>
+        <div class="card-table">
+          <div class="table-header">
+            <span class="table-title"><i class="bi bi-people me-2"></i>Doer List</span>
+            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('doerTable',this.value)"/>
+          </div>
+          <div class="table-scroll">
+            <table class="table" id="doerTable">
+              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>User Type</th><th>Actions</th></tr></thead>
+              <tbody id="doerTbody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <!-- TASKS (ADMIN) -->
+      <!-- TASKS -->
       <div class="page" id="page-tasks">
         <div class="d-flex align-items-center justify-content-between mb-2">
           <div><div class="page-title">Tasks</div><div class="page-sub">Define maintenance tasks & frequency</div></div>
-          <div class="d-flex gap-2"><button class="btn-primary-custom" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button><button class="btn-sm-icon" onclick="exportCsv('tasks')" title="Export CSV"><i class="bi bi-download"></i></button></div>
+          <div class="d-flex gap-2">
+            <button class="btn-primary-custom" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
+            <button class="btn-sm-icon" onclick="exportCsv('tasks')" title="Export CSV"><i class="bi bi-download"></i></button>
+          </div>
         </div>
-        <div class="text-center mb-3 mt-2"><button class="btn-start" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button><div style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">Generates 2-year schedule based on all tasks above</div></div>
-        <div class="card-table"><div class="table-header"><span class="table-title"><i class="bi bi-list-task me-2"></i>Task List</span><input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('taskTable',this.value)"/></div><div class="table-scroll"><table class="table" id="taskTable"><thead><tr><th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th>Actions</th></tr></thead><tbody id="taskTbody"></tbody></table></div></div>
+        <div class="text-center mb-3 mt-2">
+          <button class="btn-start" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button>
+          <div style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">Generates 2-year schedule based on all tasks above</div>
+        </div>
+        <div class="card-table">
+          <div class="table-header">
+            <span class="table-title"><i class="bi bi-list-task me-2"></i>Task List</span>
+            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('taskTable',this.value)"/>
+          </div>
+          <div class="table-scroll">
+            <table class="table" id="taskTable">
+              <thead><tr><th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th>Actions</th></tr></thead>
+              <tbody id="taskTbody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <!-- MASTER (ADMIN) -->
+      <!-- MASTER -->
       <div class="page" id="page-master">
-        <div class="d-flex align-items-center justify-content-between mb-3"><div><div class="page-title">Master Schedule</div><div class="page-sub">Auto-generated 2-year maintenance calendar</div></div><button class="btn-sm-icon" onclick="exportCsv('master_schedule')" title="Export CSV"><i class="bi bi-download"></i> CSV</button></div>
-        <div class="card-table"><div class="table-header"><span class="table-title"><i class="bi bi-calendar2-week me-2"></i>All Scheduled Tasks</span><input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('masterTable',this.value)"/></div><div class="table-scroll"><table class="table" id="masterTable"><thead><tr><th>Name</th><th>Department</th><th>Task ID</th><th>Freq</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th></tr></thead><tbody id="masterTbody"></tbody></table></div></div>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div><div class="page-title">Master Schedule</div><div class="page-sub">Auto-generated 2-year maintenance calendar</div></div>
+          <button class="btn-sm-icon" onclick="exportCsv('master_schedule')" title="Export CSV"><i class="bi bi-download"></i> CSV</button>
+        </div>
+        <div class="card-table">
+          <div class="table-header">
+            <span class="table-title"><i class="bi bi-calendar2-week me-2"></i>All Scheduled Tasks</span>
+            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('masterTable',this.value)"/>
+          </div>
+          <div class="table-scroll">
+            <table class="table" id="masterTable">
+              <thead><tr><th>Name</th><th>Department</th><th>Task ID</th><th>Freq</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th></tr></thead>
+              <tbody id="masterTbody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <!-- DONE LIST (READONLY FOR ALL) -->
+      <!-- DONE LIST -->
       <div class="page" id="page-donelist">
-        <div class="d-flex align-items-center justify-content-between mb-3"><div><div class="page-title">Done List</div><div class="page-sub">Completed maintenance records</div></div><button class="btn-sm-icon" id="doneExportBtn" onclick="exportCsv('done_list')" title="Export CSV"><i class="bi bi-download"></i> CSV</button></div>
-        <div class="card-table"><div class="table-header"><span class="table-title"><i class="bi bi-check2-all me-2"></i>Completed Tasks</span><input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('doneTable',this.value)"/></div><div class="table-scroll"><table class="table" id="doneTable"><thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th><th>Submitted By</th><th>On</th></tr></thead><tbody id="doneTbody"></tbody></table></div></div>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div><div class="page-title">Done List</div><div class="page-sub">Completed maintenance records</div></div>
+          <button class="btn-sm-icon" id="doneExportBtn" onclick="exportCsv('done_list')" title="Export CSV"><i class="bi bi-download"></i> CSV</button>
+        </div>
+        <div class="card-table">
+          <div class="table-header">
+            <span class="table-title"><i class="bi bi-check2-all me-2"></i>Completed Tasks</span>
+            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('doneTable',this.value)"/>
+          </div>
+          <div class="table-scroll">
+            <table class="table" id="doneTable">
+              <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th><th>Submitted By</th><th>On</th></tr></thead>
+              <tbody id="doneTbody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <!-- SCORING (ADMIN/SUPER ADMIN) -->
+      <!-- SCORING -->
       <div class="page" id="page-scoring">
-        <div class="d-flex align-items-center justify-content-between mb-3"><div><div class="page-title">Scoring & Leaderboard</div><div class="page-sub">+10 On Time &nbsp;|&nbsp; -100 Late</div></div><button class="btn-sm-icon" onclick="exportCsv('scoring')" title="Export CSV"><i class="bi bi-download"></i> CSV</button></div>
-        <div class="row g-3"><div class="col-md-5"><div class="card-table h-100"><div class="table-header"><span class="table-title"><i class="bi bi-trophy me-2" style="color:var(--gold);"></i>Leaderboard</span></div><div id="scoringLeaderboard" style="padding:16px;"></div></div></div><div class="col-md-7"><div class="chart-card"><div class="chart-title">Score Distribution</div><canvas id="chartScore" height="180"></canvas></div></div><div class="col-12"><div class="card-table"><div class="table-header"><span class="table-title">All Score Records</span></div><div class="table-scroll"><table class="table" id="scoreTable"><thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>On Time</th><th>Score</th><th>Date</th></tr></thead><tbody id="scoreTbody"></tbody></table></div></div></div></div>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div><div class="page-title">Scoring & Leaderboard</div><div class="page-sub">+10 On Time &nbsp;|&nbsp; -100 Late</div></div>
+          <button class="btn-sm-icon" onclick="exportCsv('scoring')" title="Export CSV"><i class="bi bi-download"></i> CSV</button>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-5">
+            <div class="card-table h-100">
+              <div class="table-header"><span class="table-title"><i class="bi bi-trophy me-2" style="color:var(--gold);"></i>Leaderboard</span></div>
+              <div id="scoringLeaderboard" style="padding:16px;"></div>
+            </div>
+          </div>
+          <div class="col-md-7">
+            <div class="chart-card"><div class="chart-title">Score Distribution</div><canvas id="chartScore" height="180"></canvas></div>
+          </div>
+          <div class="col-12">
+            <div class="card-table">
+              <div class="table-header"><span class="table-title">All Score Records</span></div>
+              <div class="table-scroll">
+                <table class="table" id="scoreTable">
+                  <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>On Time</th><th>Score</th><th>Date</th></tr></thead>
+                  <tbody id="scoreTbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- MY TASKS (USER/SUPER ADMIN) -->
+      <!-- MY TASKS (USER) -->
       <div class="page" id="page-myTasks">
         <div class="page-title">My Pending Tasks</div>
         <div class="page-sub">Tasks due within the next 10 days</div>
         <div id="myTasksContainer"></div>
       </div>
+
     </main>
   </div>
 </div>
 
-<!-- MODALS (same as before, omitted for brevity but preserved functionality) -->
-<div class="modal fade" id="doerModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Doer</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="hidden" id="doerEditId"/><div class="row g-3"><div class="col-md-6"><label class="form-label">Full Name *</label><input type="text" class="form-control" id="d_name"/></div><div class="col-md-6"><label class="form-label">Department *</label><input type="text" class="form-control" id="d_dept"/></div><div class="col-md-6"><label class="form-label">Email Address</label><input type="email" class="form-control" id="d_email"/></div><div class="col-md-6"><label class="form-label">Phone Number</label><input type="text" class="form-control" id="d_phone"/></div><div class="col-md-6"><label class="form-label">WhatsApp Number (with country code)</label><input type="text" class="form-control" id="d_wa"/></div><div class="col-md-6"><label class="form-label">User Type</label><select class="form-select" id="d_usertype"><option value="User">User</option><option value="Super Admin">Super Admin</option><option value="Admin">Admin</option></select></div></div></div><div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn-primary-custom" onclick="saveDoer()">Save Doer</button></div></div></div></div>
-<div class="modal fade" id="taskModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-list-task me-2"></i>Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="hidden" id="taskEditId"/><div class="row g-3"><div class="col-12"><label class="form-label">Task Name *</label><input type="text" class="form-control" id="t_name"/></div><div class="col-md-6"><label class="form-label">Assign Doer *</label><select class="form-select" id="t_doer" onchange="autoFillDept()"><option value="">— Select Doer —</option></select></div><div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control" id="t_dept"/></div><div class="col-md-6"><label class="form-label">Frequency *</label><select class="form-select" id="t_freq"><option value="D">Daily (D)</option><option value="W">Weekly (W)</option><option value="2W">Fortnightly / 15 days (2W)</option><option value="M">Monthly (M)</option><option value="2M">Every 2 Months (2M)</option><option value="3M">Every 3 Months (3M)</option><option value="6M">Half Yearly (6M)</option><option value="Y">Yearly (Y)</option><option value="2Y">Every 2 Years (2Y)</option></select></div><div class="col-md-6"><label class="form-label">Start Date *</label><input type="date" class="form-control" id="t_date"/></div></div></div><div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn-primary-custom" onclick="saveTask()">Save Task</button></div></div></div></div>
-<div class="modal fade" id="submitModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-clipboard2-check me-2"></i>Complete Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="submitModalBody"></div><div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn-success-custom" onclick="confirmSubmit()">Submit Completion</button></div></div></div></div>
+<!-- DOER MODAL -->
+<div class="modal fade" id="doerModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Doer</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="doerEditId"/>
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label">Full Name *</label><input type="text" class="form-control" id="d_name" placeholder="Swapan Kr Ghorai"/></div>
+        <div class="col-md-6"><label class="form-label">Department *</label><input type="text" class="form-control" id="d_dept" placeholder="Yarn Division"/></div>
+        <div class="col-md-6"><label class="form-label">Email Address</label><input type="email" class="form-control" id="d_email" placeholder="name@company.com"/></div>
+        <div class="col-md-6"><label class="form-label">Phone Number</label><input type="text" class="form-control" id="d_phone" placeholder="+91 9000000000"/></div>
+        <div class="col-md-6"><label class="form-label">WhatsApp Number (with country code)</label><input type="text" class="form-control" id="d_wa" placeholder="919000000000"/></div>
+        <div class="col-md-6">
+          <label class="form-label">User Type</label>
+          <select class="form-select" id="d_usertype">
+            <option value="User">User</option>
+            <option value="Super Admin">Super Admin</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn-primary-custom" onclick="saveDoer()"><i class="bi bi-check-lg me-1"></i>Save Doer</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- TASK MODAL -->
+<div class="modal fade" id="taskModal" tabindex="-1">
+  <div class="modal-dialog modal-lg"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-list-task me-2"></i>Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="taskEditId"/>
+      <div class="row g-3">
+        <div class="col-12"><label class="form-label">Task Name *</label><input type="text" class="form-control" id="t_name" placeholder="B. Card-1 Machine Maintenance"/></div>
+        <div class="col-md-6"><label class="form-label">Assign Doer *</label><select class="form-select" id="t_doer" onchange="autoFillDept()"><option value="">— Select Doer —</option></select></div>
+        <div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control" id="t_dept" placeholder="Auto-filled"/></div>
+        <div class="col-md-6">
+          <label class="form-label">Frequency *</label>
+          <select class="form-select" id="t_freq">
+            <option value="D">Daily (D)</option>
+            <option value="W">Weekly (W)</option>
+            <option value="2W" selected>Fortnightly / 15 days (2W)</option>
+            <option value="M">Monthly (M)</option>
+            <option value="2M">Every 2 Months (2M)</option>
+            <option value="3M">Every 3 Months (3M)</option>
+            <option value="6M">Half Yearly (6M)</option>
+            <option value="Y">Yearly (Y)</option>
+            <option value="2Y">Every 2 Years (2Y)</option>
+          </select>
+        </div>
+        <div class="col-md-6"><label class="form-label">Start Date *</label><input type="date" class="form-control" id="t_date"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn-primary-custom" onclick="saveTask()"><i class="bi bi-check-lg me-1"></i>Save Task</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- SUBMIT TASK MODAL -->
+<div class="modal fade" id="submitModal" tabindex="-1">
+  <div class="modal-dialog modal-lg"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-clipboard2-check me-2"></i>Complete Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body" id="submitModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn-success-custom" onclick="confirmSubmit()"><i class="bi bi-check2-circle me-1"></i>Submit Completion</button>
+    </div>
+  </div></div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// Supabase config
-let SUPABASE_URL = "https://xfecmmhabdjnudqfyrqz.supabase.co";
+// ══════════════════════════════════════════════════════════════
+//  CHECKLIST — Supabase Web App
+// ══════════════════════════════════════════════════════════════
+
+// ── CONFIG (loaded from config.json) ─────────────────────────
+let SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
 let SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg";
 let sb = null;
-const APP_CONFIG = { APP_NAME:"CheckList", ADMIN_USER:"admin", ADMIN_PASS:"Admin@1234", USER_PASS:"User@1234" };
-let SESSION = { role: null, name: null, dept: null, id: null };
-let DOERS_CACHE = [], TASKS_CACHE = [], currentSubmitTask = null;
-let chartCompliance, chartDept, chartScore;
 
+const APP_CONFIG = {
+  APP_NAME:      "CheckList",
+  // Score formula: (onTime/total*100)-100  → range -100 to 0
+  SCORE_ON_TIME: 1,   // stored as 1/0 boolean-int; formula applied in buildLeaderboard
+  SCORE_LATE:    0,
+  ADMIN_USER:    "admin",
+  ADMIN_PASS:    "Admin@1234",
+  USER_PASS:     "User@1234",
+};
+
+let SESSION = { role: null, name: null, dept: null };
+let DOERS_CACHE = [];
+let TASKS_CACHE = [];
+let currentSubmitTask = null;
+let chartCompliance = null, chartDept = null, chartScore = null;
+
+// ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
-  setLoadStatus("Connecting...");
-  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-  await initSupabaseTables();
-  setLoadStatus("Ready!");
-  await new Promise(r => setTimeout(r, 400));
+  setLoadStatus("Connecting to database...");
+
+  try {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    setLoadStatus("Initializing tables...");
+    await initSupabaseTables();
+    setLoadStatus("Ready!");
+    await new Promise(r => setTimeout(r, 400));
+  } catch(e) {
+    console.error(e);
+    setLoadStatus("⚠️ DB connection issue: " + e.message);
+    await new Promise(r => setTimeout(r, 2000));
+  }
   hideLoading();
   showLogin();
 });
-function setLoadStatus(msg) { let el = document.getElementById('loadStatus'); if(el) el.textContent = msg; }
-function hideLoading() { let el = document.getElementById('loadingScreen'); el.style.opacity='0'; setTimeout(()=>el.style.display='none',400); }
-function showLogin() { document.getElementById('loginScreen').style.display='flex'; }
-async function initSupabaseTables() { if(sb) await sb.from('doers').select('id').limit(1); }
 
+function setLoadStatus(msg) {
+  const el = document.getElementById('loadStatus');
+  if (el) el.textContent = msg;
+}
+function hideLoading() {
+  const el = document.getElementById('loadingScreen');
+  el.style.opacity = '0';
+  setTimeout(() => el.style.display = 'none', 400);
+}
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+
+// ── SUPABASE TABLE INIT ───────────────────────────────────────
+// Tables are created via Supabase SQL editor (see setup guide)
+// This function just verifies connectivity
+async function initSupabaseTables() {
+  if (!sb) return;
+  // Test connection by querying doers table
+  await sb.from('doers').select('id').limit(1);
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────
 let loginTab = 'admin';
 function switchLoginTab(tab) {
   loginTab = tab;
-  document.getElementById('tabAdmin').classList.toggle('active', tab==='admin');
-  document.getElementById('tabSuperAdmin').classList.toggle('active', tab==='super_admin');
-  document.getElementById('tabUser').classList.toggle('active', tab==='user');
-  document.getElementById('loginUser').value = (tab==='admin') ? 'admin' : '';
+  document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
+  document.getElementById('tabSuperAdmin').classList.toggle('active', tab === 'super_admin');
+  document.getElementById('tabUser').classList.toggle('active', tab === 'user');
+  document.getElementById('loginUser').value = tab === 'admin' ? 'admin' : '';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginError').textContent = '';
 }
 
 async function doLogin() {
-  let u = document.getElementById('loginUser').value.trim();
-  let p = document.getElementById('loginPass').value;
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
   document.getElementById('loginError').textContent = '';
-  if(!u || !p) { document.getElementById('loginError').textContent='Please enter credentials.'; return; }
-  if(u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
-    SESSION = { role:'admin', name:'Administrator', dept:'' };
-    startApp(); return;
+
+  if (!u || !p) { document.getElementById('loginError').textContent = 'Please enter credentials.'; return; }
+
+  // Admin login
+  if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
+    SESSION = { role: 'admin', name: 'Administrator', dept: '' };
+    startApp();
+    return;
   }
-  if(p === APP_CONFIG.USER_PASS && sb) {
-    let { data } = await sb.from('doers').select('*').ilike('name', u).limit(1);
-    if(data && data.length) {
-      let userType = data[0].user_type || 'User';
-      SESSION = { role: userType.toLowerCase().replace(' ','_'), name: data[0].name, dept: data[0].department, id: data[0].id };
-      startApp(); return;
+
+  // User login (Super Admin or User) — check against doers table
+  if (p === APP_CONFIG.USER_PASS) {
+    if (sb) {
+      const { data } = await sb.from('doers')
+        .select('*').ilike('name', u).limit(1);
+      if (data && data.length > 0) {
+        // Map database user_type to the session role
+        const dbRole = (data[0].user_type || 'User').toLowerCase().replace(' ', '_');
+        SESSION = { role: dbRole, name: data[0].name, dept: data[0].department, id: data[0].id };
+        startApp();
+        return;
+      }
+    } else {
+      // No DB: demo mode
+      SESSION = { role: loginTab, name: u, dept: 'Demo' };
+      startApp();
+      return;
     }
   }
-  document.getElementById('loginError').textContent='Invalid credentials. Check username/password.';
+  document.getElementById('loginError').textContent = 'Invalid credentials. Check username/password.';
 }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') doLogin();
+});
 
 function startApp() {
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('appShell').style.display='block';
-  document.getElementById('navRole').textContent = SESSION.role.toUpperCase();
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appShell').style.display = 'block';
+  document.getElementById('navRole').textContent = SESSION.role.toUpperCase().replace('_', ' ');
   document.getElementById('navUser').textContent = SESSION.name;
-  let isAdmin = (SESSION.role === 'admin');
-  let isSuperAdmin = (SESSION.role === 'super_admin');
-  let isUser = (SESSION.role === 'user');
-  document.getElementById('adminMenuGroup').style.display = isAdmin ? 'block' : 'none';
-  document.getElementById('userMenuGroup').style.display = (isSuperAdmin || isUser) ? 'block' : 'none';
-  let scoringMenuItem = document.getElementById('menu-scoringUser');
-  if(scoringMenuItem) scoringMenuItem.style.display = (isAdmin || isSuperAdmin) ? 'flex' : 'none';
-  let doneExport = document.getElementById('doneExportBtn');
-  if(doneExport) doneExport.style.display = (isAdmin || isSuperAdmin) ? 'inline-flex' : 'none';
-  showPage(isAdmin ? 'dashboard' : 'myTasks');
-  if(isAdmin) loadDashboard();
-  else if(isSuperAdmin) loadMyTasks();
-  else if(isUser) loadMyTasksReadonly();
-}
-function doLogout() { SESSION={}; document.getElementById('appShell').style.display='none'; showLogin(); }
+  
+  const isAdmin = SESSION.role === 'admin';
+  const isSuper = SESSION.role === 'super_admin';
+  const isUser  = SESSION.role === 'user';
 
-function showPage(page) {
-  let sidebar = document.getElementById('appSidebar'), overlay = document.getElementById('sidebarOverlay');
-  if(sidebar) sidebar.classList.remove('show'); if(overlay) overlay.classList.remove('show');
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
-  let el = document.getElementById('page-'+page); if(el) el.classList.add('active');
-  let m = document.getElementById('menu-'+page); if(m) m.classList.add('active');
-  let loaders = { dashboard:loadDashboard, doers:loadDoers, tasks:loadTasks, master:loadMaster, donelist:loadDoneList, scoring:loadScoring, myTasks:()=>{ if(SESSION.role==='user') loadMyTasksReadonly(); else loadMyTasks(); } };
-  if(loaders[page]) loaders[page]();
+  document.getElementById('adminMenuGroup').style.display = isAdmin ? '' : 'none';
+  document.getElementById('userMenuGroup').style.display  = (isSuper || isUser)  ? '' : 'none';
+  
+  // Custom visibility for "User" role (Non-editable constraints)
+  if (isUser) {
+    document.getElementById('menu-myScoring').style.display = 'none';
+    const exportBtn = document.getElementById('doneExportBtn');
+    if(exportBtn) exportBtn.style.display = 'none';
+  } else {
+    document.getElementById('menu-myScoring').style.display = 'flex';
+    const exportBtn = document.getElementById('doneExportBtn');
+    if(exportBtn) exportBtn.style.display = 'block';
+  }
+
+  showPage(isAdmin ? 'dashboard' : 'myTasks');
 }
-async function loadMyTasksReadonly() { await loadMyTasks(true); }
-async function loadMyTasks(readonly = false) {
-  if(!sb) { showNoTaskMsg(); return; }
-  let now = new Date(), limit = new Date(now.getTime()+10*86400000);
-  let { data } = await sb.from('master_schedule').select('*').ilike('doer_name',SESSION.name).is('status',null).lte('planned_date',limit.toISOString()).order('planned_date');
-  let tasks = data||[];
-  let el = document.getElementById('myTasksContainer');
-  if(!tasks.length) { showNoTaskMsg(); return; }
-  el.innerHTML = tasks.map(t=>{
-    let planned = new Date(t.planned_date), overdue = planned<now, daysLeft = Math.round((planned-now)/86400000);
-    let actionBtns = readonly ? '' : `<div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
-      <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email"><i class="bi bi-envelope-fill" style="color:var(--primary);"></i></button>
-      <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp"><i class="bi bi-whatsapp" style="color:#25D366;"></i></button>
-      <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">Complete</button>
+
+function doLogout() {
+  SESSION = {};
+  document.getElementById('appShell').style.display = 'none';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').textContent = '';
+  showLogin();
+}
+
+// ── PAGE ROUTING ──────────────────────────────────────────────
+function showPage(page) {
+  // Mobile Support: Auto hide sidebar on selection
+  const sidebar = document.getElementById('appSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if(sidebar) sidebar.classList.remove('show');
+  if(overlay) overlay.classList.remove('show');
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  const m = document.getElementById('menu-' + page);
+  if (m) m.classList.add('active');
+  
+  // Adjust "My Done" menu item activation
+  if(page === 'donelist' && SESSION.role !== 'admin') {
+      document.getElementById('menu-myDone').classList.add('active');
+  }
+
+  const loaders = {
+    dashboard: loadDashboard, doers: loadDoers, tasks: loadTasks,
+    master: loadMaster, donelist: loadDoneList, scoring: loadScoring, myTasks: loadMyTasks
+  };
+  if (loaders[page]) loaders[page]();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function loadDashboard() {
+  if (!sb) return;
+  const [{ count: dCount }, { data: master }, { data: done }] = await Promise.all([
+    sb.from('doers').select('*', { count: 'exact', head: true }),
+    sb.from('master_schedule').select('status, planned_date'),
+    sb.from('done_list').select('id', { count: 'exact', head: false }),
+  ]);
+  const now = new Date();
+  let pending = 0, overdue = 0;
+  (master || []).forEach(r => {
+    if (!r.status) {
+      new Date(r.planned_date) < now ? overdue++ : pending++;
+    }
+  });
+  document.getElementById('st-doers').textContent   = dCount || 0;
+  document.getElementById('st-done').textContent    = (done || []).length;
+  document.getElementById('st-pending').textContent = pending;
+  document.getElementById('st-overdue').textContent = overdue;
+
+  // Charts
+  const { data: scoring } = await sb.from('scoring').select('*');
+  const sc = scoring || [];
+  const onT = sc.filter(r => r.on_time).length;
+  const late = sc.filter(r => !r.on_time).length;
+  renderComplianceChart({ labels: ['On Time', 'Late'], data: [onT, late] });
+
+  const deptMap = {};
+  sc.forEach(r => { const d = r.department||'Unknown'; deptMap[d] = (deptMap[d]||0)+1; });
+  renderDeptChart({ labels: Object.keys(deptMap), data: Object.values(deptMap) });
+  renderLeaderboard(buildLeaderboard(sc), 'leaderboardEl');
+}
+
+function buildLeaderboard(scoring) {
+  const map = {};
+  (scoring || []).forEach(r => {
+    const n = r.doer_name || '';
+    if (!n) return;
+    if (!map[n]) map[n] = { name: n, dept: r.department||'', totalTasks: 0, onTime: 0, late: 0, score: 0 };
+    map[n].totalTasks++;
+    r.on_time ? map[n].onTime++ : map[n].late++;
+  });
+  // Formula: (onTime / totalTasks * 100) - 100
+  // -100 = all late, 0 = all on time
+  Object.values(map).forEach(p => {
+    p.score = p.totalTasks > 0
+      ? Math.round((p.onTime / p.totalTasks) * 100) - 100
+      : 0;
+    p.total = p.score; // alias for leaderboard display
+  });
+  return Object.values(map).sort((a, b) => b.score - a.score);
+}
+
+function renderComplianceChart(d) {
+  const ctx = document.getElementById('chartCompliance').getContext('2d');
+  if (chartCompliance) chartCompliance.destroy();
+  chartCompliance = new Chart(ctx, { type: 'doughnut', data: { labels: d.labels, datasets: [{ data: d.data, backgroundColor: ['#1565C0','#C62828'], borderWidth: 0 }] }, options: { plugins: { legend: { position: 'bottom' } }, cutout: '65%' } });
+}
+function renderDeptChart(d) {
+  const ctx = document.getElementById('chartDept').getContext('2d');
+  if (chartDept) chartDept.destroy();
+  chartDept = new Chart(ctx, { type: 'bar', data: { labels: d.labels, datasets: [{ label: 'Tasks', data: d.data, backgroundColor: '#1976D2', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
+}
+function renderLeaderboard(data, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!data.length) { el.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:20px;">No data yet</div>'; return; }
+  el.innerHTML = data.slice(0,5).map((p, i) => {
+    const rc = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    const scoreColor = p.total >= 0 ? 'var(--primary)' : 'var(--danger)';
+    return `<div class="score-card">
+      <div class="score-rank ${rc}">${i+1}</div>
+      <div style="flex:1;"><div style="font-weight:700;">${p.name}</div><div style="font-size:.76rem;color:var(--text-muted);">${p.dept}</div></div>
+      <div style="text-align:right;">
+        <div style="font-size:1.4rem;font-weight:700;color:${scoreColor};">${p.score}</div>
+        <div style="font-size:.7rem;color:var(--text-muted);">score (max 0)</div>
+        <div style="font-size:.72rem;margin-top:2px;"><span style="color:#2E7D32;">✓ ${p.onTime}</span> &nbsp; <span style="color:#C62828;">✗ ${p.late}</span></div>
+      </div>
     </div>`;
-    return `<div class="card-table mb-3"><div class="table-header d-flex flex-column flex-md-row gap-3 align-items-start align-items-md-center" style="background:${overdue?'#FFEBEE':'#E3F2FD'};"><div class="flex-grow-1"><div style="font-weight:700;color:${overdue?'#C62828':'var(--primary-dark)'};"><i class="bi bi-gear-fill me-2"></i>${t.task_name}</div><div style="font-size:.78rem;color:var(--text-muted);margin-top:3px;">Dept: ${t.department} &nbsp;|&nbsp; Freq: <span class="badge-freq">${t.frequency}</span><br class="d-md-none"> Planned: <strong>${fmtDate(t.planned_date)}</strong>${overdue?' &nbsp;<span class="badge-late">OVERDUE</span>':` &nbsp;<span class="badge-pending">${daysLeft}d left</span>`}</div></div>${actionBtns}</div></div>`;
   }).join('');
+}
+
+// ── DOERS ─────────────────────────────────────────────────────
+async function loadDoers() {
+  if (!sb) return;
+  const { data } = await sb.from('doers').select('*').order('created_at', { ascending: true });
+  DOERS_CACHE = data || [];
+  const tbody = document.getElementById('doerTbody');
+  tbody.innerHTML = DOERS_CACHE.map((r, i) => `
+     <tr>
+       <td>${i+1}</td>
+       <td><strong>${r.name||''}</strong></td>
+       <td>${r.department||''}</td>
+       <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
+       <td>${r.phone||''}</td>
+       <td>${r.whatsapp||''}</td>
+       <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
+       <td>
+         <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
+         <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
+       </td>
+     </tr>`).join('');
+}
+
+function openDoerModal(id) {
+  document.getElementById('doerEditId').value = id || '';
+  if (id) {
+    const r = DOERS_CACHE.find(d => d.id === id);
+    if (r) {
+      document.getElementById('d_name').value  = r.name||'';
+      document.getElementById('d_dept').value  = r.department||'';
+      document.getElementById('d_email').value = r.email||'';
+      document.getElementById('d_phone').value = r.phone||'';
+      document.getElementById('d_wa').value    = r.whatsapp||'';
+      document.getElementById('d_usertype').value = r.user_type||'User';
+    }
+  } else {
+    ['d_name','d_dept','d_email','d_phone','d_wa'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('d_usertype').value = 'User';
+  }
+  new bootstrap.Modal(document.getElementById('doerModal')).show();
+}
+function editDoer(id) { openDoerModal(id); }
+
+async function saveDoer() {
+  const name = document.getElementById('d_name').value.trim();
+  if (!name) { toast('Name is required','error'); return; }
+  const row = {
+    name, 
+    department: document.getElementById('d_dept').value.trim(),
+    email: document.getElementById('d_email').value.trim(),
+    phone: document.getElementById('d_phone').value.trim(),
+    whatsapp: document.getElementById('d_wa').value.trim(),
+    user_type: document.getElementById('d_usertype').value
+  };
+  const id = document.getElementById('doerEditId').value;
+  bootstrap.Modal.getInstance(document.getElementById('doerModal')).hide();
+  if (id) {
+    const { error } = await sb.from('doers').update(row).eq('id', id);
+    error ? toast('Update failed: '+error.message,'error') : toast('Doer updated','success');
+  } else {
+    const { error } = await sb.from('doers').insert(row);
+    error ? toast('Insert failed: '+error.message,'error') : toast('Doer added','success');
+  }
+  loadDoers();
+}
+
+async function deleteDoer(id) {
+  if (!confirm('Delete this doer?')) return;
+  await sb.from('doers').delete().eq('id', id);
+  toast('Doer deleted','info');
+  loadDoers();
+}
+
+// ── TASKS ─────────────────────────────────────────────────────
+async function loadTasks() {
+  if (!sb) return;
+  const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
+  TASKS_CACHE = data || [];
+  const tbody = document.getElementById('taskTbody');
+  tbody.innerHTML = TASKS_CACHE.map((r, i) => `
+     <tr>
+       <td>${r.id}</td>
+       <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
+       <td>${r.Doer_Name||r.doer_name||''}</td>
+       <td>${r.Department||r.department||''}</td>
+       <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
+       <td>${r.Start_Date||r.start_date||''}</td>
+       <td>
+         <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
+         <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
+       </td>
+     </tr>`).join('');
+}
+
+async function openTaskModal(id) {
+  await loadDoersForSelect();
+  document.getElementById('taskEditId').value = id || '';
+  if (id) {
+    const r = TASKS_CACHE.find(t => t.id === id);
+    if (r) {
+      document.getElementById('t_name').value = r.Task_Name||r.task_name||'';
+      document.getElementById('t_doer').value = r.Doer_Name||r.doer_name||'';
+      document.getElementById('t_dept').value = r.Department||r.department||'';
+      document.getElementById('t_freq').value = r.Frequency||r.frequency||'2W';
+      document.getElementById('t_date').value = r.Start_Date||r.start_date||'';
+    }
+  } else {
+    ['t_name','t_dept'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('t_freq').value = '2W';
+    document.getElementById('t_date').value = new Date().toISOString().split('T')[0];
+  }
+  new bootstrap.Modal(document.getElementById('taskModal')).show();
+}
+function editTask(id) { openTaskModal(id); }
+
+async function loadDoersForSelect() {
+  if (!sb) return;
+  const { data } = await sb.from('doers').select('name, department, Name, Department').order('name');
+  const sel = document.getElementById('t_doer');
+  sel.innerHTML = '<option value="">— Select Doer —</option>' +
+    (data||[]).map(d => {
+      const n = d.name||d.Name||''; const dep = d.department||d.Department||'';
+      return `<option value="${n}" data-dept="${dep}">${n} (${dep})</option>`;
+    }).join('');
+}
+
+function autoFillDept() {
+  const sel = document.getElementById('t_doer');
+  const opt = sel.selectedOptions[0];
+  document.getElementById('t_dept').value = opt ? (opt.dataset.dept||'') : '';
+}
+
+async function saveTask() {
+  const task_name = document.getElementById('t_name').value.trim();
+  const doer_name = document.getElementById('t_doer').value;
+  if (!task_name || !doer_name) { toast('Task name and doer required','error'); return; }
+  const row = {
+    Task_Name:  task_name,
+    Doer_Name:  doer_name,
+    Department: document.getElementById('t_dept').value.trim(),
+    Frequency:  document.getElementById('t_freq').value,
+    Start_Date: document.getElementById('t_date').value
+  };
+  const id = document.getElementById('taskEditId').value;
+  bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide();
+  if (id) {
+    const { error } = await sb.from('tasks').update(row).eq('id', id);
+    error ? toast('Update failed: '+error.message,'error') : toast('Task updated','success');
+  } else {
+    const { error } = await sb.from('tasks').insert(row);
+    error ? toast('Insert failed: '+error.message,'error') : toast('Task added','success');
+  }
+  loadTasks();
+}
+
+async function deleteTask(id) {
+  if (!confirm('Delete this task?')) return;
+  await sb.from('tasks').delete().eq('id', id);
+  toast('Task deleted','info');
+  loadTasks();
+}
+
+// ── GENERATE MASTER ───────────────────────────────────────────
+async function generateMaster() {
+  if (!confirm('This will regenerate the entire Master schedule (2 years). Continue?')) return;
+  toast('Generating schedule...','info');
+
+  const { data: tasks } = await sb.from('tasks').select('*');
+  if (!tasks || !tasks.length) { toast('No tasks found.','error'); return; }
+
+  // Clear existing master
+  await sb.from('master_schedule').delete().neq('id', 0);
+
+  const rows = [];
+  for (const t of tasks) {
+    const startDate = t.Start_Date || t.start_date;
+    const freq      = t.Frequency  || t.frequency;
+    const dates = generateDates(new Date(startDate), freq, 730);
+    for (const d of dates) {
+      rows.push({
+        doer_name:    t.Doer_Name   || t.doer_name,
+        department:   t.Department  || t.department,
+        task_ref_id:  t.id,
+        frequency:    freq,
+        task_name:    t.Task_Name   || t.task_name,
+        planned_date: d.toISOString(),
+        actual_date:  null,
+        status:       null,
+        air_pressure: null, gauge_check: null, spare_parts: null,
+        damaged_parts: null, grease: null, bearing_bush: null,
+        change_repair: null, remarks: null
+      });
+    }
+  }
+
+  // Insert in batches of 500
+  for (let i = 0; i < rows.length; i += 500) {
+    const { error } = await sb.from('master_schedule').insert(rows.slice(i, i+500));
+    if (error) { toast('Error: '+error.message,'error'); return; }
+  }
+  toast(`Generated ${rows.length} schedule rows!`,'success');
+  loadMaster();
+}
+
+function generateDates(startDate, freq, totalDays) {
+  const dates = [];
+  const end = new Date(startDate.getTime() + totalDays * 86400000);
+  const intervals = { D:1, W:7, '2W':15, M:30, '2M':60, '3M':90, '6M':180, Y:365, '2Y':730 };
+  const interval = intervals[(freq||'').toUpperCase()] || intervals[freq] || 30;
+  let cur = new Date(startDate);
+  while (cur <= end) { dates.push(new Date(cur)); cur.setDate(cur.getDate() + interval); }
+  return dates;
+}
+
+// ── MASTER DISPLAY ────────────────────────────────────────────
+async function loadMaster() {
+  if (!sb) return;
+  const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
+  // Use a fresh tbody
+  const t = document.getElementById('masterTbody');
+  t.innerHTML = '';
+  (data||[]).forEach(r => {
+    const st = (r.status||'').trim();
+    let badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>`
+              : st === 'Done Late'    ? `<span class="badge-late">${st}</span>`
+              : st ? `<span class="badge-ontime">${st}</span>`
+              : `<span class="badge-pending">Pending</span>`;
+    t.innerHTML += `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td>
+       <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
+       <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
+  });
+}
+
+// ── DONE LIST ─────────────────────────────────────────────────
+async function loadDoneList() {
+  if (!sb) return;
+  let query = sb.from('done_list').select('*').order('submitted_on', { ascending: false });
+  
+  // If user role, filter by their name only
+  if(SESSION.role === 'user' || SESSION.role === 'super_admin') {
+      query = query.ilike('doer_name', SESSION.name);
+  }
+
+  const { data } = await query;
+  const tbody = document.getElementById('doneTbody');
+  tbody.innerHTML = (data||[]).map(r => {
+    const st = (r.status||'').trim();
+    const badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>` : `<span class="badge-late">${st}</span>`;
+    return `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
+       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
+       <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
+  }).join('');
+}
+
+// ── SCORING ───────────────────────────────────────────────────
+async function loadScoring() {
+  if (!sb) return;
+  const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
+  const scoring = sc || [];
+
+  // Leaderboard
+  const lb = buildLeaderboard(scoring);
+  renderLeaderboard(lb, 'scoringLeaderboard');
+
+  // Score chart
+  const ctx = document.getElementById('chartScore').getContext('2d');
+  if (chartScore) chartScore.destroy();
+  const top10 = lb.slice(0, 10);
+  chartScore = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: top10.map(p => p.name),
+      datasets: [{ label: 'Score (%)', data: top10.map(p => p.score), backgroundColor: top10.map(p => p.score >= -50 ? '#1565C0' : '#C62828'), borderRadius: 6 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
+  });
+
+  // Score table
+  const tbody = document.getElementById('scoreTbody');
+  tbody.innerHTML = scoring.map(r => `
+     <tr>
+       <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
+       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
+       <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
+       <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
+       <td>${fmtDate(r.submitted_on)}</td>
+     </tr>`).join('');
+}
+
+// ── MY TASKS (USER) ───────────────────────────────────────────
+async function loadMyTasks() {
+  if (!sb) { showNoTaskMsg(); return; }
+  const now   = new Date();
+  const limit = new Date(now.getTime() + 10 * 86400000);
+
+  const { data } = await sb
+    .from('master_schedule')
+    .select('*')
+    .ilike('doer_name', SESSION.name)
+    .is('status', null)
+    .lte('planned_date', limit.toISOString())
+    .order('planned_date', { ascending: true });
+
+  const el = document.getElementById('myTasksContainer');
+  const tasks = data || [];
+
+  if (!tasks.length) { showNoTaskMsg(); return; }
+
+  el.innerHTML = tasks.map(t => {
+    const planned = new Date(t.planned_date);
+    const overdue = planned < now;
+    const daysLeft = Math.round((planned - now) / 86400000);
+    return `<div class="card-table mb-3">
+      <div class="table-header d-flex flex-column flex-md-row gap-3 align-items-start align-items-md-center" style="background:${overdue?'#FFEBEE':'#E3F2FD'};">
+        <div class="flex-grow-1">
+          <div style="font-weight:700;color:${overdue?'#C62828':'var(--primary-dark)'};">
+            <i class="bi bi-gear-fill me-2"></i>${t.task_name}
+          </div>
+          <div style="font-size:.78rem;color:var(--text-muted);margin-top:3px;">
+            Dept: ${t.department} &nbsp;|&nbsp; Freq: <span class="badge-freq">${t.frequency}</span>
+            <br class="d-md-none"> Planned: <strong>${fmtDate(t.planned_date)}</strong>
+            ${overdue ? ' &nbsp;<span class="badge-late">OVERDUE</span>' : ` &nbsp;<span class="badge-pending">${daysLeft}d left</span>`}
+          </div>
+        </div>
+        <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
+          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
+            <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
+          </button>
+          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
+            <i class="bi bi-whatsapp" style="color:#25D366;"></i>
+          </button>
+          <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
+             Complete
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Store tasks for submit
   window._pendingTasks = tasks;
 }
-function showNoTaskMsg() { document.getElementById('myTasksContainer').innerHTML = `<div style="text-align:center;padding:60px;color:var(--text-muted);"><i class="bi bi-emoji-smile" style="font-size:3rem;color:var(--accent);"></i><div style="font-size:1.1rem;margin-top:12px;font-weight:600;">All caught up!</div><div style="font-size:.85rem;margin-top:4px;">No pending tasks in next 10 days.</div></div>`; }
 
-// Keep existing functions: loadDashboard, loadDoers, loadTasks, generateMaster, loadMaster, loadDoneList, loadScoring, sendNotification, openSubmitModal, confirmSubmit, exportCsv, filterTable, toast, toggleSidebar, etc. (unchanged but shortened for brevity)
-async function loadDashboard() { if(!sb)return; let [{count:dCount},{data:master},{data:done}]=await Promise.all([sb.from('doers').select('*',{count:'exact',head:true}),sb.from('master_schedule').select('status, planned_date'),sb.from('done_list').select('id',{count:'exact',head:false})]); let now=new Date(),pending=0,overdue=0;(master||[]).forEach(r=>{if(!r.status){new Date(r.planned_date)<now?overdue++:pending++;}}); document.getElementById('st-doers').textContent=dCount||0;document.getElementById('st-done').textContent=(done||[]).length;document.getElementById('st-pending').textContent=pending;document.getElementById('st-overdue').textContent=overdue; let {data:scoring}=await sb.from('scoring').select('*');let sc=scoring||[];let onT=sc.filter(r=>r.on_time).length,late=sc.filter(r=>!r.on_time).length; renderComplianceChart({labels:['On Time','Late'],data:[onT,late]}); let deptMap={};sc.forEach(r=>{let d=r.department||'Unknown';deptMap[d]=(deptMap[d]||0)+1;}); renderDeptChart({labels:Object.keys(deptMap),data:Object.values(deptMap)}); renderLeaderboard(buildLeaderboard(sc),'leaderboardEl');}
-function buildLeaderboard(scoring){let map={};(scoring||[]).forEach(r=>{let n=r.doer_name||'';if(!n)return;if(!map[n])map[n]={name:n,dept:r.department||'',totalTasks:0,onTime:0,late:0,score:0};map[n].totalTasks++;r.on_time?map[n].onTime++:map[n].late++;});Object.values(map).forEach(p=>{p.score=p.totalTasks>0?Math.round((p.onTime/p.totalTasks)*100)-100:0;});return Object.values(map).sort((a,b)=>b.score-a.score);}
-function renderComplianceChart(d){let ctx=document.getElementById('chartCompliance').getContext('2d');if(chartCompliance)chartCompliance.destroy();chartCompliance=new Chart(ctx,{type:'doughnut',data:{labels:d.labels,datasets:[{data:d.data,backgroundColor:['#1565C0','#C62828'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom'}},cutout:'65%'}});}
-function renderDeptChart(d){let ctx=document.getElementById('chartDept').getContext('2d');if(chartDept)chartDept.destroy();chartDept=new Chart(ctx,{type:'bar',data:{labels:d.labels,datasets:[{label:'Tasks',data:d.data,backgroundColor:'#1976D2',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});}
-function renderLeaderboard(data,containerId){let el=document.getElementById(containerId);if(!el)return;if(!data.length){el.innerHTML='<div style="color:var(--text-muted);text-align:center;padding:20px;">No data yet</div>';return;}el.innerHTML=data.slice(0,5).map((p,i)=>{let rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';let scoreColor=p.score>=0?'var(--primary)':'var(--danger)';return `<div class="score-card"><div class="score-rank ${rc}">${i+1}</div><div style="flex:1;"><div style="font-weight:700;">${p.name}</div><div style="font-size:.76rem;color:var(--text-muted);">${p.dept}</div></div><div style="text-align:right;"><div style="font-size:1.4rem;font-weight:700;color:${scoreColor};">${p.score}</div><div style="font-size:.7rem;color:var(--text-muted);">score (max 0)</div><div style="font-size:.72rem;margin-top:2px;"><span style="color:#2E7D32;">✓ ${p.onTime}</span> &nbsp; <span style="color:#C62828;">✗ ${p.late}</span></div></div></div>`;}).join('');}
-async function loadDoers(){if(!sb)return;let{data}=await sb.from('doers').select('*').order('created_at');DOERS_CACHE=data||[];document.getElementById('doerTbody').innerHTML=DOERS_CACHE.map((r,i)=>`<tr><td>${i+1}</td><td><strong>${r.name||''}</strong></td><td>${r.department||''}</td><td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td><td>${r.phone||''}</td><td>${r.whatsapp||''}</td><td><span class="badge-usertype">${r.user_type||'User'}</span></td><td><button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button><button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button></td></tr>`).join('');}
-async function loadTasks(){if(!sb)return;let{data}=await sb.from('tasks').select('*').order('id');TASKS_CACHE=data||[];document.getElementById('taskTbody').innerHTML=TASKS_CACHE.map((r,i)=>`<tr><td>${r.id}</td><td><strong>${r.Task_Name||r.task_name||''}</strong></td><td>${r.Doer_Name||r.doer_name||''}</td><td>${r.Department||r.department||''}</td><td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td><td>${r.Start_Date||r.start_date||''}</td><td><button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button><button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button></td></tr>`).join('');}
-async function generateMaster(){if(!confirm('Regenerate Master schedule (2 years)?'))return;toast('Generating...','info');let{data:tasks}=await sb.from('tasks').select('*');if(!tasks||!tasks.length){toast('No tasks found.','error');return;}await sb.from('master_schedule').delete().neq('id',0);let rows=[];for(let t of tasks){let startDate=t.Start_Date||t.start_date,freq=t.Frequency||t.frequency,dates=generateDates(new Date(startDate),freq,730);for(let d of dates){rows.push({doer_name:t.Doer_Name||t.doer_name,department:t.Department||t.department,task_ref_id:t.id,frequency:freq,task_name:t.Task_Name||t.task_name,planned_date:d.toISOString(),actual_date:null,status:null});}}for(let i=0;i<rows.length;i+=500){let{error}=await sb.from('master_schedule').insert(rows.slice(i,i+500));if(error){toast('Error: '+error.message,'error');return;}}toast(`Generated ${rows.length} schedule rows!`,'success');loadMaster();}
-function generateDates(startDate,freq,totalDays){let dates=[],end=new Date(startDate.getTime()+totalDays*86400000),intervals={D:1,W:7,'2W':15,M:30,'2M':60,'3M':90,'6M':180,Y:365,'2Y':730},interval=intervals[(freq||'').toUpperCase()]||intervals[freq]||30,cur=new Date(startDate);while(cur<=end){dates.push(new Date(cur));cur.setDate(cur.getDate()+interval);}return dates;}
-async function loadMaster(){if(!sb)return;let{data}=await sb.from('master_schedule').select('*').order('planned_date');let tbody=document.getElementById('masterTbody');tbody.innerHTML='';(data||[]).forEach(r=>{let st=(r.status||'').trim(),badge=st==='Done On Time'?`<span class="badge-ontime">${st}</span>`:st==='Done Late'?`<span class="badge-late">${st}</span>`:st?`<span class="badge-ontime">${st}</span>`:`<span class="badge-pending">Pending</span>`;tbody.innerHTML+=`<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td><td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td><td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;});}
-async function loadDoneList(){if(!sb)return;let{data}=await sb.from('done_list').select('*').order('submitted_on',{ascending:false});document.getElementById('doneTbody').innerHTML=(data||[]).map(r=>{let st=(r.status||'').trim(),badge=st==='Done On Time'?`<span class="badge-ontime">${st}</span>`:`<span class="badge-late">${st}</span>`;return`<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td><td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td><td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;}).join('');}
-async function loadScoring(){if(!sb)return;let{data:sc}=await sb.from('scoring').select('*').order('submitted_on',{ascending:false});let scoring=sc||[],lb=buildLeaderboard(scoring);renderLeaderboard(lb,'scoringLeaderboard');let ctx=document.getElementById('chartScore').getContext('2d');if(chartScore)chartScore.destroy();let top10=lb.slice(0,10);chartScore=new Chart(ctx,{type:'bar',data:{labels:top10.map(p=>p.name),datasets:[{label:'Score (%)',data:top10.map(p=>p.score),backgroundColor:top10.map(p=>p.score>=-50?'#1565C0':'#C62828'),borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:false}}}});document.getElementById('scoreTbody').innerHTML=scoring.map(r=>`<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td><td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${r.on_time?'<span class="badge-ontime">YES</span>':'<span class="badge-late">NO</span>'}</td><td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time?'On Time':'Late'}</span></td><td>${fmtDate(r.submitted_on)}</td></tr>`).join('');}
-function openSubmitModal(taskId){if(SESSION.role==='user'){toast('You do not have permission to complete tasks','error');return;}let t=(window._pendingTasks||[]).find(x=>x.id==taskId);if(!t)return;currentSubmitTask=t;let checks=[{key:'air_pressure',label:'M/C cleaning by air pressure'},{key:'gauge_check',label:'All gauge must be checking that M/C'},{key:'spare_parts',label:'All spare parts are checking and cleaning'},{key:'damaged_parts',label:'Damaged spare parts must be replaced or repairing'},{key:'grease',label:'The M/C must be greased and all bearing checked'},{key:'bearing_bush',label:'If any bearing and bush are damaged they must be replaced'}];document.getElementById('submitModalBody').innerHTML=`<div style="background:var(--accent2);border-radius:8px;padding:12px 16px;margin-bottom:16px;"><strong>${t.task_name}</strong><br><small style="color:var(--text-muted);">Planned: ${fmtDate(t.planned_date)} &nbsp;|&nbsp; Dept: ${t.department}</small></div>${checks.map(c=>`<div class="check-item"><select class="form-select form-select-sm" id="chk_${c.key}" style="width:130px;"><option value="">—</option><option value="Done">Done</option><option value="Not Done">Not Done</option><option value="N/A">N/A</option></select><label style="font-size:.85rem;">${c.label}</label></div>`).join('')}<div class="mt-3"><label class="form-label">Change or Repair Parts Name</label><input type="text" class="form-control" id="chk_change_repair" placeholder="List parts if any"/></div><div class="mt-3"><label class="form-label">Remarks</label><textarea class="form-control" id="chk_remarks" rows="2" placeholder="Any notes..."></textarea></div>`;new bootstrap.Modal(document.getElementById('submitModal')).show();}
-async function confirmSubmit(){if(!currentSubmitTask)return;let t=currentSubmitTask,now=new Date(),planned=new Date(t.planned_date),plannedEOD=new Date(planned);plannedEOD.setHours(23,59,59,999);let onTime=now<=plannedEOD,status=onTime?'Done On Time':'Done Late',getV=id=>{let el=document.getElementById(id);return el?el.value:'';},update={actual_date:now.toISOString(),status,air_pressure:getV('chk_air_pressure'),gauge_check:getV('chk_gauge_check'),spare_parts:getV('chk_spare_parts'),damaged_parts:getV('chk_damaged_parts'),grease:getV('chk_grease'),bearing_bush:getV('chk_bearing_bush'),change_repair:getV('chk_change_repair'),remarks:getV('chk_remarks')};let{error:masterErr}=await sb.from('master_schedule').update(update).eq('id',t.id);if(masterErr){toast('Error: '+masterErr.message,'error');return;}await sb.from('done_list').insert({doer_name:t.doer_name,department:t.department,task_name:t.task_name,frequency:t.frequency,planned_date:t.planned_date,actual_date:now.toISOString(),status,submitted_by:SESSION.name,submitted_on:now.toISOString(),...update});await sb.from('scoring').insert({doer_name:t.doer_name,department:t.department,task_name:t.task_name,planned_date:t.planned_date,actual_date:now.toISOString(),on_time:onTime,score:onTime?1:0,submitted_on:now.toISOString()});bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();toast(`Task submitted! Score: ${onTime?'+':''}${onTime?1:0} (${status})`,onTime?'success':'error');loadMyTasks();}
-function sendNotification(taskId,type){let t=(window._pendingTasks||[]).find(x=>x.id==taskId);if(!t)return;sb.from('doers').select('*').ilike('name',t.doer_name).limit(1).then(({data})=>{let doer=data&&data[0];if(!doer){toast('Doer contact not found','error');return;}if(type==='email'){if(!doer.email){toast('No email on file','error');return;}toast(`Email reminder sent to ${doer.email}`,'success');}else{let phone=(doer.whatsapp||'').replace(/\D/g,'');if(!phone){toast('No WhatsApp number','error');return;}let msg=encodeURIComponent(`Hello ${t.doer_name}, pending maintenance task:\n*Task:* ${t.task_name}\n*Planned:* ${fmtDate(t.planned_date)}\nPlease complete on time. — CheckList`);window.open(`https://wa.me/${phone}?text=${msg}`,'_blank');}});}
-function fmtDate(d){if(!d)return'';let dt=new Date(d);if(isNaN(dt))return String(d);return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'2-digit',year:'numeric'});}
-function filterTable(tableId,query){let q=query.toLowerCase();document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr=>{tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none';});}
-function toast(msg,type='info'){let icons={success:'bi-check-circle-fill',error:'bi-x-circle-fill',info:'bi-info-circle-fill'},colors={success:'#2E7D32',error:'#C62828',info:'#1565C0'},div=document.createElement('div');div.className=`app-toast toast-${type}`;div.innerHTML=`<i class="bi ${icons[type]||icons.info}" style="color:${colors[type]};font-size:1.1rem;"></i> ${msg}`;document.getElementById('toastContainer').appendChild(div);setTimeout(()=>div.remove(),4500);}
-function toggleSidebar(){document.getElementById('appSidebar').classList.toggle('show');document.getElementById('sidebarOverlay').classList.toggle('show');}
-async function exportCsv(table){if(!sb||SESSION.role==='user'){toast('Export not allowed for users','error');return;}let{data}=await sb.from(table).select('*');if(!data||!data.length){toast('No data to export','error');return;}let keys=Object.keys(data[0]),csv=[keys.join(','),...data.map(r=>keys.map(k=>`"${r[k]??''}"`).join(','))].join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=table+'_export.csv';a.click();toast('CSV downloaded','success');}
-window.editDoer=(id)=>{openDoerModal(id);};window.deleteDoer=async(id)=>{if(!confirm('Delete?'))return;await sb.from('doers').delete().eq('id',id);toast('Deleted','info');loadDoers();};window.openDoerModal=()=>{let id=arguments[0];document.getElementById('doerEditId').value=id||'';if(id){let r=DOERS_CACHE.find(d=>d.id===id);if(r){document.getElementById('d_name').value=r.name||'';document.getElementById('d_dept').value=r.department||'';document.getElementById('d_email').value=r.email||'';document.getElementById('d_phone').value=r.phone||'';document.getElementById('d_wa').value=r.whatsapp||'';document.getElementById('d_usertype').value=r.user_type||'User';}}else{['d_name','d_dept','d_email','d_phone','d_wa'].forEach(id=>document.getElementById(id).value='');document.getElementById('d_usertype').value='User';}new bootstrap.Modal(document.getElementById('doerModal')).show();};window.saveDoer=async()=>{let name=document.getElementById('d_name').value.trim();if(!name){toast('Name required','error');return;}let row={name,department:document.getElementById('d_dept').value.trim(),email:document.getElementById('d_email').value.trim(),phone:document.getElementById('d_phone').value.trim(),whatsapp:document.getElementById('d_wa').value.trim(),user_type:document.getElementById('d_usertype').value},id=document.getElementById('doerEditId').value;bootstrap.Modal.getInstance(document.getElementById('doerModal')).hide();if(id){await sb.from('doers').update(row).eq('id',id);toast('Doer updated','success');}else{await sb.from('doers').insert(row);toast('Doer added','success');}loadDoers();};window.editTask=(id)=>{openTaskModal(id);};window.deleteTask=async(id)=>{if(!confirm('Delete task?'))return;await sb.from('tasks').delete().eq('id',id);toast('Task deleted','info');loadTasks();};window.openTaskModal=async(id)=>{await loadDoersForSelect();document.getElementById('taskEditId').value=id||'';if(id){let r=TASKS_CACHE.find(t=>t.id===id);if(r){document.getElementById('t_name').value=r.Task_Name||r.task_name||'';document.getElementById('t_doer').value=r.Doer_Name||r.doer_name||'';document.getElementById('t_dept').value=r.Department||r.department||'';document.getElementById('t_freq').value=r.Frequency||r.frequency||'2W';document.getElementById('t_date').value=r.Start_Date||r.start_date||'';}}else{['t_name','t_dept'].forEach(id=>document.getElementById(id).value='');document.getElementById('t_freq').value='2W';document.getElementById('t_date').value=new Date().toISOString().split('T')[0];}new bootstrap.Modal(document.getElementById('taskModal')).show();};window.autoFillDept=()=>{let sel=document.getElementById('t_doer'),opt=sel.selectedOptions[0];document.getElementById('t_dept').value=opt?(opt.dataset.dept||''):'';};window.saveTask=async()=>{let task_name=document.getElementById('t_name').value.trim(),doer_name=document.getElementById('t_doer').value;if(!task_name||!doer_name){toast('Task name and doer required','error');return;}let row={Task_Name:task_name,Doer_Name:doer_name,Department:document.getElementById('t_dept').value.trim(),Frequency:document.getElementById('t_freq').value,Start_Date:document.getElementById('t_date').value},id=document.getElementById('taskEditId').value;bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide();if(id){await sb.from('tasks').update(row).eq('id',id);toast('Task updated','success');}else{await sb.from('tasks').insert(row);toast('Task added','success');}loadTasks();};async function loadDoersForSelect(){if(!sb)return;let{data}=await sb.from('doers').select('name, department').order('name');let sel=document.getElementById('t_doer');sel.innerHTML='<option value="">— Select Doer —</option>'+(data||[]).map(d=>`<option value="${d.name}" data-dept="${d.department||''}">${d.name} (${d.department||''})</option>`).join('');}
+function showNoTaskMsg() {
+  document.getElementById('myTasksContainer').innerHTML = `
+    <div style="text-align:center;padding:60px;color:var(--text-muted);">
+      <i class="bi bi-emoji-smile" style="font-size:3rem;color:var(--accent);"></i>
+      <div style="font-size:1.1rem;margin-top:12px;font-weight:600;">All caught up!</div>
+      <div style="font-size:.85rem;margin-top:4px;">No pending tasks in next 10 days.</div>
+    </div>`;
+}
+
+// ── SUBMIT TASK ───────────────────────────────────────────────
+function openSubmitModal(taskId) {
+  const t = (window._pendingTasks||[]).find(x => x.id == taskId);
+  if (!t) return;
+  currentSubmitTask = t;
+  const checks = [
+    { key:'air_pressure',   label:'M/C cleaning by air pressure' },
+    { key:'gauge_check',    label:'All gauge must be checking that M/C' },
+    { key:'spare_parts',    label:'All spare parts are checking and cleaning' },
+    { key:'damaged_parts',  label:'Damaged spare parts must be replaced or repairing' },
+    { key:'grease',         label:'The M/C must be greased and all bearing checked' },
+    { key:'bearing_bush',   label:'If any bearing and bush are damaged they must be replaced' },
+  ];
+  document.getElementById('submitModalBody').innerHTML = `
+    <div style="background:var(--accent2);border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+      <strong>${t.task_name}</strong><br>
+      <small style="color:var(--text-muted);">Planned: ${fmtDate(t.planned_date)} &nbsp;|&nbsp; Dept: ${t.department}</small>
+    </div>
+    ${checks.map(c => `
+      <div class="check-item">
+        <select class="form-select form-select-sm" id="chk_${c.key}" style="width:130px;">
+          <option value="">—</option>
+          <option value="Done">Done</option>
+          <option value="Not Done">Not Done</option>
+          <option value="N/A">N/A</option>
+        </select>
+        <label style="font-size:.85rem;">${c.label}</label>
+      </div>`).join('')}
+    <div class="mt-3">
+      <label class="form-label">Change or Repair Parts Name</label>
+      <input type="text" class="form-control" id="chk_change_repair" placeholder="List parts if any"/>
+    </div>
+    <div class="mt-3">
+      <label class="form-label">Remarks</label>
+      <textarea class="form-control" id="chk_remarks" rows="2" placeholder="Any notes..."></textarea>
+    </div>`;
+  new bootstrap.Modal(document.getElementById('submitModal')).show();
+}
+
+async function confirmSubmit() {
+  if (!currentSubmitTask) return;
+  const t = currentSubmitTask;
+  const now = new Date();
+  const planned = new Date(t.planned_date);
+
+  // On time = submitted before or on planned date (end of day)
+  const plannedEOD = new Date(planned);
+  plannedEOD.setHours(23, 59, 59, 999);
+  const onTime = now <= plannedEOD;
+  // score column stores 1=ontime, 0=late; leaderboard uses formula
+  const score  = onTime ? 1 : 0;
+  const status = onTime ? 'Done On Time' : 'Done Late';
+
+  const getV = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+
+  const update = {
+    actual_date:   now.toISOString(),
+    status,
+    air_pressure:  getV('chk_air_pressure'),
+    gauge_check:   getV('chk_gauge_check'),
+    spare_parts:   getV('chk_spare_parts'),
+    damaged_parts: getV('chk_damaged_parts'),
+    grease:        getV('chk_grease'),
+    bearing_bush:  getV('chk_bearing_bush'),
+    change_repair: getV('chk_change_repair'),
+    remarks:       getV('chk_remarks'),
+  };
+
+  // 1. Update master_schedule
+  const { error: masterErr } = await sb.from('master_schedule').update(update).eq('id', t.id);
+  if (masterErr) { toast('Error updating master: '+masterErr.message,'error'); return; }
+
+  // 2. Insert into done_list
+  const { error: doneErr } = await sb.from('done_list').insert({
+    doer_name:    t.doer_name,
+    department:   t.department,
+    task_name:    t.task_name,
+    frequency:    t.frequency,
+    planned_date: t.planned_date,
+    actual_date:  now.toISOString(),
+    status,
+    submitted_by: SESSION.name,
+    submitted_on: now.toISOString(),
+    ...update
+  });
+  if (doneErr) console.warn('done_list insert:', doneErr.message);
+
+  // 3. Insert into scoring
+  const { error: scoreErr } = await sb.from('scoring').insert({
+    doer_name:    t.doer_name,
+    department:   t.department,
+    task_name:    t.task_name,
+    planned_date: t.planned_date,
+    actual_date:  now.toISOString(),
+    on_time:      onTime,
+    score,
+    submitted_on: now.toISOString(),
+  });
+  if (scoreErr) console.warn('scoring insert:', scoreErr.message);
+
+  bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
+  toast(`Task submitted! Score: ${onTime?'+':''}${score} (${status})`, onTime?'success':'error');
+  loadMyTasks();
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────
+async function sendNotification(taskId, type) {
+  const t = (window._pendingTasks||[]).find(x => x.id == taskId);
+  if (!t) return;
+  const { data: doers } = await sb.from('doers').select('*').ilike('name', t.doer_name).limit(1);
+  const doer = doers && doers[0];
+  if (!doer) { toast('Doer contact not found','error'); return; }
+
+  if (type === 'email') {
+    if (!doer.email) { toast('No email on file','error'); return; }
+    toast(`Email reminder sent to ${doer.email}`, 'success');
+    // In production: call a backend API / Supabase Edge Function to send email
+  } else {
+    const phone = (doer.whatsapp||'').replace(/\D/g,'');
+    if (!phone) { toast('No WhatsApp number on file','error'); return; }
+    const msg = encodeURIComponent(`Hello ${t.doer_name}, pending maintenance task:\n*Task:* ${t.task_name}\n*Planned:* ${fmtDate(t.planned_date)}\nPlease complete on time. — CheckList`);
+    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+  }
+}
+
+// ── CSV EXPORT ────────────────────────────────────────────────
+async function exportCsv(table) {
+  if (!sb) return;
+  const { data } = await sb.from(table).select('*');
+  if (!data || !data.length) { toast('No data to export','error'); return; }
+  const keys = Object.keys(data[0]);
+  const csv  = [keys.join(','), ...data.map(r => keys.map(k => `"${r[k]??''}"`).join(','))].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
+  a.download = table + '_export.csv';
+  a.click();
+  toast('CSV downloaded','success');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function fmtDate(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  if (isNaN(dt)) return String(d);
+  return dt.toLocaleDateString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric' });
+}
+
+function filterTable(tableId, query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function toast(msg, type='info') {
+  const icons = { success:'bi-check-circle-fill', error:'bi-x-circle-fill', info:'bi-info-circle-fill' };
+  const colors = { success:'#2E7D32', error:'#C62828', info:'#1565C0' };
+  const div = document.createElement('div');
+  div.className = `app-toast toast-${type}`;
+  div.innerHTML = `<i class="bi ${icons[type]||icons.info}" style="color:${colors[type]};font-size:1.1rem;"></i> ${msg}`;
+  document.getElementById('toastContainer').appendChild(div);
+  setTimeout(() => div.remove(), 4500);
+}
+
+// Mobile Toggle Functionality
+function toggleSidebar() {
+  const sidebar = document.getElementById('appSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.toggle('show');
+  overlay.classList.toggle('show');
+}
 </script>
 </body>
 </html>
