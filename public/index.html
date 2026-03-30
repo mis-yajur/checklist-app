@@ -62,7 +62,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(21,101,192,.12);outline:none;}
 .btn-primary-custom{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;border:none;border-radius:var(--radius-sm);padding:9px 20px;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(21,101,192,.25);}
 .btn-primary-custom:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(21,101,192,.35);}
-.btn-primary-custom.disabled{opacity:0.6;pointer-events:none;}
 
 /* NAVBAR */
 .app-navbar{background:linear-gradient(90deg,var(--primary-dark) 0%,var(--primary) 100%);padding:0 24px;height:62px;display:flex;align-items:center;box-shadow:var(--shadow-md);position:sticky;top:0;z-index:1100;}
@@ -112,7 +111,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-danger-sm:hover{background:#FFEBEE;}
 .btn-start{background:linear-gradient(135deg,var(--gold),#FF8F00);color:#000;border:none;border-radius:50px;padding:16px 48px;font-size:1.05rem;font-weight:800;letter-spacing:1px;cursor:pointer;box-shadow:0 6px 24px rgba(255,179,0,.4);transition:all .25s;text-transform:uppercase;}
 .btn-start:hover{transform:translateY(-3px) scale(1.03);}
-.btn-start.disabled{opacity:0.5;pointer-events:none;}
 
 /* BADGES */
 .badge-ontime{background:#E8F5E9;color:#2E7D32;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
@@ -196,7 +194,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div id="loadStatus" style="color:#90CAF9;margin-top:16px;font-size:.82rem;"></div>
 </div>
 
-<!-- LOGIN (Simplified) -->
+<!-- LOGIN (Simplified - no tabs) -->
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">&#9745; CheckList</div>
@@ -231,7 +229,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="app-layout">
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar" id="appSidebar">
-      <!-- Unified menu for all users -->
       <div id="adminMenuGroup">
         <div class="section-label">Management</div>
         <div class="sidebar-item active" onclick="showPage('dashboard')" id="menu-dashboard"><i class="bi bi-speedometer2"></i>Dashboard</div>
@@ -240,6 +237,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="sidebar-item" onclick="showPage('master')" id="menu-master"><i class="bi bi-table"></i>Master Schedule</div>
         <div class="sidebar-item" onclick="showPage('donelist')" id="menu-donelist"><i class="bi bi-check2-all"></i>Done List</div>
         <div class="sidebar-item" onclick="showPage('scoring')" id="menu-scoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
+      </div>
+      <div id="userMenuGroup" style="display:none;">
+        <div class="section-label">My Work</div>
+        <div class="sidebar-item active" onclick="showPage('myTasks')" id="menu-myTasks"><i class="bi bi-card-checklist"></i>My Tasks</div>
+        <div class="sidebar-item" onclick="showPage('donelist')" id="menu-myDone"><i class="bi bi-check2-all"></i>Done List</div>
+        <div class="sidebar-item" onclick="showPage('scoring')" id="menu-myScoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
     </aside>
 
@@ -294,7 +297,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div><div class="page-title">Doers</div><div class="page-sub">Manage maintenance personnel</div></div>
           <div class="d-flex gap-2">
-            <button id="doerAddBtn" class="btn-primary-custom" onclick="openDoerModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
+            <button class="btn-primary-custom" onclick="openDoerModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
             <button class="btn-sm-icon" onclick="exportCsv('doers')" title="Export CSV"><i class="bi bi-download"></i></button>
           </div>
         </div>
@@ -305,7 +308,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="doerTable">
-              <thead>汽<th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>User Type</th><th>Actions</th> </thead>
+              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>User Type</th><th>Actions</th></tr></thead>
               <tbody id="doerTbody"></tbody>
             </table>
           </div>
@@ -317,12 +320,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="d-flex align-items-center justify-content-between mb-2">
           <div><div class="page-title">Tasks</div><div class="page-sub">Define maintenance tasks & frequency</div></div>
           <div class="d-flex gap-2">
-            <button id="taskAddBtn" class="btn-primary-custom" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
+            <button class="btn-primary-custom" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
             <button class="btn-sm-icon" onclick="exportCsv('tasks')" title="Export CSV"><i class="bi bi-download"></i></button>
           </div>
         </div>
         <div class="text-center mb-3 mt-2">
-          <button id="generateMasterBtn" class="btn-start" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button>
+          <button class="btn-start" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button>
           <div style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">Generates 2-year schedule based on all tasks above</div>
         </div>
         <div class="card-table">
@@ -332,7 +335,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="taskTable">
-              <thead>汽<th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th>Actions</th> </thead>
+              <thead><tr><th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th>Actions</th></tr></thead>
               <tbody id="taskTbody"></tbody>
             </table>
           </div>
@@ -352,7 +355,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="masterTable">
-              <thead>汽<th>Name</th><th>Department</th><th>Task ID</th><th>Freq</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th> </thead>
+              <thead><tr><th>Name</th><th>Department</th><th>Task ID</th><th>Freq</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th></tr></thead>
               <tbody id="masterTbody"></tbody>
             </table>
           </div>
@@ -372,7 +375,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="doneTable">
-              <thead>汽<th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th><th>Submitted By</th><th>On</th> </thead>
+              <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th><th>Submitted By</th><th>On</th></tr></thead>
               <tbody id="doneTbody"></tbody>
             </table>
           </div>
@@ -400,7 +403,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
               <div class="table-header"><span class="table-title">All Score Records</span></div>
               <div class="table-scroll">
                 <table class="table" id="scoreTable">
-                  <thead>汽<th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>On Time</th><th>Score</th><th>Date</th> </thead>
+                  <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>On Time</th><th>Score</th><th>Date</th></tr></thead>
                   <tbody id="scoreTbody"></tbody>
                 </table>
               </div>
@@ -409,10 +412,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
 
-      <!-- MY TASKS (for quick access) -->
+      <!-- MY TASKS (USER) -->
       <div class="page" id="page-myTasks">
         <div class="page-title">My Pending Tasks</div>
-        <div class="page-sub">All pending tasks assigned to you</div>
+        <div class="page-sub">Tasks due within the next 10 days</div>
         <div id="myTasksContainer"></div>
       </div>
 
@@ -444,7 +447,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      <button id="saveDoerBtn" class="btn-primary-custom" onclick="saveDoer()"><i class="bi bi-check-lg me-1"></i>Save Doer</button>
+      <button class="btn-primary-custom" onclick="saveDoer()"><i class="bi bi-check-lg me-1"></i>Save Doer</button>
     </div>
   </div></div>
 </div>
@@ -478,7 +481,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      <button id="saveTaskBtn" class="btn-primary-custom" onclick="saveTask()"><i class="bi bi-check-lg me-1"></i>Save Task</button>
+      <button class="btn-primary-custom" onclick="saveTask()"><i class="bi bi-check-lg me-1"></i>Save Task</button>
     </div>
   </div></div>
 </div>
@@ -500,7 +503,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <script>
 // ══════════════════════════════════════════════════════════════
-//  CHECKLIST — Supabase Web App (Unified Admin Interface)
+//  CHECKLIST — Supabase Web App
 // ══════════════════════════════════════════════════════════════
 
 let SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
@@ -516,7 +519,7 @@ const APP_CONFIG = {
   USER_PASS:     "User@1234",
 };
 
-let SESSION = { role: null, name: null, dept: null, userType: null, id: null };
+let SESSION = { role: null, name: null, dept: null, userType: null };
 let DOERS_CACHE = [];
 let TASKS_CACHE = [];
 let currentSubmitTask = null;
@@ -571,7 +574,7 @@ async function doLogin() {
 
   // Admin hardcoded login
   if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
-    SESSION = { role: 'admin', name: 'Administrator', dept: '', userType: 'Admin', id: null };
+    SESSION = { role: 'admin', name: 'Administrator', dept: '', userType: 'Admin' };
     startApp();
     return;
   }
@@ -591,14 +594,14 @@ async function doLogin() {
       // Determine role based on user_type
       let role = 'user';
       if (user.user_type === 'Admin' || user.user_type === 'Super Admin') {
-        role = 'admin';  // full edit rights
+        role = 'admin';  // full admin access
       }
       SESSION = {
         role: role,
         name: user.name,
         dept: user.department,
-        userType: user.user_type,
-        id: user.id
+        id: user.id,
+        userType: user.user_type
       };
       startApp();
       return;
@@ -617,24 +620,10 @@ function startApp() {
   document.getElementById('appShell').style.display = 'block';
   document.getElementById('navRole').textContent = SESSION.role === 'admin' ? 'ADMIN' : 'USER';
   document.getElementById('navUser').textContent = SESSION.name;
-
-  // Show/hide edit controls based on role
-  const isAdmin = (SESSION.role === 'admin');
-  const addDoerBtn = document.getElementById('doerAddBtn');
-  const addTaskBtn = document.getElementById('taskAddBtn');
-  const generateBtn = document.getElementById('generateMasterBtn');
-  const saveDoerBtn = document.getElementById('saveDoerBtn');
-  const saveTaskBtn = document.getElementById('saveTaskBtn');
-
-  if (addDoerBtn) addDoerBtn.style.display = isAdmin ? '' : 'none';
-  if (addTaskBtn) addTaskBtn.style.display = isAdmin ? '' : 'none';
-  if (generateBtn) generateBtn.style.display = isAdmin ? '' : 'none';
-  if (saveDoerBtn) saveDoerBtn.style.display = isAdmin ? '' : 'none';
-  if (saveTaskBtn) saveTaskBtn.style.display = isAdmin ? '' : 'none';
-
-  // Also disable modal inputs for non-admin (they cannot edit anyway, but we prevent opening modals)
-  // We'll handle edit buttons in the table rendering.
-  showPage('dashboard');
+  const showAdminMenu = (SESSION.role === 'admin');
+  document.getElementById('adminMenuGroup').style.display = showAdminMenu ? '' : 'none';
+  document.getElementById('userMenuGroup').style.display  = showAdminMenu ? 'none' : '';
+  showPage(showAdminMenu ? 'dashboard' : 'myTasks');
 }
 
 function doLogout() {
@@ -660,8 +649,7 @@ function showPage(page) {
   if (m) m.classList.add('active');
   const loaders = {
     dashboard: loadDashboard, doers: loadDoers, tasks: loadTasks,
-    master: loadMaster, donelist: loadDoneList, scoring: loadScoring,
-    myTasks: loadMyTasks
+    master: loadMaster, donelist: loadDoneList, scoring: loadScoring, myTasks: loadMyTasks
   };
   if (loaders[page]) loaders[page]();
 }
@@ -743,13 +731,12 @@ function renderLeaderboard(data, containerId) {
   }).join('');
 }
 
-// ── DOERS ─────────────────────────────────────────────────────
+// ── DOERS (unchanged) ─────────────────────────────────────────
 async function loadDoers() {
   if (!sb) return;
   const { data } = await sb.from('doers').select('*').order('created_at', { ascending: true });
   DOERS_CACHE = data || [];
   const tbody = document.getElementById('doerTbody');
-  const isAdmin = (SESSION.role === 'admin');
   tbody.innerHTML = DOERS_CACHE.map((r, i) => `
       <tr>
         <td>${i+1}</td>
@@ -760,19 +747,13 @@ async function loadDoers() {
         <td>${r.whatsapp||''}</td>
         <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
         <td>
-          ${isAdmin ? `
-            <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
-            <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
-          ` : '<span class="text-muted">Read-only</span>'}
+          <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
+          <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
         </td>
       </tr>`).join('');
 }
 
 function openDoerModal(id) {
-  if (SESSION.role !== 'admin') {
-    toast('You do not have permission to edit doers','error');
-    return;
-  }
   document.getElementById('doerEditId').value = id || '';
   if (id) {
     const r = DOERS_CACHE.find(d => d.id === id);
@@ -793,10 +774,6 @@ function openDoerModal(id) {
 function editDoer(id) { openDoerModal(id); }
 
 async function saveDoer() {
-  if (SESSION.role !== 'admin') {
-    toast('Permission denied','error');
-    return;
-  }
   const name = document.getElementById('d_name').value.trim();
   if (!name) { toast('Name is required','error'); return; }
   const row = {
@@ -820,23 +797,18 @@ async function saveDoer() {
 }
 
 async function deleteDoer(id) {
-  if (SESSION.role !== 'admin') {
-    toast('Permission denied','error');
-    return;
-  }
   if (!confirm('Delete this doer?')) return;
   await sb.from('doers').delete().eq('id', id);
   toast('Doer deleted','info');
   loadDoers();
 }
 
-// ── TASKS ─────────────────────────────────────────────────────
+// ── TASKS (unchanged) ─────────────────────────────────────────
 async function loadTasks() {
   if (!sb) return;
   const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
   TASKS_CACHE = data || [];
   const tbody = document.getElementById('taskTbody');
-  const isAdmin = (SESSION.role === 'admin');
   tbody.innerHTML = TASKS_CACHE.map((r, i) => `
       <tr>
         <td>${r.id}</td>
@@ -846,19 +818,13 @@ async function loadTasks() {
         <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
         <td>${r.Start_Date||r.start_date||''}</td>
         <td>
-          ${isAdmin ? `
-            <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
-            <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
-          ` : '<span class="text-muted">Read-only</span>'}
+          <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
+          <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
         </td>
       </tr>`).join('');
 }
 
 async function openTaskModal(id) {
-  if (SESSION.role !== 'admin') {
-    toast('You do not have permission to edit tasks','error');
-    return;
-  }
   await loadDoersForSelect();
   document.getElementById('taskEditId').value = id || '';
   if (id) {
@@ -897,10 +863,6 @@ function autoFillDept() {
 }
 
 async function saveTask() {
-  if (SESSION.role !== 'admin') {
-    toast('Permission denied','error');
-    return;
-  }
   const task_name = document.getElementById('t_name').value.trim();
   const doer_name = document.getElementById('t_doer').value;
   if (!task_name || !doer_name) { toast('Task name and doer required','error'); return; }
@@ -924,22 +886,14 @@ async function saveTask() {
 }
 
 async function deleteTask(id) {
-  if (SESSION.role !== 'admin') {
-    toast('Permission denied','error');
-    return;
-  }
   if (!confirm('Delete this task?')) return;
   await sb.from('tasks').delete().eq('id', id);
   toast('Task deleted','info');
   loadTasks();
 }
 
-// ── GENERATE MASTER (admin only) ───────────────────────────────
+// ── GENERATE MASTER (unchanged) ───────────────────────────────
 async function generateMaster() {
-  if (SESSION.role !== 'admin') {
-    toast('Only administrators can generate the master schedule','error');
-    return;
-  }
   if (!confirm('This will regenerate the entire Master schedule (2 years). Continue?')) return;
   toast('Generating schedule...','info');
 
@@ -1052,20 +1006,18 @@ async function loadScoring() {
       </tr>`).join('');
 }
 
-// ── MY TASKS (shows all pending tasks for the logged-in doer) ──
+// ── MY TASKS (with hidden notification icons for users) ────────
 async function loadMyTasks() {
   if (!sb) { showNoTaskMsg(); return; }
-  if (!SESSION.id) {
-    showNoTaskMsg();
-    return;
-  }
+  const now   = new Date();
+  const limit = new Date(now.getTime() + 10 * 86400000);
 
-  // Fetch all pending tasks for this doer (status is null)
   const { data } = await sb
     .from('master_schedule')
     .select('*')
-    .eq('doer_name', SESSION.name)
+    .ilike('doer_name', SESSION.name)
     .is('status', null)
+    .lte('planned_date', limit.toISOString())
     .order('planned_date', { ascending: true });
 
   const el = document.getElementById('myTasksContainer');
@@ -1073,12 +1025,11 @@ async function loadMyTasks() {
 
   if (!tasks.length) { showNoTaskMsg(); return; }
 
-  // Hide WhatsApp/Email icons for non-admins
+  // Determine if user is admin (show notification icons) or regular user (hide)
   const showIcons = (SESSION.role === 'admin');
 
   el.innerHTML = tasks.map(t => {
     const planned = new Date(t.planned_date);
-    const now = new Date();
     const overdue = planned < now;
     const daysLeft = Math.round((planned - now) / 86400000);
     return `<div class="card-table mb-3">
@@ -1118,7 +1069,7 @@ function showNoTaskMsg() {
     <div style="text-align:center;padding:60px;color:var(--text-muted);">
       <i class="bi bi-emoji-smile" style="font-size:3rem;color:var(--accent);"></i>
       <div style="font-size:1.1rem;margin-top:12px;font-weight:600;">All caught up!</div>
-      <div style="font-size:.85rem;margin-top:4px;">No pending tasks assigned to you.</div>
+      <div style="font-size:.85rem;margin-top:4px;">No pending tasks in next 10 days.</div>
     </div>`;
 }
 
@@ -1218,7 +1169,6 @@ async function confirmSubmit() {
   bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
   toast(`Task submitted! Score: ${onTime?'+':''}${score} (${status})`, onTime?'success':'error');
   loadMyTasks();
-  loadDashboard(); // refresh dashboard stats
 }
 
 // ── NOTIFICATIONS (unchanged) ─────────────────────────────────
@@ -1240,7 +1190,7 @@ async function sendNotification(taskId, type) {
   }
 }
 
-// ── CSV EXPORT (unchanged) ────────────────────────────────────
+// ── CSV EXPORT ────────────────────────────────────────────────
 async function exportCsv(table) {
   if (!sb) return;
   const { data } = await sb.from(table).select('*');
