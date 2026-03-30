@@ -431,10 +431,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
 
-      <!-- MY TASKS (USER) -->
+      <!-- MY TASKS (USER) - READ ONLY -->
       <div class="page" id="page-myTasks">
         <div class="page-title">My Pending Tasks</div>
-        <div class="page-sub">Tasks due within the next 10 days</div>
+        <div class="page-sub">Tasks due within the next 10 days — <span style="color:var(--danger);">view only</span> (no completion actions)</div>
         <div id="myTasksContainer"></div>
       </div>
 
@@ -505,7 +505,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div></div>
 </div>
 
-<!-- SUBMIT TASK MODAL -->
+<!-- SUBMIT TASK MODAL (admin only, not shown to users) -->
 <div class="modal fade" id="submitModal" tabindex="-1">
   <div class="modal-dialog modal-lg"><div class="modal-content">
     <div class="modal-header"><h5 class="modal-title"><i class="bi bi-clipboard2-check me-2"></i>Complete Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
@@ -532,8 +532,7 @@ let sb = null;
 
 const APP_CONFIG = {
   APP_NAME:      "CheckList",
-  // Score formula: (onTime/total*100)-100  → range -100 to 0
-  SCORE_ON_TIME: 1,   // stored as 1/0 boolean-int; formula applied in buildLeaderboard
+  SCORE_ON_TIME: 1,
   SCORE_LATE:    0,
   ADMIN_USER:    "admin",
   ADMIN_PASS:    "Admin@1234",
@@ -578,16 +577,11 @@ function showLogin() {
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
-// ── SUPABASE TABLE INIT ───────────────────────────────────────
-// Tables are created via Supabase SQL editor (see setup guide)
-// This function just verifies connectivity
 async function initSupabaseTables() {
   if (!sb) return;
-  // Test connection by querying doers table
   await sb.from('doers').select('id').limit(1);
 }
 
-// ── LOGIN ─────────────────────────────────────────────────────
 let loginTab = 'admin';
 function switchLoginTab(tab) {
   loginTab = tab;
@@ -605,14 +599,12 @@ async function doLogin() {
 
   if (!u || !p) { document.getElementById('loginError').textContent = 'Please enter credentials.'; return; }
 
-  // Admin login
   if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
     SESSION = { role: 'admin', name: 'Administrator', dept: '' };
     startApp();
     return;
   }
 
-  // User login — check against doers table
   if (p === APP_CONFIG.USER_PASS) {
     if (sb) {
       const { data } = await sb.from('doers')
@@ -623,7 +615,6 @@ async function doLogin() {
         return;
       }
     } else {
-      // No DB: demo mode
       SESSION = { role: 'user', name: u, dept: 'Demo' };
       startApp();
       return;
@@ -654,9 +645,7 @@ function doLogout() {
   showLogin();
 }
 
-// ── PAGE ROUTING ──────────────────────────────────────────────
 function showPage(page) {
-  // Mobile Support: Auto hide sidebar on selection
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
   if(sidebar) sidebar.classList.remove('show');
@@ -695,7 +684,6 @@ async function loadDashboard() {
   document.getElementById('st-pending').textContent = pending;
   document.getElementById('st-overdue').textContent = overdue;
 
-  // Charts
   const { data: scoring } = await sb.from('scoring').select('*');
   const sc = scoring || [];
   const onT = sc.filter(r => r.on_time).length;
@@ -717,13 +705,11 @@ function buildLeaderboard(scoring) {
     map[n].totalTasks++;
     r.on_time ? map[n].onTime++ : map[n].late++;
   });
-  // Formula: (onTime / totalTasks * 100) - 100
-  // -100 = all late, 0 = all on time
   Object.values(map).forEach(p => {
     p.score = p.totalTasks > 0
       ? Math.round((p.onTime / p.totalTasks) * 100) - 100
       : 0;
-    p.total = p.score; // alias for leaderboard display
+    p.total = p.score;
   });
   return Object.values(map).sort((a, b) => b.score - a.score);
 }
@@ -764,19 +750,19 @@ async function loadDoers() {
   DOERS_CACHE = data || [];
   const tbody = document.getElementById('doerTbody');
   tbody.innerHTML = DOERS_CACHE.map((r, i) => `
-     <tr>
-       <td>${i+1}</td>
-       <td><strong>${r.name||''}</strong></td>
-       <td>${r.department||''}</td>
-       <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
-       <td>${r.phone||''}</td>
-       <td>${r.whatsapp||''}</td>
-       <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
-       <td>
+      <tr>
+        <td>${i+1}</td>
+        <td><strong>${r.name||''}</strong></td>
+        <td>${r.department||''}</td>
+        <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
+        <td>${r.phone||''}</td>
+        <td>${r.whatsapp||''}</td>
+        <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
+        <td>
          <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
          <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
-       </td>
-     </tr>`).join('');
+        </td>
+      </tr>`).join('');
 }
 
 function openDoerModal(id) {
@@ -836,18 +822,18 @@ async function loadTasks() {
   TASKS_CACHE = data || [];
   const tbody = document.getElementById('taskTbody');
   tbody.innerHTML = TASKS_CACHE.map((r, i) => `
-     <tr>
-       <td>${r.id}</td>
-       <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
-       <td>${r.Doer_Name||r.doer_name||''}</td>
-       <td>${r.Department||r.department||''}</td>
-       <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
-       <td>${r.Start_Date||r.start_date||''}</td>
-       <td>
+      <tr>
+        <td>${r.id}</td>
+        <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
+        <td>${r.Doer_Name||r.doer_name||''}</td>
+        <td>${r.Department||r.department||''}</td>
+        <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
+        <td>${r.Start_Date||r.start_date||''}</td>
+        <td>
          <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
          <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
-       </td>
-     </tr>`).join('');
+        </td>
+      </tr>`).join('');
 }
 
 async function openTaskModal(id) {
@@ -926,7 +912,6 @@ async function generateMaster() {
   const { data: tasks } = await sb.from('tasks').select('*');
   if (!tasks || !tasks.length) { toast('No tasks found.','error'); return; }
 
-  // Clear existing master
   await sb.from('master_schedule').delete().neq('id', 0);
 
   const rows = [];
@@ -951,7 +936,6 @@ async function generateMaster() {
     }
   }
 
-  // Insert in batches of 500
   for (let i = 0; i < rows.length; i += 500) {
     const { error } = await sb.from('master_schedule').insert(rows.slice(i, i+500));
     if (error) { toast('Error: '+error.message,'error'); return; }
@@ -974,7 +958,6 @@ function generateDates(startDate, freq, totalDays) {
 async function loadMaster() {
   if (!sb) return;
   const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
-  // Use a fresh tbody
   const t = document.getElementById('masterTbody');
   t.innerHTML = '';
   (data||[]).forEach(r => {
@@ -984,8 +967,8 @@ async function loadMaster() {
               : st ? `<span class="badge-ontime">${st}</span>`
               : `<span class="badge-pending">Pending</span>`;
     t.innerHTML += `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td>
-       <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
+        <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
+        <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
   });
 }
 
@@ -998,8 +981,8 @@ async function loadDoneList() {
     const st = (r.status||'').trim();
     const badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>` : `<span class="badge-late">${st}</span>`;
     return `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
-       <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
+        <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
+        <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
   }).join('');
 }
 
@@ -1009,11 +992,9 @@ async function loadScoring() {
   const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
   const scoring = sc || [];
 
-  // Leaderboard
   const lb = buildLeaderboard(scoring);
   renderLeaderboard(lb, 'scoringLeaderboard');
 
-  // Score chart
   const ctx = document.getElementById('chartScore').getContext('2d');
   if (chartScore) chartScore.destroy();
   const top10 = lb.slice(0, 10);
@@ -1026,19 +1007,18 @@ async function loadScoring() {
     options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
   });
 
-  // Score table
   const tbody = document.getElementById('scoreTbody');
   tbody.innerHTML = scoring.map(r => `
-     <tr>
-       <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
-       <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
-       <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
-       <td>${fmtDate(r.submitted_on)}</td>
-     </tr>`).join('');
+      <tr>
+        <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
+        <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
+        <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
+        <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
+        <td>${fmtDate(r.submitted_on)}</td>
+      </tr>`).join('');
 }
 
-// ── MY TASKS (USER) ───────────────────────────────────────────
+// ── MY TASKS (USER) - READ ONLY, NO EDIT/COMPLETE BUTTONS ────
 async function loadMyTasks() {
   if (!sb) { showNoTaskMsg(); return; }
   const now   = new Date();
@@ -1057,10 +1037,28 @@ async function loadMyTasks() {
 
   if (!tasks.length) { showNoTaskMsg(); return; }
 
+  // Users: read-only view – no action buttons
+  const isAdmin = (SESSION.role === 'admin');
+  
   el.innerHTML = tasks.map(t => {
     const planned = new Date(t.planned_date);
     const overdue = planned < now;
     const daysLeft = Math.round((planned - now) / 86400000);
+    // Only admin gets action buttons; regular users see only task details
+    const actionButtons = isAdmin ? `
+      <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
+        <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
+          <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
+        </button>
+        <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
+          <i class="bi bi-whatsapp" style="color:#25D366;"></i>
+        </button>
+        <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
+           Complete
+        </button>
+      </div>
+    ` : '';  // users get NO action buttons → read-only
+    
     return `<div class="card-table mb-3">
       <div class="table-header d-flex flex-column flex-md-row gap-3 align-items-start align-items-md-center" style="background:${overdue?'#FFEBEE':'#E3F2FD'};">
         <div class="flex-grow-1">
@@ -1073,22 +1071,11 @@ async function loadMyTasks() {
             ${overdue ? ' &nbsp;<span class="badge-late">OVERDUE</span>' : ` &nbsp;<span class="badge-pending">${daysLeft}d left</span>`}
           </div>
         </div>
-        <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
-            <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
-          </button>
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
-            <i class="bi bi-whatsapp" style="color:#25D366;"></i>
-          </button>
-          <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
-             Complete
-          </button>
-        </div>
+        ${actionButtons}
       </div>
     </div>`;
   }).join('');
 
-  // Store tasks for submit
   window._pendingTasks = tasks;
 }
 
@@ -1101,7 +1088,7 @@ function showNoTaskMsg() {
     </div>`;
 }
 
-// ── SUBMIT TASK ───────────────────────────────────────────────
+// ── SUBMIT TASK (admin only, but kept for completeness) ──────
 function openSubmitModal(taskId) {
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
@@ -1145,13 +1132,9 @@ async function confirmSubmit() {
   const t = currentSubmitTask;
   const now = new Date();
   const planned = new Date(t.planned_date);
-
-  // On time = submitted before or on planned date (end of day)
   const plannedEOD = new Date(planned);
   plannedEOD.setHours(23, 59, 59, 999);
   const onTime = now <= plannedEOD;
-  // score column stores 1=ontime, 0=late; leaderboard uses formula
-  const score  = onTime ? 1 : 0;
   const status = onTime ? 'Done On Time' : 'Done Late';
 
   const getV = id => { const el = document.getElementById(id); return el ? el.value : ''; };
@@ -1169,12 +1152,10 @@ async function confirmSubmit() {
     remarks:       getV('chk_remarks'),
   };
 
-  // 1. Update master_schedule
   const { error: masterErr } = await sb.from('master_schedule').update(update).eq('id', t.id);
   if (masterErr) { toast('Error updating master: '+masterErr.message,'error'); return; }
 
-  // 2. Insert into done_list
-  const { error: doneErr } = await sb.from('done_list').insert({
+  await sb.from('done_list').insert({
     doer_name:    t.doer_name,
     department:   t.department,
     task_name:    t.task_name,
@@ -1186,23 +1167,20 @@ async function confirmSubmit() {
     submitted_on: now.toISOString(),
     ...update
   });
-  if (doneErr) console.warn('done_list insert:', doneErr.message);
 
-  // 3. Insert into scoring
-  const { error: scoreErr } = await sb.from('scoring').insert({
+  await sb.from('scoring').insert({
     doer_name:    t.doer_name,
     department:   t.department,
     task_name:    t.task_name,
     planned_date: t.planned_date,
     actual_date:  now.toISOString(),
     on_time:      onTime,
-    score,
+    score:        onTime ? 1 : 0,
     submitted_on: now.toISOString(),
   });
-  if (scoreErr) console.warn('scoring insert:', scoreErr.message);
 
   bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
-  toast(`Task submitted! Score: ${onTime?'+':''}${score} (${status})`, onTime?'success':'error');
+  toast(`Task submitted! Score: ${onTime?'+':''}${onTime?1:0} (${status})`, onTime?'success':'error');
   loadMyTasks();
 }
 
@@ -1217,7 +1195,6 @@ async function sendNotification(taskId, type) {
   if (type === 'email') {
     if (!doer.email) { toast('No email on file','error'); return; }
     toast(`Email reminder sent to ${doer.email}`, 'success');
-    // In production: call a backend API / Supabase Edge Function to send email
   } else {
     const phone = (doer.whatsapp||'').replace(/\D/g,'');
     if (!phone) { toast('No WhatsApp number on file','error'); return; }
@@ -1265,7 +1242,6 @@ function toast(msg, type='info') {
   setTimeout(() => div.remove(), 4500);
 }
 
-// Mobile Toggle Functionality
 function toggleSidebar() {
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
@@ -1275,7 +1251,3 @@ function toggleSidebar() {
 </script>
 </body>
 </html>
-
-
-here All Code is Perfect and Working Very Fine Just Add In Login Popup "User" and here after login here samae data show as when user login as  "Super Admin" , after login 
-as User there is all data show but non Editable
