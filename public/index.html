@@ -112,47 +112,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-start{background:linear-gradient(135deg,var(--gold),#FF8F00);color:#000;border:none;border-radius:50px;padding:16px 48px;font-size:1.05rem;font-weight:800;letter-spacing:1px;cursor:pointer;box-shadow:0 6px 24px rgba(255,179,0,.4);transition:all .25s;text-transform:uppercase;}
 .btn-start:hover{transform:translateY(-3px) scale(1.03);}
 
-/* FORM */
-.form-label{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:4px;}
-.form-control,.form-select{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:.86rem;color:var(--text);transition:border .2s,box-shadow .2s;}
-.form-control:focus,.form-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(21,101,192,.12);outline:none;}
-
 /* BADGES */
 .badge-ontime{background:#E8F5E9;color:#2E7D32;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
 .badge-late{background:#FFEBEE;color:#C62828;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
 .badge-pending{background:#FFF3E0;color:#E65100;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
 .badge-freq{background:var(--accent2);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:600;}
-.badge-usertype{background:var(--accent2);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:600;}
-
-/* SCORE CARDS */
-.score-card{border-radius:var(--radius);padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-sm);}
-.score-rank{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--primary-dark);width:36px;text-align:center;}
-.score-rank.gold{color:var(--gold);}
-.score-rank.silver{color:#90A4AE;}
-.score-rank.bronze{color:#A1887F;}
-
-/* CHART CARD */
-.chart-card{background:var(--surface);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
-.chart-title{font-weight:700;color:var(--primary-dark);margin-bottom:14px;font-size:.92rem;}
-
-/* TOAST */
-.toast-container{position:fixed;bottom:24px;right:24px;z-index:9000;}
-.app-toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px;box-shadow:var(--shadow-lg);margin-bottom:10px;min-width:260px;display:flex;align-items:center;gap:10px;animation:toastIn .3s ease;font-size:.85rem;font-weight:500;}
-@keyframes toastIn{from{transform:translateX(60px);opacity:0;}to{transform:translateX(0);opacity:1;}}
-.toast-success{border-left:4px solid var(--success);}
-.toast-error{border-left:4px solid var(--danger);}
-.toast-info{border-left:4px solid var(--accent);}
-
-/* MODAL */
-.modal-header{background:linear-gradient(90deg,var(--primary-dark),var(--primary));color:#fff;border-radius:12px 12px 0 0;}
-.modal-header .btn-close{filter:invert(1);}
-.modal-content{border-radius:14px;border:none;box-shadow:var(--shadow-lg);}
-
-/* PROGRESS */
-.prog-bar-wrap{background:#E3F2FD;border-radius:99px;height:8px;overflow:hidden;}
-.prog-bar-fill{background:linear-gradient(90deg,var(--primary),var(--accent));height:100%;border-radius:99px;transition:width .6s ease;}
-.check-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border);}
-.check-item:last-child{border-bottom:none;}
 
 /* MOBILE COMPATIBILITY OVERRIDES */
 .menu-toggle-btn {
@@ -177,7 +141,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   .sidebar.show {
     transform: translateX(0);
   }
-  .main-content { padding: 15px; }
   .sidebar-overlay {
     display: none;
     position: fixed;
@@ -188,9 +151,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   }
   .sidebar-overlay.show { display: block; }
   .login-card { width: 90%; padding: 30px 20px; }
-  .stat-card { padding: 15px; }
-  .stat-val { font-size: 1.5rem; }
-  .btn-start { padding: 12px 24px; font-size: 0.9rem; }
 }
 </style>
 </head>
@@ -210,15 +170,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="login-logo">&#9745; CheckList</div>
     <div class="login-sub">Maintenance Management System</div>
     <div class="login-tabs">
-      <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">
-        <i class="bi bi-shield-lock me-1"></i>Admin
-      </button>
-      <button class="login-tab" id="tabSuperAdmin" onclick="switchLoginTab('super_admin')">
-        <i class="bi bi-person-badge me-1"></i>Super Admin
-      </button>
-      <button class="login-tab" id="tabUser" onclick="switchLoginTab('user')">
-        <i class="bi bi-person me-1"></i>User
-      </button>
+      <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">Admin</button>
+      <button class="login-tab" id="tabSuperAdmin" onclick="switchLoginTab('super_admin')">Super Admin</button>
+      <button class="login-tab" id="tabUser" onclick="switchLoginTab('user')">User</button>
     </div>
     <div class="mb-3">
       <label class="form-label">Username</label>
@@ -228,9 +182,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <label class="form-label">Password</label>
       <input type="password" id="loginPass" class="form-control" placeholder="Enter password"/>
     </div>
-    <button class="btn-primary-custom w-100 py-2" onclick="doLogin()">
-      <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
-    </button>
+    <button class="btn-primary-custom w-100 py-2" onclick="doLogin()">Sign In</button>
     <div id="loginError" class="text-danger text-center mt-3" style="font-size:.82rem;"></div>
   </div>
 </div>
@@ -243,7 +195,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <span id="navRole" class="badge-role">ADMIN</span>
     <div class="ms-auto d-flex align-items-center gap-2">
       <span id="navUser" class="d-none d-sm-inline" style="color:#B3D9FF;font-size:.82rem;font-weight:500;"></span>
-      <button class="nav-btn" onclick="doLogout()"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
+      <button class="nav-btn" onclick="doLogout()">Logout</button>
     </div>
   </nav>
 
@@ -268,774 +220,297 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </aside>
 
     <main class="main-content">
-
       <!-- DASHBOARD -->
       <div class="page active" id="page-dashboard">
         <div class="page-title">Dashboard</div>
-        <div class="page-sub">Maintenance Overview</div>
-        <div class="row g-3 mb-4">
-          <div class="col-6 col-md-3">
-            <div class="stat-card">
-              <div class="d-flex align-items-center gap-2 gap-md-3">
-                <div class="icon-wrap d-none d-md-flex" style="background:#E3F2FD;"><i class="bi bi-people-fill" style="color:var(--primary);"></i></div>
-                <div><div class="stat-val" id="st-doers">—</div><div class="stat-lbl">Doers</div></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3">
-            <div class="stat-card">
-              <div class="d-flex align-items-center gap-2 gap-md-3">
-                <div class="icon-wrap d-none d-md-flex" style="background:#E8F5E9;"><i class="bi bi-check2-all" style="color:#2E7D32;"></i></div>
-                <div><div class="stat-val" id="st-done">—</div><div class="stat-lbl">Done</div></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3">
-            <div class="stat-card">
-              <div class="d-flex align-items-center gap-2 gap-md-3">
-                <div class="icon-wrap d-none d-md-flex" style="background:#FFF3E0;"><i class="bi bi-clock-history" style="color:#E65100;"></i></div>
-                <div><div class="stat-val" id="st-pending">—</div><div class="stat-lbl">Pending</div></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3">
-            <div class="stat-card">
-              <div class="d-flex align-items-center gap-2 gap-md-3">
-                <div class="icon-wrap d-none d-md-flex" style="background:#FFEBEE;"><i class="bi bi-exclamation-triangle-fill" style="color:#C62828;"></i></div>
-                <div><div class="stat-val" id="st-overdue">—</div><div class="stat-lbl">Overdue</div></div>
-              </div>
-            </div>
-          </div>
+        <div class="row g-3 mb-4" id="statsRow">
+           <div class="col-6 col-md-3"><div class="stat-card"><div><div class="stat-val" id="st-doers">—</div><div class="stat-lbl">Doers</div></div></div></div>
+           <div class="col-6 col-md-3"><div class="stat-card"><div><div class="stat-val" id="st-done">—</div><div class="stat-lbl">Done</div></div></div></div>
+           <div class="col-6 col-md-3"><div class="stat-card"><div><div class="stat-val" id="st-pending">—</div><div class="stat-lbl">Pending</div></div></div></div>
+           <div class="col-6 col-md-3"><div class="stat-card"><div><div class="stat-val" id="st-overdue">—</div><div class="stat-lbl">Overdue</div></div></div></div>
         </div>
         <div class="row g-3">
-          <div class="col-md-6"><div class="chart-card"><div class="chart-title"><i class="bi bi-pie-chart-fill me-2" style="color:var(--primary);"></i>Compliance Rate</div><canvas id="chartCompliance" height="200"></canvas></div></div>
-          <div class="col-md-6"><div class="chart-card"><div class="chart-title"><i class="bi bi-bar-chart-fill me-2" style="color:var(--primary);"></i>Tasks by Department</div><canvas id="chartDept" height="200"></canvas></div></div>
-          <div class="col-12"><div class="chart-card"><div class="chart-title"><i class="bi bi-trophy-fill me-2" style="color:var(--gold);"></i>Top Performers</div><div id="leaderboardEl"></div></div></div>
+          <div class="col-md-6"><div class="chart-card"><div class="chart-title">Compliance Rate</div><canvas id="chartCompliance" height="200"></canvas></div></div>
+          <div class="col-md-6"><div class="chart-card"><div class="chart-title">Leaderboard</div><div id="leaderboardEl"></div></div></div>
         </div>
       </div>
 
       <!-- DOERS -->
       <div class="page" id="page-doers">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <div><div class="page-title">Doers</div><div class="page-sub">Manage maintenance personnel</div></div>
-          <div class="d-flex gap-2">
-            <button class="btn-primary-custom" onclick="openDoerModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
-            <button class="btn-sm-icon" onclick="exportCsv('doers')" title="Export CSV"><i class="bi bi-download"></i></button>
-          </div>
+        <div class="d-flex justify-content-between mb-3">
+          <div class="page-title">Doers</div>
+          <button class="btn-primary-custom" onclick="openDoerModal()">Add Doer</button>
         </div>
-        <div class="card-table">
-          <div class="table-header">
-            <span class="table-title"><i class="bi bi-people me-2"></i>Doer List</span>
-            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('doerTable',this.value)"/>
-          </div>
-          <div class="table-scroll">
-            <table class="table" id="doerTable">
-              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>User Type</th><th>Actions</th></tr></thead>
-              <tbody id="doerTbody"></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="card-table"><table class="table" id="doerTable"><thead><tr><th>Name</th><th>Dept</th><th>Type</th><th>Actions</th></tr></thead><tbody id="doerTbody"></tbody></table></div>
       </div>
 
       <!-- TASKS -->
       <div class="page" id="page-tasks">
-        <div class="d-flex align-items-center justify-content-between mb-2">
-          <div><div class="page-title">Tasks</div><div class="page-sub">Define maintenance tasks & frequency</div></div>
-          <div class="d-flex gap-2">
-            <button class="btn-primary-custom" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
-            <button class="btn-sm-icon" onclick="exportCsv('tasks')" title="Export CSV"><i class="bi bi-download"></i></button>
-          </div>
+        <div class="d-flex justify-content-between mb-2">
+          <div class="page-title">Tasks</div>
+          <button class="btn-primary-custom" onclick="openTaskModal()">Add Task</button>
         </div>
-        <div class="text-center mb-3 mt-2">
-          <button class="btn-start" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button>
-          <div style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">Generates 2-year schedule based on all tasks above</div>
-        </div>
-        <div class="card-table">
-          <div class="table-header">
-            <span class="table-title"><i class="bi bi-list-task me-2"></i>Task List</span>
-            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('taskTable',this.value)"/>
-          </div>
-          <div class="table-scroll">
-            <table class="table" id="taskTable">
-              <thead><tr><th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th>Actions</th></tr></thead>
-              <tbody id="taskTbody"></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="text-center mb-3"><button class="btn-start" onclick="generateMaster()">Generate Schedule</button></div>
+        <div class="card-table"><table class="table" id="taskTable"><thead><tr><th>ID</th><th>Task</th><th>Doer</th><th>Freq</th><th>Actions</th></tr></thead><tbody id="taskTbody"></tbody></table></div>
       </div>
 
       <!-- MASTER -->
       <div class="page" id="page-master">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <div><div class="page-title">Master Schedule</div><div class="page-sub">Auto-generated 2-year maintenance calendar</div></div>
-          <button class="btn-sm-icon" onclick="exportCsv('master_schedule')" title="Export CSV"><i class="bi bi-download"></i> CSV</button>
-        </div>
-        <div class="card-table">
-          <div class="table-header">
-            <span class="table-title"><i class="bi bi-calendar2-week me-2"></i>All Scheduled Tasks</span>
-            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('masterTable',this.value)"/>
-          </div>
-          <div class="table-scroll">
-            <table class="table" id="masterTable">
-              <thead><tr><th>Name</th><th>Department</th><th>Task ID</th><th>Freq</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th></tr></thead>
-              <tbody id="masterTbody"></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="page-title">Master Schedule</div>
+        <div class="card-table"><div class="table-scroll"><table class="table" id="masterTable"><thead><tr><th>Doer</th><th>Task</th><th>Planned</th><th>Status</th></tr></thead><tbody id="masterTbody"></tbody></table></div></div>
       </div>
 
       <!-- DONE LIST -->
       <div class="page" id="page-donelist">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <div><div class="page-title">Done List</div><div class="page-sub">Completed maintenance records</div></div>
-          <button class="btn-sm-icon" onclick="exportCsv('done_list')" title="Export CSV"><i class="bi bi-download"></i> CSV</button>
-        </div>
-        <div class="card-table">
-          <div class="table-header">
-            <span class="table-title"><i class="bi bi-check2-all me-2"></i>Completed Tasks</span>
-            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('doneTable',this.value)"/>
-          </div>
-          <div class="table-scroll">
-            <table class="table" id="doneTable">
-              <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th><th>Submitted By</th><th>On</th></tr></thead>
-              <tbody id="doneTbody"></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="page-title">Done List</div>
+        <div class="card-table"><table class="table" id="doneTable"><thead><tr><th>Doer</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th></tr></thead><tbody id="doneTbody"></tbody></table></div>
       </div>
 
       <!-- SCORING -->
       <div class="page" id="page-scoring">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <div><div class="page-title">Scoring & Leaderboard</div><div class="page-sub">+10 On Time &nbsp;|&nbsp; -100 Late</div></div>
-          <button class="btn-sm-icon" onclick="exportCsv('scoring')" title="Export CSV"><i class="bi bi-download"></i> CSV</button>
-        </div>
-        <div class="row g-3">
-          <div class="col-md-5">
-            <div class="card-table h-100">
-              <div class="table-header"><span class="table-title"><i class="bi bi-trophy me-2" style="color:var(--gold);"></i>Leaderboard</span></div>
-              <div id="scoringLeaderboard" style="padding:16px;"></div>
-            </div>
-          </div>
-          <div class="col-md-7">
-            <div class="chart-card"><div class="chart-title">Score Distribution</div><canvas id="chartScore" height="180"></canvas></div>
-          </div>
-          <div class="col-12">
-            <div class="card-table">
-              <div class="table-header"><span class="table-title">All Score Records</span></div>
-              <div class="table-scroll">
-                <table class="table" id="scoreTable">
-                  <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>On Time</th><th>Score</th><th>Date</th></tr></thead>
-                  <tbody id="scoreTbody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="page-title">Scoring</div>
+        <div class="card-table"><table class="table" id="scoreTable"><thead><tr><th>Doer</th><th>Task</th><th>On Time</th><th>Score</th><th>Date</th></tr></thead><tbody id="scoreTbody"></tbody></table></div>
       </div>
 
       <!-- MY TASKS (USER) -->
       <div class="page" id="page-myTasks">
-        <div class="page-title">My Pending Tasks</div>
-        <div id="myTasksSubtitle" class="page-sub">View and complete your assigned maintenance</div>
+        <div class="page-title">My Tasks</div>
+        <div id="myTasksSubtitle" class="page-sub">Assigned maintenance tasks</div>
         <div id="myTasksContainer"></div>
       </div>
-
     </main>
   </div>
 </div>
 
-<!-- DOER MODAL -->
-<div class="modal fade" id="doerModal" tabindex="-1">
-  <div class="modal-dialog"><div class="modal-content">
-    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Doer</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-    <div class="modal-body">
-      <input type="hidden" id="doerEditId"/>
-      <div class="row g-3">
-        <div class="col-md-6"><label class="form-label">Full Name *</label><input type="text" class="form-control" id="d_name" placeholder="Swapan Kr Ghorai"/></div>
-        <div class="col-md-6"><label class="form-label">Department *</label><input type="text" class="form-control" id="d_dept" placeholder="Yarn Division"/></div>
-        <div class="col-md-6"><label class="form-label">Email Address</label><input type="email" class="form-control" id="d_email" placeholder="name@company.com"/></div>
-        <div class="col-md-6"><label class="form-label">Phone Number</label><input type="text" class="form-control" id="d_phone" placeholder="+91 9000000000"/></div>
-        <div class="col-md-6"><label class="form-label">WhatsApp Number (with country code)</label><input type="text" class="form-control" id="d_wa" placeholder="919000000000"/></div>
-        <div class="col-md-6">
-          <label class="form-label">User Type</label>
-          <select class="form-select" id="d_usertype">
-            <option value="User">User</option>
-            <option value="Super Admin">Super Admin</option>
-            <option value="Admin">Admin</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      <button class="btn-primary-custom" onclick="saveDoer()"><i class="bi bi-check-lg me-1"></i>Save Doer</button>
-    </div>
-  </div></div>
-</div>
-
-<!-- TASK MODAL -->
-<div class="modal fade" id="taskModal" tabindex="-1">
-  <div class="modal-dialog modal-lg"><div class="modal-content">
-    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-list-task me-2"></i>Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-    <div class="modal-body">
-      <input type="hidden" id="taskEditId"/>
-      <div class="row g-3">
-        <div class="col-12"><label class="form-label">Task Name *</label><input type="text" class="form-control" id="t_name" placeholder="B. Card-1 Machine Maintenance"/></div>
-        <div class="col-md-6"><label class="form-label">Assign Doer *</label><select class="form-select" id="t_doer" onchange="autoFillDept()"><option value="">— Select Doer —</option></select></div>
-        <div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control" id="t_dept" placeholder="Auto-filled"/></div>
-        <div class="col-md-6">
-          <label class="form-label">Frequency *</label>
-          <select class="form-select" id="t_freq">
-            <option value="D">Daily (D)</option>
-            <option value="W">Weekly (W)</option>
-            <option value="2W" selected>Fortnightly / 15 days (2W)</option>
-            <option value="M">Monthly (M)</option>
-            <option value="2M">Every 2 Months (2M)</option>
-            <option value="3M">Every 3 Months (3M)</option>
-            <option value="6M">Half Yearly (6M)</option>
-            <option value="Y">Yearly (Y)</option>
-            <option value="2Y">Every 2 Years (2Y)</option>
-          </select>
-        </div>
-        <div class="col-md-6"><label class="form-label">Start Date *</label><input type="date" class="form-control" id="t_date"/></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      <button class="btn-primary-custom" onclick="saveTask()"><i class="bi bi-check-lg me-1"></i>Save Task</button>
-    </div>
-  </div></div>
-</div>
-
-<!-- SUBMIT TASK MODAL -->
-<div class="modal fade" id="submitModal" tabindex="-1">
-  <div class="modal-dialog modal-lg"><div class="modal-content">
-    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-clipboard2-check me-2"></i>Complete Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-    <div class="modal-body" id="submitModalBody"></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      <button class="btn-success-custom" onclick="confirmSubmit()"><i class="bi bi-check2-circle me-1"></i>Submit Completion</button>
-    </div>
-  </div></div>
-</div>
+<!-- MODALS -->
+<div class="modal fade" id="doerModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5>Doer</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="hidden" id="doerEditId"/><div class="mb-2"><label>Name</label><input type="text" id="d_name" class="form-control"/></div><div class="mb-2"><label>Dept</label><input type="text" id="d_dept" class="form-control"/></div><div class="mb-2"><label>Role</label><select id="d_usertype" class="form-select"><option value="User">User</option><option value="Super Admin">Super Admin</option><option value="Admin">Admin</option></select></div></div><div class="modal-footer"><button class="btn-primary-custom" onclick="saveDoer()">Save</button></div></div></div></div>
+<div class="modal fade" id="taskModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5>Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="hidden" id="taskEditId"/><div class="mb-2"><label>Task Name</label><input type="text" id="t_name" class="form-control"/></div><div class="mb-2"><label>Doer</label><select id="t_doer" class="form-select" onchange="autoFillDept()"></select></div><div class="mb-2"><label>Dept</label><input type="text" id="t_dept" class="form-control" readonly/></div><div class="mb-2"><label>Frequency</label><select id="t_freq" class="form-select"><option value="2W">2W (Fortnightly)</option><option value="M">Monthly</option></select></div><div class="mb-2"><label>Start Date</label><input type="date" id="t_date" class="form-control"/></div></div><div class="modal-footer"><button class="btn-primary-custom" onclick="saveTask()">Save</button></div></div></div></div>
+<div class="modal fade" id="submitModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5>Complete Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="submitModalBody"></div><div class="modal-footer"><button class="btn-success-custom" onclick="confirmSubmit()">Submit</button></div></div></div></div>
 
 <div class="toast-container" id="toastContainer"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// ══════════════════════════════════════════════════════════════
-//  CHECKLIST — Supabase Web App (FIXED USER DATA)
-// ══════════════════════════════════════════════════════════════
-
-let SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
-let SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg";
+// ── APP INITIALIZATION ────────────────────────────────────────
 let sb = null;
+const SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg";
 
 const APP_CONFIG = {
-  APP_NAME:      "CheckList",
-  SCORE_ON_TIME: 1,
-  SCORE_LATE:    0,
-  ADMIN_USER:    "admin",
-  ADMIN_PASS:    "Admin@1234",
-  USER_PASS:     "User@1234",
+  ADMIN_USER: "admin", ADMIN_PASS: "Admin@1234", USER_PASS: "User@1234"
 };
 
-let SESSION = { role: null, name: null, dept: null };
-let DOERS_CACHE = [];
-let TASKS_CACHE = [];
+let SESSION = { role: null, name: null };
 let currentSubmitTask = null;
-let chartCompliance = null, chartDept = null, chartScore = null;
 
-// ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
-  setLoadStatus("Connecting to database...");
   try {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    setLoadStatus("Initializing...");
-    await initSupabaseTables();
-    setLoadStatus("Ready!");
-  } catch(e) {
-    console.error(e);
-    setLoadStatus("⚠️ Connection issue: " + e.message);
-  }
-  hideLoading();
-  showLogin();
+    document.getElementById('loadStatus').textContent = "Connected";
+    setTimeout(() => {
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('loginScreen').style.display = 'flex';
+    }, 500);
+  } catch(e) { console.error(e); }
 });
 
-function setLoadStatus(msg) {
-  const el = document.getElementById('loadStatus');
-  if (el) el.textContent = msg;
-}
-function hideLoading() {
-  const el = document.getElementById('loadingScreen');
-  el.style.opacity = '0';
-  setTimeout(() => el.style.display = 'none', 400);
-}
-function showLogin() {
-  document.getElementById('loginScreen').style.display = 'flex';
-}
-
-async function initSupabaseTables() {
-  if (!sb) return;
-  await sb.from('doers').select('id').limit(1);
-}
-
-// ── LOGIN ─────────────────────────────────────────────────────
+// ── LOGIN LOGIC ── (Lowercase Sync) ──────────────────────────
 let loginTab = 'admin';
-function switchLoginTab(tab) {
-  loginTab = tab;
-  document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
-  document.getElementById('tabSuperAdmin').classList.toggle('active', tab === 'super_admin');
-  document.getElementById('tabUser').classList.toggle('active', tab === 'user');
-  document.getElementById('loginUser').value = tab === 'admin' ? 'admin' : '';
-  document.getElementById('loginPass').value = '';
-  document.getElementById('loginError').textContent = '';
+function switchLoginTab(t) {
+  loginTab = t;
+  document.querySelectorAll('.login-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab' + t.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')).classList.add('active');
+  document.getElementById('loginUser').value = t === 'admin' ? 'admin' : '';
 }
 
 async function doLogin() {
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value;
-  document.getElementById('loginError').textContent = '';
-
-  if (!u || !p) { document.getElementById('loginError').textContent = 'Please enter credentials.'; return; }
 
   if (loginTab === 'admin' && u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
-    SESSION = { role: 'admin', name: 'Administrator', dept: '' };
+    SESSION = { role: 'admin', name: 'Admin' };
     startApp();
     return;
   }
 
   if (p === APP_CONFIG.USER_PASS) {
-    if (sb) {
-      const { data } = await sb.from('doers').select('*').ilike('name', u).limit(1);
-      if (data && data.length > 0) {
-        const doer = data[0];
-        // Handle User vs Super Admin
-        const dbType = (doer.user_type || 'User').toLowerCase().replace(' ', '_');
-        if (loginTab === dbType || (loginTab === 'user' && dbType === 'user')) {
-             SESSION = { role: loginTab, name: doer.name, dept: doer.department, id: doer.id };
-             startApp();
-             return;
-        } else {
-             document.getElementById('loginError').textContent = `Please select the correct login tab for your account type.`;
-             return;
-        }
+    const { data } = await sb.from('doers').select('*').ilike('name', u).limit(1);
+    if (data && data.length > 0) {
+      const dbType = (data[0].user_type || 'User').toLowerCase().replace(' ', '_');
+      if (loginTab === dbType) {
+        SESSION = { role: loginTab, name: data[0].name };
+        startApp();
+        return;
       }
     }
   }
-  document.getElementById('loginError').textContent = 'Invalid credentials. Check username/password.';
+  document.getElementById('loginError').textContent = "Invalid User or Tab";
 }
 
 function startApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
-  document.getElementById('navRole').textContent = SESSION.role.toUpperCase().replace('_',' ');
+  document.getElementById('navRole').textContent = SESSION.role.toUpperCase();
   document.getElementById('navUser').textContent = SESSION.name;
+  
   document.getElementById('adminMenuGroup').style.display = SESSION.role === 'admin' ? '' : 'none';
-  document.getElementById('userMenuGroup').style.display  = (SESSION.role === 'user' || SESSION.role === 'super_admin') ? '' : 'none';
+  document.getElementById('userMenuGroup').style.display  = SESSION.role !== 'admin' ? '' : 'none';
   document.getElementById('scoringMenuItem').style.display = SESSION.role === 'user' ? 'none' : 'block';
+
   showPage(SESSION.role === 'admin' ? 'dashboard' : 'myTasks');
 }
 
-function doLogout() {
-  SESSION = {};
-  document.getElementById('appShell').style.display = 'none';
-  document.getElementById('loginPass').value = '';
-  showLogin();
+function doLogout() { location.reload(); }
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  if (p === 'dashboard') loadDashboard();
+  if (p === 'doers') loadDoers();
+  if (p === 'tasks') loadTasks();
+  if (p === 'master') loadMaster();
+  if (p === 'donelist') loadDoneList();
+  if (p === 'scoring') loadScoring();
+  if (p === 'myTasks') loadMyTasks();
 }
 
-// ── PAGE ROUTING ──────────────────────────────────────────────
-function showPage(page) {
-  const sidebar = document.getElementById('appSidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  if(sidebar) sidebar.classList.remove('show');
-  if(overlay) overlay.classList.remove('show');
+// ── DATA LOADING ── (Strict Lowercase Keys) ──────────────────
+async function loadMyTasks() {
+  const isRead = SESSION.role === 'user';
+  document.getElementById('myTasksSubtitle').textContent = isRead ? "View Only" : "Action Required";
 
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById('page-' + page);
-  if (el) el.classList.add('active');
-  const m = document.getElementById('menu-' + page);
-  if (m) m.classList.add('active');
-  
-  const loaders = {
-    dashboard: loadDashboard, doers: loadDoers, tasks: loadTasks,
-    master: loadMaster, donelist: loadDoneList, scoring: loadScoring, myTasks: loadMyTasks
-  };
-  if (loaders[page]) loaders[page]();
-}
+  // Query using lowercase columns from your SQL
+  const { data } = await sb.from('master_schedule')
+    .select('*')
+    .ilike('doer_name', SESSION.name.trim())
+    .is('status', null)
+    .order('planned_date', { ascending: true });
 
-// ── DASHBOARD ─────────────────────────────────────────────────
-async function loadDashboard() {
-  if (!sb) return;
-  const [{ count: dCount }, { data: master }, { data: done }] = await Promise.all([
-    sb.from('doers').select('*', { count: 'exact', head: true }),
-    sb.from('master_schedule').select('status, planned_date'),
-    sb.from('done_list').select('id', { count: 'exact', head: false }),
-  ]);
-  const now = new Date();
-  let pending = 0, overdue = 0;
-  (master || []).forEach(r => {
-    if (!r.status) {
-      new Date(r.planned_date) < now ? overdue++ : pending++;
-    }
-  });
-  document.getElementById('st-doers').textContent   = dCount || 0;
-  document.getElementById('st-done').textContent    = (done || []).length;
-  document.getElementById('st-pending').textContent = pending;
-  document.getElementById('st-overdue').textContent = overdue;
+  const container = document.getElementById('myTasksContainer');
+  if (!data || data.length === 0) {
+    container.innerHTML = `<div class="p-5 text-center">No pending tasks for ${SESSION.name}</div>`;
+    return;
+  }
 
-  const { data: scoring } = await sb.from('scoring').select('*');
-  const sc = scoring || [];
-  renderComplianceChart({ labels: ['On Time', 'Late'], data: [sc.filter(r => r.on_time).length, sc.filter(r => !r.on_time).length] });
-  const deptMap = {};
-  sc.forEach(r => { const d = r.department||'Unknown'; deptMap[d] = (deptMap[d]||0)+1; });
-  renderDeptChart({ labels: Object.keys(deptMap), data: Object.values(deptMap) });
-  renderLeaderboard(buildLeaderboard(sc), 'leaderboardEl');
-}
-
-function buildLeaderboard(scoring) {
-  const map = {};
-  (scoring || []).forEach(r => {
-    const n = r.doer_name || '';
-    if (!n) return;
-    if (!map[n]) map[n] = { name: n, dept: r.department||'', totalTasks: 0, onTime: 0, late: 0, score: 0 };
-    map[n].totalTasks++;
-    r.on_time ? map[n].onTime++ : map[n].late++;
-  });
-  Object.values(map).forEach(p => p.score = p.totalTasks > 0 ? Math.round((p.onTime / p.totalTasks) * 100) - 100 : 0);
-  return Object.values(map).sort((a, b) => b.score - a.score);
-}
-
-function renderComplianceChart(d) {
-  const ctx = document.getElementById('chartCompliance').getContext('2d');
-  if (chartCompliance) chartCompliance.destroy();
-  chartCompliance = new Chart(ctx, { type: 'doughnut', data: { labels: d.labels, datasets: [{ data: d.data, backgroundColor: ['#1565C0','#C62828'], borderWidth: 0 }] }, options: { plugins: { legend: { position: 'bottom' } }, cutout: '65%' } });
-}
-function renderDeptChart(d) {
-  const ctx = document.getElementById('chartDept').getContext('2d');
-  if (chartDept) chartDept.destroy();
-  chartDept = new Chart(ctx, { type: 'bar', data: { labels: d.labels, datasets: [{ label: 'Tasks', data: d.data, backgroundColor: '#1976D2', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
-}
-function renderLeaderboard(data, containerId) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  if (!data.length) { el.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:20px;">No data yet</div>'; return; }
-  el.innerHTML = data.slice(0,5).map((p, i) => {
-    const rc = i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    return `<div class="score-card">
-      <div class="score-rank ${rc}">${i+1}</div>
-      <div style="flex:1;"><div style="font-weight:700;">${p.name}</div><div style="font-size:.76rem;color:var(--text-muted);">${p.dept}</div></div>
-      <div style="text-align:right;">
-        <div style="font-size:1.4rem;font-weight:700;color:${p.score>=0?'#1565C0':'#C62828'};">${p.score}</div>
-        <div style="font-size:.7rem;color:var(--text-muted);">score (max 0)</div>
+  container.innerHTML = data.map(t => `
+    <div class="card-table mb-3">
+      <div class="table-header">
+        <div>
+          <div class="fw-bold">${t.task_name}</div>
+          <div class="small text-muted">Planned: ${fmtDate(t.planned_date)}</div>
+        </div>
+        ${isRead ? '' : `<button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">Complete</button>`}
       </div>
-    </div>`;
-  }).join('');
+    </div>`).join('');
+  window._pending = data;
 }
 
-// ── DOERS ─────────────────────────────────────────────────────
+async function loadDashboard() {
+  const { count: doerC } = await sb.from('doers').select('*', { count: 'exact', head: true });
+  const { data: m } = await sb.from('master_schedule').select('status, planned_date');
+  const { data: d } = await sb.from('done_list').select('id');
+  
+  let pend = 0, over = 0;
+  const now = new Date();
+  m.forEach(r => { 
+    if(!r.status) { new Date(r.planned_date) < now ? over++ : pend++; }
+  });
+
+  document.getElementById('st-doers').textContent = doerC || 0;
+  document.getElementById('st-done').textContent = (d || []).length;
+  document.getElementById('st-pending').textContent = pend;
+  document.getElementById('st-overdue').textContent = over;
+}
+
 async function loadDoers() {
-  if (!sb) return;
-  const { data } = await sb.from('doers').select('*').order('created_at', { ascending: true });
-  DOERS_CACHE = data || [];
-  const tbody = document.getElementById('doerTbody');
-  tbody.innerHTML = DOERS_CACHE.map((r, i) => `
-     <tr>
-       <td>${i+1}</td>
-       <td><strong>${r.name||''}</strong></td>
-       <td>${r.department||''}</td>
-       <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
-       <td>${r.phone||''}</td>
-       <td>${r.whatsapp||''}</td>
-       <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
-       <td>
-         <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
-         <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
-       </td>
-     </tr>`).join('');
+  const { data } = await sb.from('doers').select('*').order('name');
+  document.getElementById('doerTbody').innerHTML = (data||[]).map(r => `<tr><td>${r.name}</td><td>${r.department}</td><td>${r.user_type}</td><td><button class="btn-sm-icon text-danger" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button></td></tr>`).join('');
 }
 
-function openDoerModal(id) {
-  document.getElementById('doerEditId').value = id || '';
-  if (id) {
-    const r = DOERS_CACHE.find(d => d.id === id);
-    if (r) {
-      document.getElementById('d_name').value  = r.name||'';
-      document.getElementById('d_dept').value  = r.department||'';
-      document.getElementById('d_email').value = r.email||'';
-      document.getElementById('d_phone').value = r.phone||'';
-      document.getElementById('d_wa').value    = r.whatsapp||'';
-      document.getElementById('d_usertype').value = r.user_type||'User';
-    }
-  } else {
-    ['d_name','d_dept','d_email','d_phone','d_wa'].forEach(id => document.getElementById(id).value='');
-    document.getElementById('d_usertype').value = 'User';
-  }
-  new bootstrap.Modal(document.getElementById('doerModal')).show();
-}
-
-async function saveDoer() {
-  const name = document.getElementById('d_name').value.trim();
-  if (!name) { toast('Name is required','error'); return; }
-  const row = {
-    name, department: document.getElementById('d_dept').value.trim(),
-    email: document.getElementById('d_email').value.trim(), phone: document.getElementById('d_phone').value.trim(),
-    whatsapp: document.getElementById('d_wa').value.trim(), user_type: document.getElementById('d_usertype').value
-  };
-  const id = document.getElementById('doerEditId').value;
-  if (id) { await sb.from('doers').update(row).eq('id', id); toast('Doer updated','success'); } 
-  else { await sb.from('doers').insert(row); toast('Doer added','success'); }
-  bootstrap.Modal.getInstance(document.getElementById('doerModal')).hide();
-  loadDoers();
-}
-
-async function deleteDoer(id) {
-  if (!confirm('Delete?')) return;
-  await sb.from('doers').delete().eq('id', id);
-  loadDoers();
-}
-
-// ── TASKS ─────────────────────────────────────────────────────
 async function loadTasks() {
-  if (!sb) return;
-  const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
-  TASKS_CACHE = data || [];
-  const tbody = document.getElementById('taskTbody');
-  tbody.innerHTML = TASKS_CACHE.map((r, i) => `
-     <tr>
-       <td>${r.id}</td>
-       <td><strong>${r.task_name||r.Task_Name||''}</strong></td>
-       <td>${r.doer_name||r.Doer_Name||''}</td>
-       <td>${r.department||r.Department||''}</td>
-       <td><span class="badge-freq">${r.frequency||r.Frequency||''}</span></td>
-       <td>${r.start_date||r.Start_Date||''}</td>
-       <td>
-         <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
-         <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
-       </td>
-     </tr>`).join('');
+  const { data } = await sb.from('tasks').select('*');
+  document.getElementById('taskTbody').innerHTML = (data||[]).map(r => `<tr><td>${r.id}</td><td>${r.task_name}</td><td>${r.doer_name}</td><td>${r.frequency}</td><td><button class="btn-sm-icon text-danger" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button></td></tr>`).join('');
 }
 
-async function openTaskModal(id) {
-  await loadDoersForSelect();
-  document.getElementById('taskEditId').value = id || '';
-  if (id) {
-    const r = TASKS_CACHE.find(t => t.id === id);
-    if (r) {
-      document.getElementById('t_name').value = r.task_name||r.Task_Name||'';
-      document.getElementById('t_doer').value = r.doer_name||r.Doer_Name||'';
-      document.getElementById('t_dept').value = r.department||r.Department||'';
-      document.getElementById('t_freq').value = r.frequency||r.Frequency||'2W';
-      document.getElementById('t_date').value = r.start_date||r.Start_Date||'';
-    }
-  } else {
-    ['t_name','t_dept'].forEach(id => document.getElementById(id).value='');
-    document.getElementById('t_date').value = new Date().toISOString().split('T')[0];
-  }
-  new bootstrap.Modal(document.getElementById('taskModal')).show();
-}
-
-async function loadDoersForSelect() {
-  const { data } = await sb.from('doers').select('name, department').order('name');
-  document.getElementById('t_doer').innerHTML = '<option value="">— Select Doer —</option>' +
-    (data||[]).map(d => `<option value="${d.name}" data-dept="${d.department}">${d.name} (${d.department})</option>`).join('');
-}
-
-function autoFillDept() {
-  const sel = document.getElementById('t_doer');
-  document.getElementById('t_dept').value = sel.selectedOptions[0].dataset.dept || '';
-}
-
-async function saveTask() {
-  const row = {
-    task_name: document.getElementById('t_name').value.trim(),
-    doer_name: document.getElementById('t_doer').value,
-    department: document.getElementById('t_dept').value.trim(),
-    frequency: document.getElementById('t_freq').value,
-    start_date: document.getElementById('t_date').value
-  };
-  const id = document.getElementById('taskEditId').value;
-  if (id) await sb.from('tasks').update(row).eq('id', id);
-  else await sb.from('tasks').insert(row);
-  bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide();
-  loadTasks();
-}
-
-async function deleteTask(id) {
-  if (confirm('Delete?')) { await sb.from('tasks').delete().eq('id', id); loadTasks(); }
-}
-
-// ── GENERATE MASTER ───────────────────────────────────────────
-async function generateMaster() {
-  if (!confirm('Regenerate 2-year schedule?')) return;
-  const { data: tasks } = await sb.from('tasks').select('*');
-  await sb.from('master_schedule').delete().neq('id', 0);
-  const rows = [];
-  for (const t of tasks) {
-    const dates = generateDates(new Date(t.start_date||t.Start_Date), t.frequency||t.Frequency, 730);
-    for (const d of dates) {
-      rows.push({
-        doer_name: t.doer_name||t.Doer_Name, department: t.department||t.Department,
-        task_ref_id: t.id, frequency: t.frequency||t.Frequency,
-        task_name: t.task_name||t.Task_Name, planned_date: d.toISOString(), status: null
-      });
-    }
-  }
-  for (let i = 0; i < rows.length; i += 500) await sb.from('master_schedule').insert(rows.slice(i, i+500));
-  toast(`Generated ${rows.length} rows!`,'success');
-  loadMaster();
-}
-
-function generateDates(start, freq, days) {
-  const dates = []; const end = new Date(start.getTime() + days * 86400000);
-  const ints = { D:1, W:7, '2W':15, M:30, '2M':60, '3M':90, '6M':180, Y:365, '2Y':730 };
-  const step = ints[freq] || 30; let cur = new Date(start);
-  while (cur <= end) { dates.push(new Date(cur)); cur.setDate(cur.getDate() + step); }
-  return dates;
-}
-
-// ── MASTER & DONE LIST ────────────────────────────────────────
 async function loadMaster() {
-  const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
-  document.getElementById('masterTbody').innerHTML = (data||[]).map(r => `<tr>
-    <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td>
-    <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
-    <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td>
-    <td>${r.status?`<span class="badge-${r.status.includes('Time')?'ontime':'late'}">${r.status}</span>`:'<span class="badge-pending">Pending</span>'}</td></tr>`).join('');
+  const { data } = await sb.from('master_schedule').select('*').order('planned_date');
+  document.getElementById('masterTbody').innerHTML = (data||[]).map(r => `<tr><td>${r.doer_name}</td><td>${r.task_name}</td><td>${fmtDate(r.planned_date)}</td><td>${r.status||'Pending'}</td></tr>`).join('');
 }
 
 async function loadDoneList() {
   const { data } = await sb.from('done_list').select('*').order('submitted_on', { ascending: false });
-  document.getElementById('doneTbody').innerHTML = (data||[]).map(r => `<tr>
-    <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-    <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
-    <td><span class="badge-${r.status.includes('Time')?'ontime':'late'}">${r.status}</span></td>
-    <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`).join('');
+  document.getElementById('doneTbody').innerHTML = (data||[]).map(r => `<tr><td>${r.doer_name}</td><td>${r.task_name}</td><td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${r.status}</td></tr>`).join('');
 }
 
 async function loadScoring() {
   const { data } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
-  const lb = buildLeaderboard(data);
-  renderLeaderboard(lb, 'scoringLeaderboard');
-  const tbody = document.getElementById('scoreTbody');
-  tbody.innerHTML = (data||[]).map(r => `<tr>
-    <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-    <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
-    <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
-    <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
-    <td>${fmtDate(r.submitted_on)}</td></tr>`).join('');
+  document.getElementById('scoreTbody').innerHTML = (data||[]).map(r => `<tr><td>${r.doer_name}</td><td>${r.task_name}</td><td>${r.on_time?'Yes':'No'}</td><td>${r.score}</td><td>${fmtDate(r.submitted_on)}</td></tr>`).join('');
 }
 
-// ── MY TASKS (USER) ── FIXED DATA LOADING ───────────────────
-async function loadMyTasks() {
-  if (!sb) return;
-  const isRegularUser = SESSION.role === 'user';
-  
-  // Adjusted Filter: Show ALL pending tasks for the logged in user
-  const { data, error } = await sb
-    .from('master_schedule')
-    .select('*')
-    .ilike('doer_name', SESSION.name.trim()) // Using ILIKE for case-insensitivity
-    .or('status.is.null,status.eq.""') // Find tasks where status is actually NULL or Empty
-    .order('planned_date', { ascending: true });
-
-  if (error) { toast("Error loading tasks: " + error.message, "error"); return; }
-
-  const el = document.getElementById('myTasksContainer');
-  const tasks = data || [];
-  if (!tasks.length) { showNoTaskMsg(); return; }
-
-  el.innerHTML = tasks.map(t => {
-    const planned = new Date(t.planned_date);
-    const overdue = planned < new Date();
-    
-    // Hide buttons for regular "User" role
-    const actionsHtml = isRegularUser ? `<div class="badge-role">READ ONLY</div>` : `
-        <div class="d-flex gap-2">
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')"><i class="bi bi-envelope"></i></button>
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')"><i class="bi bi-whatsapp"></i></button>
-          <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">Complete</button>
-        </div>`;
-
-    return `<div class="card-table mb-3">
-      <div class="table-header" style="background:${overdue?'#FFEBEE':'#E3F2FD'};">
-        <div>
-          <div style="font-weight:700;"><i class="bi bi-gear-fill me-2"></i>${t.task_name}</div>
-          <div style="font-size:.78rem;color:var(--text-muted);">
-            Planned: <strong>${fmtDate(t.planned_date)}</strong> ${overdue?'<span class="badge-late">OVERDUE</span>':''}
-          </div>
-        </div>
-        ${actionsHtml}
-      </div>
-    </div>`;
-  }).join('');
-  window._pendingTasks = tasks;
+// ── CRUD OPS ──────────────────────────────────────────────────
+async function saveDoer() {
+  const row = { name: document.getElementById('d_name').value, department: document.getElementById('d_dept').value, user_type: document.getElementById('d_usertype').value };
+  await sb.from('doers').insert(row);
+  bootstrap.Modal.getInstance(document.getElementById('doerModal')).hide();
+  loadDoers();
 }
 
-function showNoTaskMsg() {
-  document.getElementById('myTasksContainer').innerHTML = `
-    <div style="text-align:center;padding:60px;color:var(--text-muted);">
-      <i class="bi bi-emoji-smile" style="font-size:3rem;color:var(--accent);"></i>
-      <div style="font-size:1.1rem;margin-top:12px;font-weight:600;">All caught up!</div>
-      <div>No pending tasks found for <strong>${SESSION.name}</strong></div>
-    </div>`;
+async function saveTask() {
+  const row = { task_name: document.getElementById('t_name').value, doer_name: document.getElementById('t_doer').value, department: document.getElementById('t_dept').value, frequency: document.getElementById('t_freq').value, start_date: document.getElementById('t_date').value };
+  await sb.from('tasks').insert(row);
+  bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide();
+  loadTasks();
 }
 
-// ── SUBMIT TASK ───────────────────────────────────────────────
-function openSubmitModal(taskId) {
-  const t = (window._pendingTasks||[]).find(x => x.id == taskId);
-  if (!t) return;
-  currentSubmitTask = t;
-  document.getElementById('submitModalBody').innerHTML = `
-    <div style="background:var(--accent2);padding:12px;margin-bottom:15px;border-radius:8px;">
-        <strong>${t.task_name}</strong> | ${fmtDate(t.planned_date)}
-    </div>
-    <div class="row g-2">
-        ${['air_pressure','gauge_check','spare_parts','damaged_parts','grease','bearing_bush'].map(k=>`
-            <div class="col-md-6 check-item">
-                <select id="chk_${k}" class="form-select form-select-sm"><option value="Done">Done</option><option value="N/A">N/A</option></select>
-                <span class="ms-2 small">${k.replace('_',' ')}</span>
-            </div>`).join('')}
-    </div>
-    <div class="mt-3"><label class="form-label">Remarks</label><textarea id="chk_remarks" class="form-control" rows="2"></textarea></div>`;
+async function generateMaster() {
+  const { data: tasks } = await sb.from('tasks').select('*');
+  const rows = [];
+  tasks.forEach(t => {
+    const dates = [new Date(t.start_date)];
+    for(let i=1; i<10; i++) {
+        let d = new Date(t.start_date); 
+        d.setDate(d.getDate() + (i * (t.frequency === '2W' ? 15 : 30)));
+        rows.push({ doer_name: t.doer_name, department: t.department, task_name: t.task_name, planned_date: d.toISOString(), task_ref_id: t.id, frequency: t.frequency });
+    }
+  });
+  await sb.from('master_schedule').insert(rows);
+  toast("Schedule Generated");
+}
+
+function openSubmitModal(id) {
+  currentSubmitTask = window._pending.find(x => x.id == id);
+  document.getElementById('submitModalBody').innerHTML = `Confirm completion for <b>${currentSubmitTask.task_name}</b>?`;
   new bootstrap.Modal(document.getElementById('submitModal')).show();
 }
 
 async function confirmSubmit() {
-  const t = currentSubmitTask; const now = new Date();
-  const onTime = now <= new Date(new Date(t.planned_date).setHours(23,59,59));
-  const status = onTime ? 'Done On Time' : 'Done Late';
+  const t = currentSubmitTask;
+  const now = new Date();
+  const onTime = now <= new Date(t.planned_date);
+  const status = onTime ? "Done On Time" : "Done Late";
 
-  const update = { actual_date: now.toISOString(), status, remarks: document.getElementById('chk_remarks').value };
-  await sb.from('master_schedule').update(update).eq('id', t.id);
-  await sb.from('done_list').insert({ ...update, doer_name: t.doer_name, task_name: t.task_name, planned_date: t.planned_date, submitted_by: SESSION.name, submitted_on: now.toISOString() });
-  await sb.from('scoring').insert({ doer_name: t.doer_name, department: t.department, task_name: t.task_name, planned_date: t.planned_date, actual_date: now.toISOString(), on_time: onTime, score: onTime?1:0, submitted_on: now.toISOString() });
+  await sb.from('master_schedule').update({ status, actual_date: now.toISOString() }).eq('id', t.id);
+  await sb.from('done_list').insert({ doer_name: t.doer_name, task_name: t.task_name, status, planned_date: t.planned_date, actual_date: now.toISOString(), submitted_by: SESSION.name });
+  await sb.from('scoring').insert({ doer_name: t.doer_name, task_name: t.task_name, on_time: onTime, score: onTime?10:-50 });
 
   bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
-  toast('Submitted successfully','success');
   loadMyTasks();
 }
 
-// ── HELPERS ───────────────────────────────────────────────────
-function fmtDate(d) {
-  if (!d) return ''; const dt = new Date(d);
-  return dt.toLocaleDateString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric' });
+// ── UTILS ─────────────────────────────────────────────────────
+function fmtDate(d) { return new Date(d).toLocaleDateString('en-IN'); }
+function toast(m) { alert(m); }
+async function loadDoersForSelect() {
+  const { data } = await sb.from('doers').select('name, department');
+  document.getElementById('t_doer').innerHTML = data.map(d => `<option value="${d.name}" data-dept="${d.department}">${d.name}</option>`).join('');
 }
-function toast(msg, type='info') {
-  const div = document.createElement('div'); div.className = `app-toast toast-${type}`;
-  div.innerHTML = `<i class="bi bi-info-circle"></i> ${msg}`;
-  document.getElementById('toastContainer').appendChild(div);
-  setTimeout(() => div.remove(), 4000);
+function autoFillDept() {
+  const sel = document.getElementById('t_doer');
+  document.getElementById('t_dept').value = sel.selectedOptions[0].dataset.dept;
 }
-function filterTable(id, q) {
-  document.querySelectorAll(`#${id} tbody tr`).forEach(tr => tr.style.display = tr.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none');
-}
-function toggleSidebar() {
-  document.getElementById('appSidebar').classList.toggle('show');
-  document.getElementById('sidebarOverlay').classList.toggle('show');
-}
+function openTaskModal() { loadDoersForSelect(); new bootstrap.Modal(document.getElementById('taskModal')).show(); }
+function openDoerModal() { new bootstrap.Modal(document.getElementById('doerModal')).show(); }
+function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('show'); }
 </script>
 </body>
 </html>
