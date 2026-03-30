@@ -1,4 +1,3 @@
-this is index.html file 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -541,7 +540,7 @@ const APP_CONFIG = {
   USER_PASS:     "User@1234",
 };
 
-let SESSION = { role: null, name: null, dept: null };
+let SESSION = { role: null, name: null, dept: null, userType: null };
 let DOERS_CACHE = [];
 let TASKS_CACHE = [];
 let currentSubmitTask = null;
@@ -593,7 +592,7 @@ let loginTab = 'admin';
 function switchLoginTab(tab) {
   loginTab = tab;
   document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
-  document.getElementById('tabUser').classList.toggle('active', tab === 'user');
+  document.getElementById('tabUser').classList.toggle('active', tab === 'super_admin');
   document.getElementById('loginUser').value = tab === 'admin' ? 'admin' : '';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginError').textContent = '';
@@ -608,7 +607,7 @@ async function doLogin() {
 
   // Admin login
   if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
-    SESSION = { role: 'admin', name: 'Administrator', dept: '' };
+    SESSION = { role: 'admin', name: 'Administrator', dept: '', userType: 'Admin' };
     startApp();
     return;
   }
@@ -619,13 +618,13 @@ async function doLogin() {
       const { data } = await sb.from('doers')
         .select('*').ilike('name', u).limit(1);
       if (data && data.length > 0) {
-        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id };
+        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id, userType: data[0].user_type };
         startApp();
         return;
       }
     } else {
       // No DB: demo mode
-      SESSION = { role: 'user', name: u, dept: 'Demo' };
+      SESSION = { role: 'user', name: u, dept: 'Demo', userType: 'User' };
       startApp();
       return;
     }
@@ -640,10 +639,18 @@ document.addEventListener('keydown', e => {
 function startApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
-  document.getElementById('navRole').textContent = SESSION.role.toUpperCase();
+  document.getElementById('navRole').textContent = SESSION.userType ? SESSION.userType.toUpperCase() : SESSION.role.toUpperCase();
   document.getElementById('navUser').textContent = SESSION.name;
   document.getElementById('adminMenuGroup').style.display = SESSION.role === 'admin' ? '' : 'none';
   document.getElementById('userMenuGroup').style.display  = SESSION.role === 'user'  ? '' : 'none';
+  
+  // Logic for Restrictive "User" (e.g. Prosun)
+  if(SESSION.userType === 'User') {
+      document.getElementById('menu-myScoring').style.display = 'none';
+  } else {
+      document.getElementById('menu-myScoring').style.display = 'flex';
+  }
+
   showPage(SESSION.role === 'admin' ? 'dashboard' : 'myTasks');
 }
 
@@ -1062,6 +1069,10 @@ async function loadMyTasks() {
     const planned = new Date(t.planned_date);
     const overdue = planned < now;
     const daysLeft = Math.round((planned - now) / 86400000);
+    
+    // Non-Editable Logic for "User" type
+    const showActions = SESSION.userType !== 'User';
+
     return `<div class="card-table mb-3">
       <div class="table-header d-flex flex-column flex-md-row gap-3 align-items-start align-items-md-center" style="background:${overdue?'#FFEBEE':'#E3F2FD'};">
         <div class="flex-grow-1">
@@ -1074,6 +1085,7 @@ async function loadMyTasks() {
             ${overdue ? ' &nbsp;<span class="badge-late">OVERDUE</span>' : ` &nbsp;<span class="badge-pending">${daysLeft}d left</span>`}
           </div>
         </div>
+        ${showActions ? `
         <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
           <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
             <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
@@ -1084,7 +1096,7 @@ async function loadMyTasks() {
           <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
              Complete
           </button>
-        </div>
+        </div>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -1276,25 +1288,3 @@ function toggleSidebar() {
 </script>
 </body>
 </html>
-
-
-this is config.json code 
-
-{
-  "supabase_url": "https://xfecmmhabdjnudqfyrqz.supabase.co",
-  "supabase_anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg",
-  "app": {
-    "APP_NAME": "CheckList",
-    "ADMIN_USER": "admin",
-    "ADMIN_PASS": "Admin@1234",
-    "USER_PASS": "User@1234",
-    "SCORE_ON_TIME": 1,
-    "SCORE_LATE": 0,
-    "ROLES": {
-      "ADMIN": "Full Access: Management, Doers, Tasks, Schedule Generation, Scoring",
-      "SUPER_ADMIN": "Supervisor Access: My Tasks, Done List, Scoring",
-      "USER": "Operator Access: My Tasks, Done List (Read-only)"
-    },
-    "EMAIL_FROM": "mis@yajurfibres.com"
-  }
-}
