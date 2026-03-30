@@ -60,9 +60,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 @keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
 .login-logo{font-family:'Playfair Display',serif;color:var(--primary);font-size:2rem;text-align:center;margin-bottom:6px;}
 .login-sub{text-align:center;color:var(--text-muted);font-size:.82rem;margin-bottom:28px;letter-spacing:1px;text-transform:uppercase;}
-.login-tabs{display:flex;gap:0;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:24px;}
-.login-tab{flex:1;padding:8px;text-align:center;font-size:.84rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text-muted);transition:all .2s;border:none;}
-.login-tab.active{background:var(--primary);color:#fff;}
 
 /* NAVBAR */
 .app-navbar{background:linear-gradient(90deg,var(--primary-dark) 0%,var(--primary) 100%);padding:0 24px;height:62px;display:flex;align-items:center;box-shadow:var(--shadow-md);position:sticky;top:0;z-index:1100;}
@@ -255,11 +252,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="login-card">
     <div class="login-logo">&#9745; CheckList</div>
     <div class="login-sub">Maintenance Management System</div>
-    <div class="login-tabs">
-      <button class="login-tab active" id="tabLogin" onclick="switchLoginTab('login')">
-        <i class="bi bi-box-arrow-in-right me-1"></i>Login
-      </button>
-    </div>
     <div class="mb-3">
       <label class="form-label">Username</label>
       <input type="text" id="loginUser" class="form-control" placeholder="Enter username or name" value="admin"/>
