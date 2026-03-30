@@ -213,8 +213,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">
         <i class="bi bi-shield-lock me-1"></i>Admin
       </button>
-      <button class="login-tab" id="tabUser" onclick="switchLoginTab('super_admin')">
-        <i class="bi bi-person me-1"></i>Super Admin
+      <button class="login-tab" id="tabUser" onclick="switchLoginTab('user')">
+        <i class="bi bi-person me-1"></i>User
       </button>
     </div>
     <div class="mb-3">
@@ -316,7 +316,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div><div class="page-title">Doers</div><div class="page-sub">Manage maintenance personnel</div></div>
           <div class="d-flex gap-2">
-            <button class="btn-primary-custom" onclick="openDoerModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
+            <button class="btn-primary-custom" id="addDoerBtn" onclick="openDoerModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
             <button class="btn-sm-icon" onclick="exportCsv('doers')" title="Export CSV"><i class="bi bi-download"></i></button>
           </div>
         </div>
@@ -327,7 +327,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="doerTable">
-              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>User Type</th><th>Actions</th></tr></thead>
+              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>User Type</th><th>Actions</th> </thead>
               <tbody id="doerTbody"></tbody>
             </table>
           </div>
@@ -339,12 +339,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="d-flex align-items-center justify-content-between mb-2">
           <div><div class="page-title">Tasks</div><div class="page-sub">Define maintenance tasks & frequency</div></div>
           <div class="d-flex gap-2">
-            <button class="btn-primary-custom" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
+            <button class="btn-primary-custom" id="addTaskBtn" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
             <button class="btn-sm-icon" onclick="exportCsv('tasks')" title="Export CSV"><i class="bi bi-download"></i></button>
           </div>
         </div>
         <div class="text-center mb-3 mt-2">
-          <button class="btn-start" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button>
+          <button class="btn-start" id="generateMasterBtn" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button>
           <div style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">Generates 2-year schedule based on all tasks above</div>
         </div>
         <div class="card-table">
@@ -354,7 +354,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="taskTable">
-              <thead><tr><th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th>Actions</th></tr></thead>
+              <thead><tr><th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th>Actions</th> </thead>
               <tbody id="taskTbody"></tbody>
             </table>
           </div>
@@ -522,18 +522,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <script>
 // ══════════════════════════════════════════════════════════════
-//  CHECKLIST — Supabase Web App
+//  CHECKLIST — Supabase Web App with View‑Only "Super Admin" Mode
 // ══════════════════════════════════════════════════════════════
 
-// ── CONFIG (loaded from config.json) ─────────────────────────
+// ── CONFIG ─────────────────────────────────────────────────────
 let SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
 let SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg";
 let sb = null;
 
 const APP_CONFIG = {
   APP_NAME:      "CheckList",
-  // Score formula: (onTime/total*100)-100  → range -100 to 0
-  SCORE_ON_TIME: 1,   // stored as 1/0 boolean-int; formula applied in buildLeaderboard
+  SCORE_ON_TIME: 1,
   SCORE_LATE:    0,
   ADMIN_USER:    "admin",
   ADMIN_PASS:    "Admin@1234",
@@ -541,6 +540,7 @@ const APP_CONFIG = {
 };
 
 let SESSION = { role: null, name: null, dept: null };
+let VIEW_ONLY = false;            // NEW: if true → no edits/adds/deletes/generate
 let DOERS_CACHE = [];
 let TASKS_CACHE = [];
 let currentSubmitTask = null;
@@ -549,7 +549,6 @@ let chartCompliance = null, chartDept = null, chartScore = null;
 // ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
   setLoadStatus("Connecting to database...");
-
   try {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     setLoadStatus("Initializing tables...");
@@ -578,16 +577,12 @@ function showLogin() {
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
-// ── SUPABASE TABLE INIT ───────────────────────────────────────
-// Tables are created via Supabase SQL editor (see setup guide)
-// This function just verifies connectivity
 async function initSupabaseTables() {
   if (!sb) return;
-  // Test connection by querying doers table
   await sb.from('doers').select('id').limit(1);
 }
 
-// ── LOGIN ─────────────────────────────────────────────────────
+// ── LOGIN with View-Only for User tab ──────────────────────────
 let loginTab = 'admin';
 function switchLoginTab(tab) {
   loginTab = tab;
@@ -605,26 +600,29 @@ async function doLogin() {
 
   if (!u || !p) { document.getElementById('loginError').textContent = 'Please enter credentials.'; return; }
 
-  // Admin login
+  // Admin login (full edit)
   if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
     SESSION = { role: 'admin', name: 'Administrator', dept: '' };
+    VIEW_ONLY = false;
     startApp();
     return;
   }
 
-  // User login — check against doers table
+  // User login (via "User" tab) -> Super Admin view-only
   if (p === APP_CONFIG.USER_PASS) {
     if (sb) {
       const { data } = await sb.from('doers')
         .select('*').ilike('name', u).limit(1);
       if (data && data.length > 0) {
-        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id };
+        SESSION = { role: 'superadmin', name: data[0].name, dept: data[0].department, id: data[0].id };
+        VIEW_ONLY = true;   // <-- read-only mode
         startApp();
         return;
       }
     } else {
-      // No DB: demo mode
-      SESSION = { role: 'user', name: u, dept: 'Demo' };
+      // Demo fallback
+      SESSION = { role: 'superadmin', name: u, dept: 'Demo' };
+      VIEW_ONLY = true;
       startApp();
       return;
     }
@@ -641,13 +639,43 @@ function startApp() {
   document.getElementById('appShell').style.display = 'block';
   document.getElementById('navRole').textContent = SESSION.role.toUpperCase();
   document.getElementById('navUser').textContent = SESSION.name;
-  document.getElementById('adminMenuGroup').style.display = SESSION.role === 'admin' ? '' : 'none';
-  document.getElementById('userMenuGroup').style.display  = SESSION.role === 'user'  ? '' : 'none';
-  showPage(SESSION.role === 'admin' ? 'dashboard' : 'myTasks');
+
+  // Always show full admin menu (for view‑only Super Admin)
+  document.getElementById('adminMenuGroup').style.display = '';
+  document.getElementById('userMenuGroup').style.display  = 'none';
+
+  // Apply view‑only restrictions
+  applyViewOnlyRestrictions();
+
+  showPage('dashboard');
+}
+
+function applyViewOnlyRestrictions() {
+  const addDoerBtn = document.getElementById('addDoerBtn');
+  const addTaskBtn = document.getElementById('addTaskBtn');
+  const genBtn = document.getElementById('generateMasterBtn');
+
+  if (VIEW_ONLY) {
+    if (addDoerBtn) addDoerBtn.style.display = 'none';
+    if (addTaskBtn) addTaskBtn.style.display = 'none';
+    if (genBtn) genBtn.style.display = 'none';
+    // Also hide any other mutable buttons globally
+    document.querySelectorAll('.btn-primary-custom, .btn-success-custom, .btn-danger-sm')
+      .forEach(btn => {
+        if (btn.closest('.modal') === null) btn.style.display = 'none';
+      });
+  } else {
+    if (addDoerBtn) addDoerBtn.style.display = '';
+    if (addTaskBtn) addTaskBtn.style.display = '';
+    if (genBtn) genBtn.style.display = '';
+    document.querySelectorAll('.btn-primary-custom, .btn-success-custom, .btn-danger-sm')
+      .forEach(btn => btn.style.display = '');
+  }
 }
 
 function doLogout() {
   SESSION = {};
+  VIEW_ONLY = false;
   document.getElementById('appShell').style.display = 'none';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginError').textContent = '';
@@ -656,7 +684,6 @@ function doLogout() {
 
 // ── PAGE ROUTING ──────────────────────────────────────────────
 function showPage(page) {
-  // Mobile Support: Auto hide sidebar on selection
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
   if(sidebar) sidebar.classList.remove('show');
@@ -695,7 +722,6 @@ async function loadDashboard() {
   document.getElementById('st-pending').textContent = pending;
   document.getElementById('st-overdue').textContent = overdue;
 
-  // Charts
   const { data: scoring } = await sb.from('scoring').select('*');
   const sc = scoring || [];
   const onT = sc.filter(r => r.on_time).length;
@@ -717,13 +743,8 @@ function buildLeaderboard(scoring) {
     map[n].totalTasks++;
     r.on_time ? map[n].onTime++ : map[n].late++;
   });
-  // Formula: (onTime / totalTasks * 100) - 100
-  // -100 = all late, 0 = all on time
   Object.values(map).forEach(p => {
-    p.score = p.totalTasks > 0
-      ? Math.round((p.onTime / p.totalTasks) * 100) - 100
-      : 0;
-    p.total = p.score; // alias for leaderboard display
+    p.score = p.totalTasks > 0 ? Math.round((p.onTime / p.totalTasks) * 100) - 100 : 0;
   });
   return Object.values(map).sort((a, b) => b.score - a.score);
 }
@@ -744,7 +765,7 @@ function renderLeaderboard(data, containerId) {
   if (!data.length) { el.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:20px;">No data yet</div>'; return; }
   el.innerHTML = data.slice(0,5).map((p, i) => {
     const rc = i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    const scoreColor = p.total >= 0 ? 'var(--primary)' : 'var(--danger)';
+    const scoreColor = p.score >= 0 ? 'var(--primary)' : 'var(--danger)';
     return `<div class="score-card">
       <div class="score-rank ${rc}">${i+1}</div>
       <div style="flex:1;"><div style="font-weight:700;">${p.name}</div><div style="font-size:.76rem;color:var(--text-muted);">${p.dept}</div></div>
@@ -757,29 +778,31 @@ function renderLeaderboard(data, containerId) {
   }).join('');
 }
 
-// ── DOERS ─────────────────────────────────────────────────────
+// ── DOERS (read‑only if VIEW_ONLY) ─────────────────────────────
 async function loadDoers() {
   if (!sb) return;
   const { data } = await sb.from('doers').select('*').order('created_at', { ascending: true });
   DOERS_CACHE = data || [];
   const tbody = document.getElementById('doerTbody');
   tbody.innerHTML = DOERS_CACHE.map((r, i) => `
-     <tr>
-       <td>${i+1}</td>
-       <td><strong>${r.name||''}</strong></td>
-       <td>${r.department||''}</td>
-       <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
-       <td>${r.phone||''}</td>
-       <td>${r.whatsapp||''}</td>
-       <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
-       <td>
+      <tr>
+        <td>${i+1}</td>
+        <td><strong>${r.name||''}</strong></td>
+        <td>${r.department||''}</td>
+        <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
+        <td>${r.phone||''}</td>
+        <td>${r.whatsapp||''}</td>
+        <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
+        <td>${!VIEW_ONLY ? `
          <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
          <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
-       </td>
-     </tr>`).join('');
+        ` : '—'}</td>
+      </tr>`).join('');
 }
 
 function openDoerModal(id) {
+  if (VIEW_ONLY) { toast("View‑only mode – no edits allowed", "error"); return; }
+  // ... rest same as original (no change)
   document.getElementById('doerEditId').value = id || '';
   if (id) {
     const r = DOERS_CACHE.find(d => d.id === id);
@@ -800,6 +823,8 @@ function openDoerModal(id) {
 function editDoer(id) { openDoerModal(id); }
 
 async function saveDoer() {
+  if (VIEW_ONLY) { toast("View‑only mode", "error"); return; }
+  // ... original save logic (unchanged)
   const name = document.getElementById('d_name').value.trim();
   if (!name) { toast('Name is required','error'); return; }
   const row = {
@@ -823,34 +848,37 @@ async function saveDoer() {
 }
 
 async function deleteDoer(id) {
+  if (VIEW_ONLY) { toast("View‑only mode", "error"); return; }
   if (!confirm('Delete this doer?')) return;
   await sb.from('doers').delete().eq('id', id);
   toast('Doer deleted','info');
   loadDoers();
 }
 
-// ── TASKS ─────────────────────────────────────────────────────
+// ── TASKS (read‑only) ─────────────────────────────────────────
 async function loadTasks() {
   if (!sb) return;
   const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
   TASKS_CACHE = data || [];
   const tbody = document.getElementById('taskTbody');
   tbody.innerHTML = TASKS_CACHE.map((r, i) => `
-     <tr>
-       <td>${r.id}</td>
-       <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
-       <td>${r.Doer_Name||r.doer_name||''}</td>
-       <td>${r.Department||r.department||''}</td>
-       <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
-       <td>${r.Start_Date||r.start_date||''}</td>
-       <td>
+      <tr>
+        <td>${r.id}</td>
+        <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
+        <td>${r.Doer_Name||r.doer_name||''}</td>
+        <td>${r.Department||r.department||''}</td>
+        <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
+        <td>${r.Start_Date||r.start_date||''}</td>
+        <td>${!VIEW_ONLY ? `
          <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
          <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
-       </td>
-     </tr>`).join('');
+        ` : '—'}</td>
+      </tr>`).join('');
 }
 
 async function openTaskModal(id) {
+  if (VIEW_ONLY) { toast("View‑only mode – no edits allowed", "error"); return; }
+  // ... original code (unchanged)
   await loadDoersForSelect();
   document.getElementById('taskEditId').value = id || '';
   if (id) {
@@ -889,6 +917,7 @@ function autoFillDept() {
 }
 
 async function saveTask() {
+  if (VIEW_ONLY) { toast("View‑only mode", "error"); return; }
   const task_name = document.getElementById('t_name').value.trim();
   const doer_name = document.getElementById('t_doer').value;
   if (!task_name || !doer_name) { toast('Task name and doer required','error'); return; }
@@ -912,23 +941,21 @@ async function saveTask() {
 }
 
 async function deleteTask(id) {
+  if (VIEW_ONLY) { toast("View‑only mode", "error"); return; }
   if (!confirm('Delete this task?')) return;
   await sb.from('tasks').delete().eq('id', id);
   toast('Task deleted','info');
   loadTasks();
 }
 
-// ── GENERATE MASTER ───────────────────────────────────────────
+// ── GENERATE MASTER (disabled in view‑only) ───────────────────
 async function generateMaster() {
+  if (VIEW_ONLY) { toast("View‑only mode – cannot generate schedule", "error"); return; }
   if (!confirm('This will regenerate the entire Master schedule (2 years). Continue?')) return;
   toast('Generating schedule...','info');
-
   const { data: tasks } = await sb.from('tasks').select('*');
   if (!tasks || !tasks.length) { toast('No tasks found.','error'); return; }
-
-  // Clear existing master
   await sb.from('master_schedule').delete().neq('id', 0);
-
   const rows = [];
   for (const t of tasks) {
     const startDate = t.Start_Date || t.start_date;
@@ -944,14 +971,9 @@ async function generateMaster() {
         planned_date: d.toISOString(),
         actual_date:  null,
         status:       null,
-        air_pressure: null, gauge_check: null, spare_parts: null,
-        damaged_parts: null, grease: null, bearing_bush: null,
-        change_repair: null, remarks: null
       });
     }
   }
-
-  // Insert in batches of 500
   for (let i = 0; i < rows.length; i += 500) {
     const { error } = await sb.from('master_schedule').insert(rows.slice(i, i+500));
     if (error) { toast('Error: '+error.message,'error'); return; }
@@ -970,11 +992,10 @@ function generateDates(startDate, freq, totalDays) {
   return dates;
 }
 
-// ── MASTER DISPLAY ────────────────────────────────────────────
+// ── MASTER, DONE, SCORING (read‑only, no changes) ─────────────
 async function loadMaster() {
   if (!sb) return;
   const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
-  // Use a fresh tbody
   const t = document.getElementById('masterTbody');
   t.innerHTML = '';
   (data||[]).forEach(r => {
@@ -984,12 +1005,11 @@ async function loadMaster() {
               : st ? `<span class="badge-ontime">${st}</span>`
               : `<span class="badge-pending">Pending</span>`;
     t.innerHTML += `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td>
-       <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
+        <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
+        <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
   });
 }
 
-// ── DONE LIST ─────────────────────────────────────────────────
 async function loadDoneList() {
   if (!sb) return;
   const { data } = await sb.from('done_list').select('*').order('submitted_on', { ascending: false });
@@ -998,52 +1018,43 @@ async function loadDoneList() {
     const st = (r.status||'').trim();
     const badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>` : `<span class="badge-late">${st}</span>`;
     return `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
-       <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
+        <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
+        <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
   }).join('');
 }
 
-// ── SCORING ───────────────────────────────────────────────────
 async function loadScoring() {
   if (!sb) return;
   const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
   const scoring = sc || [];
-
-  // Leaderboard
   const lb = buildLeaderboard(scoring);
   renderLeaderboard(lb, 'scoringLeaderboard');
 
-  // Score chart
   const ctx = document.getElementById('chartScore').getContext('2d');
   if (chartScore) chartScore.destroy();
   const top10 = lb.slice(0, 10);
   chartScore = new Chart(ctx, {
     type: 'bar',
-    data: {
-      labels: top10.map(p => p.name),
-      datasets: [{ label: 'Score (%)', data: top10.map(p => p.score), backgroundColor: top10.map(p => p.score >= -50 ? '#1565C0' : '#C62828'), borderRadius: 6 }]
-    },
+    data: { labels: top10.map(p => p.name), datasets: [{ label: 'Score (%)', data: top10.map(p => p.score), backgroundColor: top10.map(p => p.score >= -50 ? '#1565C0' : '#C62828'), borderRadius: 6 }] },
     options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
   });
 
-  // Score table
   const tbody = document.getElementById('scoreTbody');
   tbody.innerHTML = scoring.map(r => `
-     <tr>
-       <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
-       <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
-       <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
-       <td>${fmtDate(r.submitted_on)}</td>
-     </tr>`).join('');
+      <tr>
+        <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
+        <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
+        <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
+        <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
+        <td>${fmtDate(r.submitted_on)}</td>
+      </tr>`).join('');
 }
 
-// ── MY TASKS (USER) ───────────────────────────────────────────
+// ── MY TASKS (USER) – no "Complete" in view‑only ──────────────
 async function loadMyTasks() {
   if (!sb) { showNoTaskMsg(); return; }
   const now   = new Date();
   const limit = new Date(now.getTime() + 10 * 86400000);
-
   const { data } = await sb
     .from('master_schedule')
     .select('*')
@@ -1051,10 +1062,8 @@ async function loadMyTasks() {
     .is('status', null)
     .lte('planned_date', limit.toISOString())
     .order('planned_date', { ascending: true });
-
-  const el = document.getElementById('myTasksContainer');
   const tasks = data || [];
-
+  const el = document.getElementById('myTasksContainer');
   if (!tasks.length) { showNoTaskMsg(); return; }
 
   el.innerHTML = tasks.map(t => {
@@ -1080,15 +1089,11 @@ async function loadMyTasks() {
           <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
             <i class="bi bi-whatsapp" style="color:#25D366;"></i>
           </button>
-          <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
-             Complete
-          </button>
+          ${!VIEW_ONLY ? `<button class="btn-success-custom" onclick="openSubmitModal('${t.id}')"> Complete </button>` : ''}
         </div>
       </div>
     </div>`;
   }).join('');
-
-  // Store tasks for submit
   window._pendingTasks = tasks;
 }
 
@@ -1101,8 +1106,8 @@ function showNoTaskMsg() {
     </div>`;
 }
 
-// ── SUBMIT TASK ───────────────────────────────────────────────
 function openSubmitModal(taskId) {
+  if (VIEW_ONLY) { toast("View‑only mode – cannot complete tasks", "error"); return; }
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
   currentSubmitTask = t;
@@ -1119,43 +1124,24 @@ function openSubmitModal(taskId) {
       <strong>${t.task_name}</strong><br>
       <small style="color:var(--text-muted);">Planned: ${fmtDate(t.planned_date)} &nbsp;|&nbsp; Dept: ${t.department}</small>
     </div>
-    ${checks.map(c => `
-      <div class="check-item">
-        <select class="form-select form-select-sm" id="chk_${c.key}" style="width:130px;">
-          <option value="">—</option>
-          <option value="Done">Done</option>
-          <option value="Not Done">Not Done</option>
-          <option value="N/A">N/A</option>
-        </select>
-        <label style="font-size:.85rem;">${c.label}</label>
-      </div>`).join('')}
-    <div class="mt-3">
-      <label class="form-label">Change or Repair Parts Name</label>
-      <input type="text" class="form-control" id="chk_change_repair" placeholder="List parts if any"/>
-    </div>
-    <div class="mt-3">
-      <label class="form-label">Remarks</label>
-      <textarea class="form-control" id="chk_remarks" rows="2" placeholder="Any notes..."></textarea>
-    </div>`;
+    ${checks.map(c => `<div class="check-item"><select class="form-select form-select-sm" id="chk_${c.key}" style="width:130px;"><option value="">—</option><option value="Done">Done</option><option value="Not Done">Not Done</option><option value="N/A">N/A</option></select><label>${c.label}</label></div>`).join('')}
+    <div class="mt-3"><label class="form-label">Change or Repair Parts Name</label><input type="text" class="form-control" id="chk_change_repair" placeholder="List parts if any"/></div>
+    <div class="mt-3"><label class="form-label">Remarks</label><textarea class="form-control" id="chk_remarks" rows="2" placeholder="Any notes..."></textarea></div>`;
   new bootstrap.Modal(document.getElementById('submitModal')).show();
 }
 
 async function confirmSubmit() {
+  if (VIEW_ONLY) { toast("View‑only mode", "error"); return; }
   if (!currentSubmitTask) return;
   const t = currentSubmitTask;
   const now = new Date();
   const planned = new Date(t.planned_date);
-
-  // On time = submitted before or on planned date (end of day)
   const plannedEOD = new Date(planned);
   plannedEOD.setHours(23, 59, 59, 999);
   const onTime = now <= plannedEOD;
-  // score column stores 1=ontime, 0=late; leaderboard uses formula
-  const score  = onTime ? 1 : 0;
   const status = onTime ? 'Done On Time' : 'Done Late';
 
   const getV = id => { const el = document.getElementById(id); return el ? el.value : ''; };
-
   const update = {
     actual_date:   now.toISOString(),
     status,
@@ -1168,56 +1154,33 @@ async function confirmSubmit() {
     change_repair: getV('chk_change_repair'),
     remarks:       getV('chk_remarks'),
   };
-
-  // 1. Update master_schedule
   const { error: masterErr } = await sb.from('master_schedule').update(update).eq('id', t.id);
   if (masterErr) { toast('Error updating master: '+masterErr.message,'error'); return; }
-
-  // 2. Insert into done_list
-  const { error: doneErr } = await sb.from('done_list').insert({
-    doer_name:    t.doer_name,
-    department:   t.department,
-    task_name:    t.task_name,
-    frequency:    t.frequency,
-    planned_date: t.planned_date,
-    actual_date:  now.toISOString(),
-    status,
-    submitted_by: SESSION.name,
-    submitted_on: now.toISOString(),
-    ...update
+  await sb.from('done_list').insert({
+    doer_name:    t.doer_name, department: t.department, task_name: t.task_name,
+    frequency: t.frequency, planned_date: t.planned_date, actual_date: now.toISOString(),
+    status, submitted_by: SESSION.name, submitted_on: now.toISOString(), ...update
   });
-  if (doneErr) console.warn('done_list insert:', doneErr.message);
-
-  // 3. Insert into scoring
-  const { error: scoreErr } = await sb.from('scoring').insert({
-    doer_name:    t.doer_name,
-    department:   t.department,
-    task_name:    t.task_name,
-    planned_date: t.planned_date,
-    actual_date:  now.toISOString(),
-    on_time:      onTime,
-    score,
-    submitted_on: now.toISOString(),
+  await sb.from('scoring').insert({
+    doer_name: t.doer_name, department: t.department, task_name: t.task_name,
+    planned_date: t.planned_date, actual_date: now.toISOString(),
+    on_time: onTime, score: onTime ? 1 : 0, submitted_on: now.toISOString(),
   });
-  if (scoreErr) console.warn('scoring insert:', scoreErr.message);
-
   bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
-  toast(`Task submitted! Score: ${onTime?'+':''}${score} (${status})`, onTime?'success':'error');
+  toast(`Task submitted! Status: ${status}`, onTime?'success':'error');
   loadMyTasks();
 }
 
-// ── NOTIFICATIONS ─────────────────────────────────────────────
+// ── NOTIFICATIONS, CSV, HELPERS ───────────────────────────────
 async function sendNotification(taskId, type) {
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
   const { data: doers } = await sb.from('doers').select('*').ilike('name', t.doer_name).limit(1);
   const doer = doers && doers[0];
   if (!doer) { toast('Doer contact not found','error'); return; }
-
   if (type === 'email') {
     if (!doer.email) { toast('No email on file','error'); return; }
     toast(`Email reminder sent to ${doer.email}`, 'success');
-    // In production: call a backend API / Supabase Edge Function to send email
   } else {
     const phone = (doer.whatsapp||'').replace(/\D/g,'');
     if (!phone) { toast('No WhatsApp number on file','error'); return; }
@@ -1226,7 +1189,6 @@ async function sendNotification(taskId, type) {
   }
 }
 
-// ── CSV EXPORT ────────────────────────────────────────────────
 async function exportCsv(table) {
   if (!sb) return;
   const { data } = await sb.from(table).select('*');
@@ -1240,7 +1202,6 @@ async function exportCsv(table) {
   toast('CSV downloaded','success');
 }
 
-// ── HELPERS ───────────────────────────────────────────────────
 function fmtDate(d) {
   if (!d) return '';
   const dt = new Date(d);
@@ -1265,7 +1226,6 @@ function toast(msg, type='info') {
   setTimeout(() => div.remove(), 4500);
 }
 
-// Mobile Toggle Functionality
 function toggleSidebar() {
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
