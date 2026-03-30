@@ -10,8 +10,9 @@
     "SCORE_LATE": 0,
     "ROLES": {
       "ADMIN": "Full Access: Management, Doers, Tasks, Schedule Generation, Scoring",
-      "SUPER_ADMIN": "Supervisor Access: My Tasks (Editable), Done List, Scoring",
-      "USER": "Operator Access: My Tasks (Read-only), Done List (Read-only)"
-    }
+      "SUPER_ADMIN": "Supervisor Access: My Tasks, Done List, Scoring",
+      "USER": "Operator Access: My Tasks, Done List (Read-only)"
+    },
+    "EMAIL_FROM": "mis@yajurfibres.com"
   }
 }
