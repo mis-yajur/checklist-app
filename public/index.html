@@ -57,12 +57,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 @keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
 .login-logo{font-family:'Playfair Display',serif;color:var(--primary);font-size:2rem;text-align:center;margin-bottom:6px;}
 .login-sub{text-align:center;color:var(--text-muted);font-size:.82rem;margin-bottom:28px;letter-spacing:1px;text-transform:uppercase;}
-.form-label{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:4px;}
-.form-control{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:.86rem;color:var(--text);transition:border .2s,box-shadow .2s;}
-.form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(21,101,192,.12);outline:none;}
-.btn-primary-custom{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;border:none;border-radius:var(--radius-sm);padding:9px 20px;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(21,101,192,.25);}
-.btn-primary-custom:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(21,101,192,.35);}
-.btn-primary-custom.disabled{opacity:0.6;pointer-events:none;}
+.login-tabs{display:flex;gap:0;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:24px;}
+.login-tab{flex:1;padding:8px;text-align:center;font-size:.84rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text-muted);transition:all .2s;border:none;}
+.login-tab.active{background:var(--primary);color:#fff;}
 
 /* NAVBAR */
 .app-navbar{background:linear-gradient(90deg,var(--primary-dark) 0%,var(--primary) 100%);padding:0 24px;height:62px;display:flex;align-items:center;box-shadow:var(--shadow-md);position:sticky;top:0;z-index:1100;}
@@ -105,6 +102,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .table-scroll{max-height:400px;overflow-y:auto;}
 
 /* BUTTONS */
+.btn-primary-custom{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;border:none;border-radius:var(--radius-sm);padding:9px 20px;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(21,101,192,.25);}
+.btn-primary-custom:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(21,101,192,.35);}
 .btn-success-custom{background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;border:none;border-radius:var(--radius-sm);padding:9px 20px;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .2s;}
 .btn-sm-icon{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:.8rem;transition:all .2s;}
 .btn-sm-icon:hover{background:var(--accent2);}
@@ -112,7 +111,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-danger-sm:hover{background:#FFEBEE;}
 .btn-start{background:linear-gradient(135deg,var(--gold),#FF8F00);color:#000;border:none;border-radius:50px;padding:16px 48px;font-size:1.05rem;font-weight:800;letter-spacing:1px;cursor:pointer;box-shadow:0 6px 24px rgba(255,179,0,.4);transition:all .25s;text-transform:uppercase;}
 .btn-start:hover{transform:translateY(-3px) scale(1.03);}
-.btn-start.disabled{opacity:0.5;pointer-events:none;}
+
+/* FORM */
+.form-label{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:4px;}
+.form-control,.form-select{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:.86rem;color:var(--text);transition:border .2s,box-shadow .2s;}
+.form-control:focus,.form-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(21,101,192,.12);outline:none;}
 
 /* BADGES */
 .badge-ontime{background:#E8F5E9;color:#2E7D32;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
@@ -146,10 +149,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .modal-content{border-radius:14px;border:none;box-shadow:var(--shadow-lg);}
 
 /* PROGRESS */
+.prog-bar-wrap{background:#E3F2FD;border-radius:99px;height:8px;overflow:hidden;}
+.prog-bar-fill{background:linear-gradient(90deg,var(--primary),var(--accent));height:100%;border-radius:99px;transition:width .6s ease;}
 .check-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border);}
 .check-item:last-child{border-bottom:none;}
 
-/* MOBILE */
+/* MOBILE COMPATIBILITY OVERRIDES */
 .menu-toggle-btn {
   display: none;
   background: transparent;
@@ -159,6 +164,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   margin-right: 15px;
   cursor: pointer;
 }
+
 @media (max-width: 991.98px) {
   .menu-toggle-btn { display: block; }
   .sidebar {
@@ -168,7 +174,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     height: calc(100vh - 62px);
     transform: translateX(-100%);
   }
-  .sidebar.show { transform: translateX(0); }
+  .sidebar.show {
+    transform: translateX(0);
+  }
   .main-content { padding: 15px; }
   .sidebar-overlay {
     display: none;
@@ -196,14 +204,22 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div id="loadStatus" style="color:#90CAF9;margin-top:16px;font-size:.82rem;"></div>
 </div>
 
-<!-- LOGIN (Simplified) -->
+<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">&#9745; CheckList</div>
     <div class="login-sub">Maintenance Management System</div>
+    <div class="login-tabs">
+      <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">
+        <i class="bi bi-shield-lock me-1"></i>Admin
+      </button>
+      <button class="login-tab" id="tabUser" onclick="switchLoginTab('user')">
+        <i class="bi bi-person me-1"></i>User
+      </button>
+    </div>
     <div class="mb-3">
       <label class="form-label">Username</label>
-      <input type="text" id="loginUser" class="form-control" placeholder="Enter username" autocomplete="off"/>
+      <input type="text" id="loginUser" class="form-control" placeholder="Enter username" value="admin"/>
     </div>
     <div class="mb-4">
       <label class="form-label">Password</label>
@@ -231,7 +247,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="app-layout">
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar" id="appSidebar">
-      <!-- Unified menu for all users -->
       <div id="adminMenuGroup">
         <div class="section-label">Management</div>
         <div class="sidebar-item active" onclick="showPage('dashboard')" id="menu-dashboard"><i class="bi bi-speedometer2"></i>Dashboard</div>
@@ -241,9 +256,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="sidebar-item" onclick="showPage('donelist')" id="menu-donelist"><i class="bi bi-check2-all"></i>Done List</div>
         <div class="sidebar-item" onclick="showPage('scoring')" id="menu-scoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
+      <div id="userMenuGroup" style="display:none;">
+        <div class="section-label">My Work</div>
+        <div class="sidebar-item active" onclick="showPage('myTasks')" id="menu-myTasks"><i class="bi bi-card-checklist"></i>My Tasks</div>
+        <div class="sidebar-item" onclick="showPage('donelist')" id="menu-myDone"><i class="bi bi-check2-all"></i>Done List</div>
+        <div class="sidebar-item" onclick="showPage('scoring')" id="menu-myScoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
+      </div>
     </aside>
 
     <main class="main-content">
+
       <!-- DASHBOARD -->
       <div class="page active" id="page-dashboard">
         <div class="page-title">Dashboard</div>
@@ -294,7 +316,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div><div class="page-title">Doers</div><div class="page-sub">Manage maintenance personnel</div></div>
           <div class="d-flex gap-2">
-            <button id="doerAddBtn" class="btn-primary-custom" onclick="openDoerModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
+            <button class="btn-primary-custom" onclick="openDoerModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
             <button class="btn-sm-icon" onclick="exportCsv('doers')" title="Export CSV"><i class="bi bi-download"></i></button>
           </div>
         </div>
@@ -305,7 +327,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="doerTable">
-              <thead>汽<th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>User Type</th><th>Actions</th> </thead>
+              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>User Type</th><th>Actions</th></tr></thead>
               <tbody id="doerTbody"></tbody>
             </table>
           </div>
@@ -317,12 +339,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="d-flex align-items-center justify-content-between mb-2">
           <div><div class="page-title">Tasks</div><div class="page-sub">Define maintenance tasks & frequency</div></div>
           <div class="d-flex gap-2">
-            <button id="taskAddBtn" class="btn-primary-custom" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
+            <button class="btn-primary-custom" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
             <button class="btn-sm-icon" onclick="exportCsv('tasks')" title="Export CSV"><i class="bi bi-download"></i></button>
           </div>
         </div>
         <div class="text-center mb-3 mt-2">
-          <button id="generateMasterBtn" class="btn-start" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button>
+          <button class="btn-start" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button>
           <div style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">Generates 2-year schedule based on all tasks above</div>
         </div>
         <div class="card-table">
@@ -332,7 +354,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="taskTable">
-              <thead>汽<th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th>Actions</th> </thead>
+              <thead><tr><th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th>Actions</th></tr></thead>
               <tbody id="taskTbody"></tbody>
             </table>
           </div>
@@ -352,7 +374,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="masterTable">
-              <thead>汽<th>Name</th><th>Department</th><th>Task ID</th><th>Freq</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th> </thead>
+              <thead><tr><th>Name</th><th>Department</th><th>Task ID</th><th>Freq</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th></tr></thead>
               <tbody id="masterTbody"></tbody>
             </table>
           </div>
@@ -372,7 +394,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="doneTable">
-              <thead>汽<th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th><th>Submitted By</th><th>On</th> </thead>
+              <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th><th>Submitted By</th><th>On</th></tr></thead>
               <tbody id="doneTbody"></tbody>
             </table>
           </div>
@@ -400,7 +422,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
               <div class="table-header"><span class="table-title">All Score Records</span></div>
               <div class="table-scroll">
                 <table class="table" id="scoreTable">
-                  <thead>汽<th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>On Time</th><th>Score</th><th>Date</th> </thead>
+                  <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>On Time</th><th>Score</th><th>Date</th></tr></thead>
                   <tbody id="scoreTbody"></tbody>
                 </table>
               </div>
@@ -409,10 +431,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
 
-      <!-- MY TASKS (for quick access) -->
+      <!-- MY TASKS (USER) -->
       <div class="page" id="page-myTasks">
         <div class="page-title">My Pending Tasks</div>
-        <div class="page-sub">All pending tasks assigned to you</div>
+        <div class="page-sub">Tasks due within the next 10 days</div>
         <div id="myTasksContainer"></div>
       </div>
 
@@ -444,7 +466,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      <button id="saveDoerBtn" class="btn-primary-custom" onclick="saveDoer()"><i class="bi bi-check-lg me-1"></i>Save Doer</button>
+      <button class="btn-primary-custom" onclick="saveDoer()"><i class="bi bi-check-lg me-1"></i>Save Doer</button>
     </div>
   </div></div>
 </div>
@@ -478,7 +500,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      <button id="saveTaskBtn" class="btn-primary-custom" onclick="saveTask()"><i class="bi bi-check-lg me-1"></i>Save Task</button>
+      <button class="btn-primary-custom" onclick="saveTask()"><i class="bi bi-check-lg me-1"></i>Save Task</button>
     </div>
   </div></div>
 </div>
@@ -500,23 +522,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <script>
 // ══════════════════════════════════════════════════════════════
-//  CHECKLIST — Supabase Web App (Unified Admin Interface)
+//  CHECKLIST — Supabase Web App
 // ══════════════════════════════════════════════════════════════
 
+// ── CONFIG (loaded from config.json) ─────────────────────────
 let SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
 let SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg";
 let sb = null;
 
 const APP_CONFIG = {
   APP_NAME:      "CheckList",
-  SCORE_ON_TIME: 1,
+  // Score formula: (onTime/total*100)-100  → range -100 to 0
+  SCORE_ON_TIME: 1,   // stored as 1/0 boolean-int; formula applied in buildLeaderboard
   SCORE_LATE:    0,
   ADMIN_USER:    "admin",
   ADMIN_PASS:    "Admin@1234",
   USER_PASS:     "User@1234",
 };
 
-let SESSION = { role: null, name: null, dept: null, userType: null, id: null };
+let SESSION = { role: null, name: null, dept: null };
 let DOERS_CACHE = [];
 let TASKS_CACHE = [];
 let currentSubmitTask = null;
@@ -525,6 +549,7 @@ let chartCompliance = null, chartDept = null, chartScore = null;
 // ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
   setLoadStatus("Connecting to database...");
+
   try {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     setLoadStatus("Initializing tables...");
@@ -553,59 +578,58 @@ function showLogin() {
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
+// ── SUPABASE TABLE INIT ───────────────────────────────────────
+// Tables are created via Supabase SQL editor (see setup guide)
+// This function just verifies connectivity
 async function initSupabaseTables() {
   if (!sb) return;
+  // Test connection by querying doers table
   await sb.from('doers').select('id').limit(1);
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────
+let loginTab = 'admin';
+function switchLoginTab(tab) {
+  loginTab = tab;
+  document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
+  document.getElementById('tabUser').classList.toggle('active', tab === 'user');
+  document.getElementById('loginUser').value = tab === 'admin' ? 'admin' : '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').textContent = '';
+}
+
 async function doLogin() {
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value;
   document.getElementById('loginError').textContent = '';
 
-  if (!u || !p) {
-    document.getElementById('loginError').textContent = 'Please enter credentials.';
-    return;
-  }
+  if (!u || !p) { document.getElementById('loginError').textContent = 'Please enter credentials.'; return; }
 
-  // Admin hardcoded login
+  // Admin login
   if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
-    SESSION = { role: 'admin', name: 'Administrator', dept: '', userType: 'Admin', id: null };
+    SESSION = { role: 'admin', name: 'Administrator', dept: '' };
     startApp();
     return;
   }
 
-  // User login – check doers table
-  if (p === APP_CONFIG.USER_PASS && sb) {
-    const { data, error } = await sb.from('doers')
-      .select('*')
-      .ilike('name', u)
-      .limit(1);
-    if (error) {
-      document.getElementById('loginError').textContent = 'Database error.';
-      return;
-    }
-    if (data && data.length > 0) {
-      const user = data[0];
-      // Determine role based on user_type
-      let role = 'user';
-      if (user.user_type === 'Admin' || user.user_type === 'Super Admin') {
-        role = 'admin';  // full edit rights
+  // User login — check against doers table
+  if (p === APP_CONFIG.USER_PASS) {
+    if (sb) {
+      const { data } = await sb.from('doers')
+        .select('*').ilike('name', u).limit(1);
+      if (data && data.length > 0) {
+        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id };
+        startApp();
+        return;
       }
-      SESSION = {
-        role: role,
-        name: user.name,
-        dept: user.department,
-        userType: user.user_type,
-        id: user.id
-      };
+    } else {
+      // No DB: demo mode
+      SESSION = { role: 'user', name: u, dept: 'Demo' };
       startApp();
       return;
     }
   }
-
-  document.getElementById('loginError').textContent = 'Invalid credentials.';
+  document.getElementById('loginError').textContent = 'Invalid credentials. Check username/password.';
 }
 
 document.addEventListener('keydown', e => {
@@ -615,26 +639,11 @@ document.addEventListener('keydown', e => {
 function startApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
-  document.getElementById('navRole').textContent = SESSION.role === 'admin' ? 'ADMIN' : 'USER';
+  document.getElementById('navRole').textContent = SESSION.role.toUpperCase();
   document.getElementById('navUser').textContent = SESSION.name;
-
-  // Show/hide edit controls based on role
-  const isAdmin = (SESSION.role === 'admin');
-  const addDoerBtn = document.getElementById('doerAddBtn');
-  const addTaskBtn = document.getElementById('taskAddBtn');
-  const generateBtn = document.getElementById('generateMasterBtn');
-  const saveDoerBtn = document.getElementById('saveDoerBtn');
-  const saveTaskBtn = document.getElementById('saveTaskBtn');
-
-  if (addDoerBtn) addDoerBtn.style.display = isAdmin ? '' : 'none';
-  if (addTaskBtn) addTaskBtn.style.display = isAdmin ? '' : 'none';
-  if (generateBtn) generateBtn.style.display = isAdmin ? '' : 'none';
-  if (saveDoerBtn) saveDoerBtn.style.display = isAdmin ? '' : 'none';
-  if (saveTaskBtn) saveTaskBtn.style.display = isAdmin ? '' : 'none';
-
-  // Also disable modal inputs for non-admin (they cannot edit anyway, but we prevent opening modals)
-  // We'll handle edit buttons in the table rendering.
-  showPage('dashboard');
+  document.getElementById('adminMenuGroup').style.display = SESSION.role === 'admin' ? '' : 'none';
+  document.getElementById('userMenuGroup').style.display  = SESSION.role === 'user'  ? '' : 'none';
+  showPage(SESSION.role === 'admin' ? 'dashboard' : 'myTasks');
 }
 
 function doLogout() {
@@ -647,6 +656,7 @@ function doLogout() {
 
 // ── PAGE ROUTING ──────────────────────────────────────────────
 function showPage(page) {
+  // Mobile Support: Auto hide sidebar on selection
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
   if(sidebar) sidebar.classList.remove('show');
@@ -660,13 +670,12 @@ function showPage(page) {
   if (m) m.classList.add('active');
   const loaders = {
     dashboard: loadDashboard, doers: loadDoers, tasks: loadTasks,
-    master: loadMaster, donelist: loadDoneList, scoring: loadScoring,
-    myTasks: loadMyTasks
+    master: loadMaster, donelist: loadDoneList, scoring: loadScoring, myTasks: loadMyTasks
   };
   if (loaders[page]) loaders[page]();
 }
 
-// ── DASHBOARD (unchanged) ────────────────────────────────────
+// ── DASHBOARD ─────────────────────────────────────────────────
 async function loadDashboard() {
   if (!sb) return;
   const [{ count: dCount }, { data: master }, { data: done }] = await Promise.all([
@@ -686,6 +695,7 @@ async function loadDashboard() {
   document.getElementById('st-pending').textContent = pending;
   document.getElementById('st-overdue').textContent = overdue;
 
+  // Charts
   const { data: scoring } = await sb.from('scoring').select('*');
   const sc = scoring || [];
   const onT = sc.filter(r => r.on_time).length;
@@ -707,9 +717,13 @@ function buildLeaderboard(scoring) {
     map[n].totalTasks++;
     r.on_time ? map[n].onTime++ : map[n].late++;
   });
+  // Formula: (onTime / totalTasks * 100) - 100
+  // -100 = all late, 0 = all on time
   Object.values(map).forEach(p => {
-    p.score = p.totalTasks > 0 ? Math.round((p.onTime / p.totalTasks) * 100) - 100 : 0;
-    p.total = p.score;
+    p.score = p.totalTasks > 0
+      ? Math.round((p.onTime / p.totalTasks) * 100) - 100
+      : 0;
+    p.total = p.score; // alias for leaderboard display
   });
   return Object.values(map).sort((a, b) => b.score - a.score);
 }
@@ -749,30 +763,23 @@ async function loadDoers() {
   const { data } = await sb.from('doers').select('*').order('created_at', { ascending: true });
   DOERS_CACHE = data || [];
   const tbody = document.getElementById('doerTbody');
-  const isAdmin = (SESSION.role === 'admin');
   tbody.innerHTML = DOERS_CACHE.map((r, i) => `
-      <tr>
-        <td>${i+1}</td>
-        <td><strong>${r.name||''}</strong></td>
-        <td>${r.department||''}</td>
-        <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
-        <td>${r.phone||''}</td>
-        <td>${r.whatsapp||''}</td>
-        <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
-        <td>
-          ${isAdmin ? `
-            <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
-            <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
-          ` : '<span class="text-muted">Read-only</span>'}
-        </td>
-      </tr>`).join('');
+     <tr>
+       <td>${i+1}</td>
+       <td><strong>${r.name||''}</strong></td>
+       <td>${r.department||''}</td>
+       <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
+       <td>${r.phone||''}</td>
+       <td>${r.whatsapp||''}</td>
+       <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
+       <td>
+         <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
+         <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
+       </td>
+     </tr>`).join('');
 }
 
 function openDoerModal(id) {
-  if (SESSION.role !== 'admin') {
-    toast('You do not have permission to edit doers','error');
-    return;
-  }
   document.getElementById('doerEditId').value = id || '';
   if (id) {
     const r = DOERS_CACHE.find(d => d.id === id);
@@ -793,10 +800,6 @@ function openDoerModal(id) {
 function editDoer(id) { openDoerModal(id); }
 
 async function saveDoer() {
-  if (SESSION.role !== 'admin') {
-    toast('Permission denied','error');
-    return;
-  }
   const name = document.getElementById('d_name').value.trim();
   if (!name) { toast('Name is required','error'); return; }
   const row = {
@@ -820,10 +823,6 @@ async function saveDoer() {
 }
 
 async function deleteDoer(id) {
-  if (SESSION.role !== 'admin') {
-    toast('Permission denied','error');
-    return;
-  }
   if (!confirm('Delete this doer?')) return;
   await sb.from('doers').delete().eq('id', id);
   toast('Doer deleted','info');
@@ -836,29 +835,22 @@ async function loadTasks() {
   const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
   TASKS_CACHE = data || [];
   const tbody = document.getElementById('taskTbody');
-  const isAdmin = (SESSION.role === 'admin');
   tbody.innerHTML = TASKS_CACHE.map((r, i) => `
-      <tr>
-        <td>${r.id}</td>
-        <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
-        <td>${r.Doer_Name||r.doer_name||''}</td>
-        <td>${r.Department||r.department||''}</td>
-        <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
-        <td>${r.Start_Date||r.start_date||''}</td>
-        <td>
-          ${isAdmin ? `
-            <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
-            <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
-          ` : '<span class="text-muted">Read-only</span>'}
-        </td>
-      </tr>`).join('');
+     <tr>
+       <td>${r.id}</td>
+       <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
+       <td>${r.Doer_Name||r.doer_name||''}</td>
+       <td>${r.Department||r.department||''}</td>
+       <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
+       <td>${r.Start_Date||r.start_date||''}</td>
+       <td>
+         <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
+         <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
+       </td>
+     </tr>`).join('');
 }
 
 async function openTaskModal(id) {
-  if (SESSION.role !== 'admin') {
-    toast('You do not have permission to edit tasks','error');
-    return;
-  }
   await loadDoersForSelect();
   document.getElementById('taskEditId').value = id || '';
   if (id) {
@@ -897,10 +889,6 @@ function autoFillDept() {
 }
 
 async function saveTask() {
-  if (SESSION.role !== 'admin') {
-    toast('Permission denied','error');
-    return;
-  }
   const task_name = document.getElementById('t_name').value.trim();
   const doer_name = document.getElementById('t_doer').value;
   if (!task_name || !doer_name) { toast('Task name and doer required','error'); return; }
@@ -924,28 +912,21 @@ async function saveTask() {
 }
 
 async function deleteTask(id) {
-  if (SESSION.role !== 'admin') {
-    toast('Permission denied','error');
-    return;
-  }
   if (!confirm('Delete this task?')) return;
   await sb.from('tasks').delete().eq('id', id);
   toast('Task deleted','info');
   loadTasks();
 }
 
-// ── GENERATE MASTER (admin only) ───────────────────────────────
+// ── GENERATE MASTER ───────────────────────────────────────────
 async function generateMaster() {
-  if (SESSION.role !== 'admin') {
-    toast('Only administrators can generate the master schedule','error');
-    return;
-  }
   if (!confirm('This will regenerate the entire Master schedule (2 years). Continue?')) return;
   toast('Generating schedule...','info');
 
   const { data: tasks } = await sb.from('tasks').select('*');
   if (!tasks || !tasks.length) { toast('No tasks found.','error'); return; }
 
+  // Clear existing master
   await sb.from('master_schedule').delete().neq('id', 0);
 
   const rows = [];
@@ -970,6 +951,7 @@ async function generateMaster() {
     }
   }
 
+  // Insert in batches of 500
   for (let i = 0; i < rows.length; i += 500) {
     const { error } = await sb.from('master_schedule').insert(rows.slice(i, i+500));
     if (error) { toast('Error: '+error.message,'error'); return; }
@@ -988,10 +970,11 @@ function generateDates(startDate, freq, totalDays) {
   return dates;
 }
 
-// ── MASTER DISPLAY (unchanged) ────────────────────────────────
+// ── MASTER DISPLAY ────────────────────────────────────────────
 async function loadMaster() {
   if (!sb) return;
   const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
+  // Use a fresh tbody
   const t = document.getElementById('masterTbody');
   t.innerHTML = '';
   (data||[]).forEach(r => {
@@ -1001,12 +984,12 @@ async function loadMaster() {
               : st ? `<span class="badge-ontime">${st}</span>`
               : `<span class="badge-pending">Pending</span>`;
     t.innerHTML += `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td>
-        <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
-        <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
+       <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
+       <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
   });
 }
 
-// ── DONE LIST (unchanged) ─────────────────────────────────────
+// ── DONE LIST ─────────────────────────────────────────────────
 async function loadDoneList() {
   if (!sb) return;
   const { data } = await sb.from('done_list').select('*').order('submitted_on', { ascending: false });
@@ -1015,20 +998,22 @@ async function loadDoneList() {
     const st = (r.status||'').trim();
     const badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>` : `<span class="badge-late">${st}</span>`;
     return `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-        <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
-        <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
+       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
+       <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
   }).join('');
 }
 
-// ── SCORING (unchanged) ───────────────────────────────────────
+// ── SCORING ───────────────────────────────────────────────────
 async function loadScoring() {
   if (!sb) return;
   const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
   const scoring = sc || [];
 
+  // Leaderboard
   const lb = buildLeaderboard(scoring);
   renderLeaderboard(lb, 'scoringLeaderboard');
 
+  // Score chart
   const ctx = document.getElementById('chartScore').getContext('2d');
   if (chartScore) chartScore.destroy();
   const top10 = lb.slice(0, 10);
@@ -1041,31 +1026,30 @@ async function loadScoring() {
     options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
   });
 
+  // Score table
   const tbody = document.getElementById('scoreTbody');
   tbody.innerHTML = scoring.map(r => `
-      <tr>
-        <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-        <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
-        <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
-        <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
-        <td>${fmtDate(r.submitted_on)}</td>
-      </tr>`).join('');
+     <tr>
+       <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
+       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
+       <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
+       <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
+       <td>${fmtDate(r.submitted_on)}</td>
+     </tr>`).join('');
 }
 
-// ── MY TASKS (shows all pending tasks for the logged-in doer) ──
+// ── MY TASKS (USER) ───────────────────────────────────────────
 async function loadMyTasks() {
   if (!sb) { showNoTaskMsg(); return; }
-  if (!SESSION.id) {
-    showNoTaskMsg();
-    return;
-  }
+  const now   = new Date();
+  const limit = new Date(now.getTime() + 10 * 86400000);
 
-  // Fetch all pending tasks for this doer (status is null)
   const { data } = await sb
     .from('master_schedule')
     .select('*')
-    .eq('doer_name', SESSION.name)
+    .ilike('doer_name', SESSION.name)
     .is('status', null)
+    .lte('planned_date', limit.toISOString())
     .order('planned_date', { ascending: true });
 
   const el = document.getElementById('myTasksContainer');
@@ -1073,12 +1057,8 @@ async function loadMyTasks() {
 
   if (!tasks.length) { showNoTaskMsg(); return; }
 
-  // Hide WhatsApp/Email icons for non-admins
-  const showIcons = (SESSION.role === 'admin');
-
   el.innerHTML = tasks.map(t => {
     const planned = new Date(t.planned_date);
-    const now = new Date();
     const overdue = planned < now;
     const daysLeft = Math.round((planned - now) / 86400000);
     return `<div class="card-table mb-3">
@@ -1094,22 +1074,21 @@ async function loadMyTasks() {
           </div>
         </div>
         <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
-          ${showIcons ? `
-            <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
-              <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
-            </button>
-            <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
-              <i class="bi bi-whatsapp" style="color:#25D366;"></i>
-            </button>
-          ` : ''}
+          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
+            <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
+          </button>
+          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
+            <i class="bi bi-whatsapp" style="color:#25D366;"></i>
+          </button>
           <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
-            Complete
+             Complete
           </button>
         </div>
       </div>
     </div>`;
   }).join('');
 
+  // Store tasks for submit
   window._pendingTasks = tasks;
 }
 
@@ -1118,11 +1097,11 @@ function showNoTaskMsg() {
     <div style="text-align:center;padding:60px;color:var(--text-muted);">
       <i class="bi bi-emoji-smile" style="font-size:3rem;color:var(--accent);"></i>
       <div style="font-size:1.1rem;margin-top:12px;font-weight:600;">All caught up!</div>
-      <div style="font-size:.85rem;margin-top:4px;">No pending tasks assigned to you.</div>
+      <div style="font-size:.85rem;margin-top:4px;">No pending tasks in next 10 days.</div>
     </div>`;
 }
 
-// ── SUBMIT TASK (unchanged) ───────────────────────────────────
+// ── SUBMIT TASK ───────────────────────────────────────────────
 function openSubmitModal(taskId) {
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
@@ -1167,9 +1146,11 @@ async function confirmSubmit() {
   const now = new Date();
   const planned = new Date(t.planned_date);
 
+  // On time = submitted before or on planned date (end of day)
   const plannedEOD = new Date(planned);
   plannedEOD.setHours(23, 59, 59, 999);
   const onTime = now <= plannedEOD;
+  // score column stores 1=ontime, 0=late; leaderboard uses formula
   const score  = onTime ? 1 : 0;
   const status = onTime ? 'Done On Time' : 'Done Late';
 
@@ -1188,10 +1169,12 @@ async function confirmSubmit() {
     remarks:       getV('chk_remarks'),
   };
 
+  // 1. Update master_schedule
   const { error: masterErr } = await sb.from('master_schedule').update(update).eq('id', t.id);
   if (masterErr) { toast('Error updating master: '+masterErr.message,'error'); return; }
 
-  await sb.from('done_list').insert({
+  // 2. Insert into done_list
+  const { error: doneErr } = await sb.from('done_list').insert({
     doer_name:    t.doer_name,
     department:   t.department,
     task_name:    t.task_name,
@@ -1203,8 +1186,10 @@ async function confirmSubmit() {
     submitted_on: now.toISOString(),
     ...update
   });
+  if (doneErr) console.warn('done_list insert:', doneErr.message);
 
-  await sb.from('scoring').insert({
+  // 3. Insert into scoring
+  const { error: scoreErr } = await sb.from('scoring').insert({
     doer_name:    t.doer_name,
     department:   t.department,
     task_name:    t.task_name,
@@ -1214,14 +1199,14 @@ async function confirmSubmit() {
     score,
     submitted_on: now.toISOString(),
   });
+  if (scoreErr) console.warn('scoring insert:', scoreErr.message);
 
   bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
   toast(`Task submitted! Score: ${onTime?'+':''}${score} (${status})`, onTime?'success':'error');
   loadMyTasks();
-  loadDashboard(); // refresh dashboard stats
 }
 
-// ── NOTIFICATIONS (unchanged) ─────────────────────────────────
+// ── NOTIFICATIONS ─────────────────────────────────────────────
 async function sendNotification(taskId, type) {
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
@@ -1232,6 +1217,7 @@ async function sendNotification(taskId, type) {
   if (type === 'email') {
     if (!doer.email) { toast('No email on file','error'); return; }
     toast(`Email reminder sent to ${doer.email}`, 'success');
+    // In production: call a backend API / Supabase Edge Function to send email
   } else {
     const phone = (doer.whatsapp||'').replace(/\D/g,'');
     if (!phone) { toast('No WhatsApp number on file','error'); return; }
@@ -1240,7 +1226,7 @@ async function sendNotification(taskId, type) {
   }
 }
 
-// ── CSV EXPORT (unchanged) ────────────────────────────────────
+// ── CSV EXPORT ────────────────────────────────────────────────
 async function exportCsv(table) {
   if (!sb) return;
   const { data } = await sb.from(table).select('*');
@@ -1279,6 +1265,7 @@ function toast(msg, type='info') {
   setTimeout(() => div.remove(), 4500);
 }
 
+// Mobile Toggle Functionality
 function toggleSidebar() {
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
