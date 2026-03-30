@@ -282,10 +282,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="app-layout">
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar" id="appSidebar">
-      <!-- ADMIN MENU -->
+      <!-- ADMIN MENU (only visible for Admin, not for Super Admin) -->
       <div id="adminMenuGroup" style="display:none;">
         <div class="section-label">Management</div>
-        <div class="sidebar-item active" onclick="showPage('dashboard')" id="menu-dashboard"><i class="bi bi-speedometer2"></i>Dashboard</div>
+        <div class="sidebar-item" onclick="showPage('dashboard')" id="menu-dashboard"><i class="bi bi-speedometer2"></i>Dashboard</div>
         <div class="sidebar-item" onclick="showPage('doers')" id="menu-doers"><i class="bi bi-people-fill"></i>Doers</div>
         <div class="sidebar-item" onclick="showPage('tasks')" id="menu-tasks"><i class="bi bi-list-task"></i>Tasks</div>
         <div class="sidebar-item" onclick="showPage('master')" id="menu-master"><i class="bi bi-table"></i>Master Schedule</div>
@@ -293,7 +293,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="sidebar-item" onclick="showPage('scoring')" id="menu-scoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
 
-      <!-- USER & SUPER ADMIN MENU (Same for both) -->
+      <!-- USER & SUPER ADMIN MENU (both see only My Tasks + Done List) -->
       <div id="userMenuGroup" style="display:none;">
         <div class="section-label">My Work</div>
         <div class="sidebar-item active" onclick="showPage('myTasks')" id="menu-myTasks"><i class="bi bi-card-checklist"></i>My Tasks</div>
@@ -304,7 +304,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <main class="main-content">
 
       <!-- DASHBOARD -->
-      <div class="page active" id="page-dashboard">
+      <div class="page" id="page-dashboard">
         <div class="page-title">Dashboard</div>
         <div class="page-sub">Maintenance Overview</div>
         <div class="row g-3 mb-4">
@@ -468,7 +468,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
 
-      <!-- MY TASKS (USER) -->
+      <!-- MY TASKS (USER + SUPER ADMIN) -->
       <div class="page" id="page-myTasks">
         <div class="page-title">My Pending Tasks</div>
         <div class="page-sub">Tasks due within the next 10 days</div>
@@ -564,7 +564,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <script>
 // ══════════════════════════════════════════════════════════════
-//  CHECKLIST — Supabase Web App (UPDATED WITH ROLE-BASED ACCESS)
+//  CHECKLIST — Supabase Web App (UPDATED ROLE-BASED: Only Admin has full mgmt; Super Admin & User only see MyTasks/DoneList, Super Admin gets WhatsApp button)
 // ══════════════════════════════════════════════════════════════
 
 let SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
@@ -578,7 +578,6 @@ const APP_CONFIG = {
   ADMIN_USER:    "admin",
   ADMIN_PASS:    "Admin@1234",
   USER_PASS:     "User@1234",
-  EMAIL_FROM:    "mis@yajurfibres.com",
 };
 
 let SESSION = { role: null, name: null, dept: null, user_type: null };
@@ -634,14 +633,14 @@ async function doLogin() {
     return; 
   }
 
-  // Admin login (hardcoded)
+  // Admin login (hardcoded, full management rights)
   if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
     SESSION = { role: 'admin', user_type: 'Admin', name: 'Administrator', dept: '' };
     startApp();
     return;
   }
 
-  // User login - check doers table with user_type
+  // User / Super Admin login via doers table
   if (p === APP_CONFIG.USER_PASS) {
     if (sb) {
       const { data } = await sb.from('doers')
@@ -673,7 +672,7 @@ function startApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
   
-  // Set navbar role badge color and text
+  // Set navbar role badge
   const roleEl = document.getElementById('navRole');
   roleEl.textContent = SESSION.user_type.toUpperCase();
   roleEl.classList.remove('admin', 'super', 'user');
@@ -683,14 +682,16 @@ function startApp() {
   
   document.getElementById('navUser').textContent = SESSION.name;
 
-  // Show/hide menu groups based on user_type
-  const isAdmin = SESSION.user_type === 'Admin' || SESSION.role === 'admin';
-  const isSuperAdminOrUser = SESSION.user_type === 'Super Admin' || SESSION.user_type === 'User';
-
+  // Determine if user is Admin (hardcoded admin or user_type Admin)
+  const isAdmin = (SESSION.user_type === 'Admin' || SESSION.role === 'admin');
+  
+  // Super Admin and User share same menu (only My Tasks + Done List)
+  const isUserOrSuper = (SESSION.user_type === 'User' || SESSION.user_type === 'Super Admin');
+  
   document.getElementById('adminMenuGroup').style.display = isAdmin ? '' : 'none';
-  document.getElementById('userMenuGroup').style.display = isSuperAdminOrUser ? '' : 'none';
+  document.getElementById('userMenuGroup').style.display = isUserOrSuper ? '' : 'none';
 
-  // Start with appropriate page
+  // Default page: Admin sees dashboard, others see My Tasks
   if (isAdmin) {
     showPage('dashboard');
   } else {
@@ -729,7 +730,7 @@ function showPage(page) {
   if (loaders[page]) loaders[page]();
 }
 
-// ── DASHBOARD ─────────────────────────────────────────────────
+// ── DASHBOARD (unchanged) ─────────────────────────────────────
 async function loadDashboard() {
   if (!sb) return;
   const [{ count: dCount }, { data: master }, { data: done }] = await Promise.all([
@@ -808,23 +809,21 @@ function renderLeaderboard(data, containerId) {
   }).join('');
 }
 
-// ── DOERS ─────────────────────────────────────────────────────
+// ── DOERS (only Admin can edit/add/delete) ────────────────────
 async function loadDoers() {
   if (!sb) return;
   const { data } = await sb.from('doers').select('*').order('created_at', { ascending: true });
   DOERS_CACHE = data || [];
   
-  // Show/hide action buttons based on permission
-  const isAdmin = SESSION.user_type === 'Admin' || SESSION.role === 'admin';
-  const isSuperAdmin = SESSION.user_type === 'Super Admin';
-  document.getElementById('doerActions').style.display = (isAdmin || isSuperAdmin) ? '' : 'none';
+  const isAdmin = (SESSION.user_type === 'Admin' || SESSION.role === 'admin');
+  document.getElementById('doerActions').style.display = isAdmin ? '' : 'none';
 
   const tbody = document.getElementById('doerTbody');
   tbody.innerHTML = DOERS_CACHE.map((r, i) => {
     const userTypeBadge = r.user_type === 'Admin' ? `<span class="badge-admin">${r.user_type}</span>`
                         : r.user_type === 'Super Admin' ? `<span class="badge-super">${r.user_type}</span>`
                         : `<span class="badge-user">${r.user_type || 'User'}</span>`;
-    const actions = (isAdmin || isSuperAdmin) ? `
+    const actions = isAdmin ? `
       <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
       <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>` : '';
     
@@ -841,7 +840,7 @@ async function loadDoers() {
   }).join('');
 }
 
-function openDoerModal(id) {
+function openDoerModal(id) { if (SESSION.user_type !== 'Admin' && SESSION.role !== 'admin') return; /* security */ 
   document.getElementById('doerEditId').value = id || '';
   if (id) {
     const r = DOERS_CACHE.find(d => d.id === id);
@@ -862,6 +861,8 @@ function openDoerModal(id) {
 function editDoer(id) { openDoerModal(id); }
 
 async function saveDoer() {
+  const isAdmin = (SESSION.user_type === 'Admin' || SESSION.role === 'admin');
+  if (!isAdmin) return;
   const name = document.getElementById('d_name').value.trim();
   if (!name) { toast('Name is required','error'); return; }
   const row = {
@@ -885,26 +886,26 @@ async function saveDoer() {
 }
 
 async function deleteDoer(id) {
-  if (!confirm('Delete this doer?')) return;
+  const isAdmin = (SESSION.user_type === 'Admin' || SESSION.role === 'admin');
+  if (!isAdmin || !confirm('Delete this doer?')) return;
   await sb.from('doers').delete().eq('id', id);
   toast('Doer deleted','info');
   loadDoers();
 }
 
-// ── TASKS ─────────────────────────────────────────────────────
+// ── TASKS (only Admin can manage) ─────────────────────────────
 async function loadTasks() {
   if (!sb) return;
   const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
   TASKS_CACHE = data || [];
   
-  const isAdmin = SESSION.user_type === 'Admin' || SESSION.role === 'admin';
-  const isSuperAdmin = SESSION.user_type === 'Super Admin';
-  document.getElementById('taskActions').style.display = (isAdmin || isSuperAdmin) ? '' : 'none';
-  document.getElementById('generateMasterBtn').style.display = (isAdmin || isSuperAdmin) ? '' : 'none';
+  const isAdmin = (SESSION.user_type === 'Admin' || SESSION.role === 'admin');
+  document.getElementById('taskActions').style.display = isAdmin ? '' : 'none';
+  document.getElementById('generateMasterBtn').style.display = isAdmin ? '' : 'none';
 
   const tbody = document.getElementById('taskTbody');
   tbody.innerHTML = TASKS_CACHE.map((r, i) => {
-    const actions = (isAdmin || isSuperAdmin) ? `
+    const actions = isAdmin ? `
       <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
       <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>` : '';
     
@@ -921,6 +922,8 @@ async function loadTasks() {
 }
 
 async function openTaskModal(id) {
+  const isAdmin = (SESSION.user_type === 'Admin' || SESSION.role === 'admin');
+  if (!isAdmin) return;
   await loadDoersForSelect();
   document.getElementById('taskEditId').value = id || '';
   if (id) {
@@ -961,6 +964,8 @@ function autoFillDept() {
 }
 
 async function saveTask() {
+  const isAdmin = (SESSION.user_type === 'Admin' || SESSION.role === 'admin');
+  if (!isAdmin) return;
   const task_name = document.getElementById('t_name').value.trim();
   const doer_name = document.getElementById('t_doer').value;
   if (!task_name || !doer_name) { toast('Task name and doer required','error'); return; }
@@ -984,14 +989,17 @@ async function saveTask() {
 }
 
 async function deleteTask(id) {
-  if (!confirm('Delete this task?')) return;
+  const isAdmin = (SESSION.user_type === 'Admin' || SESSION.role === 'admin');
+  if (!isAdmin || !confirm('Delete this task?')) return;
   await sb.from('tasks').delete().eq('id', id);
   toast('Task deleted','info');
   loadTasks();
 }
 
-// ── GENERATE MASTER ───────────────────────────────────────────
+// ── GENERATE MASTER (only Admin) ──────────────────────────────
 async function generateMaster() {
+  const isAdmin = (SESSION.user_type === 'Admin' || SESSION.role === 'admin');
+  if (!isAdmin) return;
   if (!confirm('This will regenerate the entire Master schedule (2 years). Continue?')) return;
   toast('Generating schedule...','info');
 
@@ -1104,7 +1112,7 @@ async function loadScoring() {
     </tr>`).join('');
 }
 
-// ── MY TASKS (USER & SUPER ADMIN) ────────────────────────
+// ── MY TASKS (User & Super Admin) + WhatsApp for Super Admin ──
 async function loadMyTasks() {
   if (!sb) { showNoTaskMsg(); return; }
   const now   = new Date();
@@ -1123,14 +1131,15 @@ async function loadMyTasks() {
 
   if (!tasks.length) { showNoTaskMsg(); return; }
 
-  const isSuperAdmin = SESSION.user_type === 'Super Admin';
+  const isSuperAdmin = (SESSION.user_type === 'Super Admin');
+  const isAdminOnly = (SESSION.user_type === 'Admin' || SESSION.role === 'admin');
 
   el.innerHTML = tasks.map(t => {
     const planned = new Date(t.planned_date);
     const overdue = planned < now;
     const daysLeft = Math.round((planned - now) / 86400000);
     
-    // WhatsApp button only for Super Admin
+    // WhatsApp button only for Super Admin (not for Admin or User)
     const whatsappBtn = isSuperAdmin ? `<button class="btn-sm-icon" onclick="sendWhatsAppToAssignee('${t.id}')" title="Send WhatsApp to Assignee" style="background:#25D366;color:#fff;border:none;">
       <i class="bi bi-whatsapp"></i>
     </button>` : '';
@@ -1169,7 +1178,7 @@ function showNoTaskMsg() {
     </div>`;
 }
 
-// ── SUBMIT TASK ───────────────────────────────────────────────
+// ── SUBMIT TASK (common for User & Super Admin) ───────────────
 function openSubmitModal(taskId) {
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
@@ -1217,7 +1226,6 @@ async function confirmSubmit() {
   const plannedEOD = new Date(planned);
   plannedEOD.setHours(23, 59, 59, 999);
   const onTime = now <= plannedEOD;
-  const score  = onTime ? 1 : 0;
   const status = onTime ? 'Done On Time' : 'Done Late';
 
   const getV = id => { const el = document.getElementById(id); return el ? el.value : ''; };
@@ -1259,17 +1267,17 @@ async function confirmSubmit() {
     planned_date: t.planned_date,
     actual_date:  now.toISOString(),
     on_time:      onTime,
-    score,
+    score:        onTime ? 1 : 0,
     submitted_on: now.toISOString(),
   });
   if (scoreErr) console.warn('scoring insert:', scoreErr.message);
 
   bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
-  toast(`Task submitted! Score: ${onTime?'+':''}${score} (${status})`, onTime?'success':'error');
+  toast(`Task submitted! Score: ${onTime?'+1':'0'} (${status})`, onTime?'success':'error');
   loadMyTasks();
 }
 
-// ── WHATSAPP (SUPER ADMIN ONLY) ───────────────────────────────
+// ── WHATSAPP (Super Admin only) ───────────────────────────────
 async function sendWhatsAppToAssignee(taskId) {
   if (SESSION.user_type !== 'Super Admin') {
     toast('Only Super Admin can send WhatsApp','error');
@@ -1279,7 +1287,6 @@ async function sendWhatsAppToAssignee(taskId) {
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
   
-  // Get doer details to get their WhatsApp number
   const { data: doers } = await sb.from('doers')
     .select('*').ilike('name', t.doer_name).limit(1);
   
