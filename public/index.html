@@ -38,9 +38,6 @@
   --shadow-lg:     0 8px 40px rgba(21,101,192,.22);
   --radius:        14px;
   --radius-sm:     8px;
-  --role-admin:    #FF6B6B;
-  --role-super:    #FFD93D;
-  --role-user:     #6BCB77;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
@@ -60,29 +57,28 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 @keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
 .login-logo{font-family:'Playfair Display',serif;color:var(--primary);font-size:2rem;text-align:center;margin-bottom:6px;}
 .login-sub{text-align:center;color:var(--text-muted);font-size:.82rem;margin-bottom:28px;letter-spacing:1px;text-transform:uppercase;}
+.login-tabs{display:flex;gap:0;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:24px;}
+.login-tab{flex:1;padding:8px;text-align:center;font-size:.84rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text-muted);transition:all .2s;border:none;}
+.login-tab.active{background:var(--primary);color:#fff;}
 
 /* NAVBAR */
 .app-navbar{background:linear-gradient(90deg,var(--primary-dark) 0%,var(--primary) 100%);padding:0 24px;height:62px;display:flex;align-items:center;box-shadow:var(--shadow-md);position:sticky;top:0;z-index:1100;}
 .app-navbar .brand{font-family:'Playfair Display',serif;color:#fff;font-size:1.5rem;letter-spacing:1px;}
 .badge-role{font-size:.7rem;background:var(--gold);color:#000;border-radius:20px;padding:2px 10px;font-weight:700;margin-left:10px;vertical-align:middle;}
-.badge-role.admin{background:var(--role-admin);color:#fff;}
-.badge-role.super{background:var(--role-super);color:#000;}
-.badge-role.user{background:var(--role-user);color:#fff;}
 .nav-btn{background:rgba(255,255,255,.12);color:#fff!important;border:1px solid rgba(255,255,255,.25)!important;border-radius:var(--radius-sm);padding:6px 14px;font-size:.82rem;font-weight:500;transition:all .2s;cursor:pointer;}
 .nav-btn:hover{background:rgba(255,255,255,.22);}
 
 /* SIDEBAR */
 .app-layout{display:flex;min-height:calc(100vh - 62px);}
-.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);padding:20px 12px;flex-shrink:0;box-shadow:2px 0 12px rgba(21,101,192,.06);}
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);padding:20px 12px;flex-shrink:0;box-shadow:2px 0 12px rgba(21,101,192,.06); transition: transform 0.3s ease; z-index: 1050;}
 .section-label{font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:1.5px;padding:14px 12px 6px;}
 .sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:.88rem;font-weight:500;color:var(--text-muted);transition:all .2s;}
 .sidebar-item:hover{background:var(--accent2);color:var(--primary);}
 .sidebar-item.active{background:var(--primary);color:#fff;}
 .sidebar-item i{font-size:1rem;width:20px;text-align:center;}
-.sidebar-item.disabled{opacity:.5;cursor:not-allowed;pointer-events:none;}
 
 /* MAIN */
-.main-content{flex:1;padding:28px;overflow-x:hidden;overflow-y:auto;}
+.main-content{flex:1;padding:28px;overflow-x:hidden;}
 .page{display:none;}.page.active{display:block;}
 .page-title{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--primary-dark);margin-bottom:4px;}
 .page-sub{color:var(--text-muted);font-size:.85rem;margin-bottom:24px;}
@@ -96,8 +92,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* TABLES */
 .card-table{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow:hidden;}
-.card-table .table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:linear-gradient(90deg,var(--accent2) 0%,#fff 100%);gap:10px;flex-wrap:wrap;}
-.card-table .table-title{font-weight:700;color:var(--primary-dark);font-size:.95rem;white-space:nowrap;}
+.card-table .table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:linear-gradient(90deg,var(--accent2) 0%,#fff 100%);}
+.card-table .table-title{font-weight:700;color:var(--primary-dark);font-size:.95rem;}
 .table{margin-bottom:0;font-size:.83rem;}
 .table thead th{background:var(--primary);color:#fff;font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;border:none;padding:10px 12px;position:sticky;top:0;}
 .table tbody tr{transition:background .15s;}
@@ -126,9 +122,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .badge-late{background:#FFEBEE;color:#C62828;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
 .badge-pending{background:#FFF3E0;color:#E65100;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
 .badge-freq{background:var(--accent2);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:600;}
-.badge-admin{background:var(--role-admin);color:#fff;border-radius:20px;padding:2px 8px;font-size:.7rem;font-weight:700;}
-.badge-super{background:var(--role-super);color:#000;border-radius:20px;padding:2px 8px;font-size:.7rem;font-weight:700;}
-.badge-user{background:var(--role-user);color:#fff;border-radius:20px;padding:2px 8px;font-size:.7rem;font-weight:700;}
 
 /* SCORE CARDS */
 .score-card{border-radius:var(--radius);padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-sm);}
@@ -160,7 +153,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .check-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border);}
 .check-item:last-child{border-bottom:none;}
 
-/* MOBILE COMPATIBILITY */
+/* MOBILE COMPATIBILITY OVERRIDES */
 .menu-toggle-btn {
   display: none;
   background: transparent;
@@ -173,24 +166,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 @media (max-width: 991.98px) {
   .menu-toggle-btn { display: block; }
-  
   .sidebar {
     position: fixed;
     top: 62px;
     left: 0;
-    width: 240px;
     height: calc(100vh - 62px);
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    z-index: 1050;
-    border-right: 1px solid var(--border);
-    box-shadow: 2px 0 12px rgba(21,101,192,.15);
   }
-  
   .sidebar.show {
     transform: translateX(0);
   }
-  
+  .main-content { padding: 15px; }
   .sidebar-overlay {
     display: none;
     position: fixed;
@@ -199,41 +185,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     background: rgba(0,0,0,0.4);
     z-index: 1040;
   }
-  
-  .sidebar-overlay.show { 
-    display: block; 
-  }
-  
-  .main-content { 
-    padding: 15px; 
-  }
-  
-  .login-card { 
-    width: 90%; 
-    padding: 30px 20px; 
-  }
-  
-  .stat-card { 
-    padding: 15px; 
-  }
-  
-  .stat-val { 
-    font-size: 1.5rem; 
-  }
-  
-  .btn-start { 
-    padding: 12px 24px; 
-    font-size: 0.9rem; 
-  }
-  
-  .table-header {
-    flex-direction: column;
-    align-items: stretch !important;
-  }
-  
-  .table-header input {
-    width: 100% !important;
-  }
+  .sidebar-overlay.show { display: block; }
+  .login-card { width: 90%; padding: 30px 20px; }
+  .stat-card { padding: 15px; }
+  .stat-val { font-size: 1.5rem; }
+  .btn-start { padding: 12px 24px; font-size: 0.9rem; }
 }
 </style>
 </head>
@@ -252,9 +208,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="login-card">
     <div class="login-logo">&#9745; CheckList</div>
     <div class="login-sub">Maintenance Management System</div>
+    <div class="login-tabs">
+      <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">
+        <i class="bi bi-shield-lock me-1"></i>Admin
+      </button>
+      <button class="login-tab" id="tabUser" onclick="switchLoginTab('user')">
+        <i class="bi bi-person me-1"></i>User
+      </button>
+    </div>
     <div class="mb-3">
       <label class="form-label">Username</label>
-      <input type="text" id="loginUser" class="form-control" placeholder="Enter username or name" value="admin"/>
+      <input type="text" id="loginUser" class="form-control" placeholder="Enter username" value="admin"/>
     </div>
     <div class="mb-4">
       <label class="form-label">Password</label>
@@ -272,7 +236,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <nav class="app-navbar">
     <button class="menu-toggle-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
     <span class="brand me-2">&#9745; CheckList</span>
-    <span id="navRole" class="badge-role admin">ADMIN</span>
+    <span id="navRole" class="badge-role">ADMIN</span>
     <div class="ms-auto d-flex align-items-center gap-2">
       <span id="navUser" class="d-none d-sm-inline" style="color:#B3D9FF;font-size:.82rem;font-weight:500;"></span>
       <button class="nav-btn" onclick="doLogout()"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
@@ -282,8 +246,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="app-layout">
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar" id="appSidebar">
-      <!-- ADMIN MENU -->
-      <div id="adminMenuGroup" style="display:none;">
+      <div id="adminMenuGroup">
         <div class="section-label">Management</div>
         <div class="sidebar-item active" onclick="showPage('dashboard')" id="menu-dashboard"><i class="bi bi-speedometer2"></i>Dashboard</div>
         <div class="sidebar-item" onclick="showPage('doers')" id="menu-doers"><i class="bi bi-people-fill"></i>Doers</div>
@@ -292,12 +255,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="sidebar-item" onclick="showPage('donelist')" id="menu-donelist"><i class="bi bi-check2-all"></i>Done List</div>
         <div class="sidebar-item" onclick="showPage('scoring')" id="menu-scoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
-
-      <!-- USER & SUPER ADMIN MENU (Same for both) -->
       <div id="userMenuGroup" style="display:none;">
         <div class="section-label">My Work</div>
         <div class="sidebar-item active" onclick="showPage('myTasks')" id="menu-myTasks"><i class="bi bi-card-checklist"></i>My Tasks</div>
         <div class="sidebar-item" onclick="showPage('donelist')" id="menu-myDone"><i class="bi bi-check2-all"></i>Done List</div>
+        <div class="sidebar-item" onclick="showPage('scoring')" id="menu-myScoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
     </aside>
 
@@ -352,7 +314,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="page" id="page-doers">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div><div class="page-title">Doers</div><div class="page-sub">Manage maintenance personnel</div></div>
-          <div class="d-flex gap-2" id="doerActions" style="display:none;">
+          <div class="d-flex gap-2">
             <button class="btn-primary-custom" onclick="openDoerModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
             <button class="btn-sm-icon" onclick="exportCsv('doers')" title="Export CSV"><i class="bi bi-download"></i></button>
           </div>
@@ -364,7 +326,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="doerTable">
-              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>User Type</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>Actions</th></tr></thead>
+              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>Actions</th></tr></thead>
               <tbody id="doerTbody"></tbody>
             </table>
           </div>
@@ -375,12 +337,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="page" id="page-tasks">
         <div class="d-flex align-items-center justify-content-between mb-2">
           <div><div class="page-title">Tasks</div><div class="page-sub">Define maintenance tasks & frequency</div></div>
-          <div class="d-flex gap-2" id="taskActions" style="display:none;">
+          <div class="d-flex gap-2">
             <button class="btn-primary-custom" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
             <button class="btn-sm-icon" onclick="exportCsv('tasks')" title="Export CSV"><i class="bi bi-download"></i></button>
           </div>
         </div>
-        <div class="text-center mb-3 mt-2" id="generateMasterBtn" style="display:none;">
+        <div class="text-center mb-3 mt-2">
           <button class="btn-start" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button>
           <div style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">Generates 2-year schedule based on all tasks above</div>
         </div>
@@ -488,14 +450,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="row g-3">
         <div class="col-md-6"><label class="form-label">Full Name *</label><input type="text" class="form-control" id="d_name" placeholder="Swapan Kr Ghorai"/></div>
         <div class="col-md-6"><label class="form-label">Department *</label><input type="text" class="form-control" id="d_dept" placeholder="Yarn Division"/></div>
-        <div class="col-md-6">
-          <label class="form-label">User Type *</label>
-          <select class="form-select" id="d_usertype">
-            <option value="User">User</option>
-            <option value="Super Admin">Super Admin</option>
-            <option value="Admin">Admin</option>
-          </select>
-        </div>
         <div class="col-md-6"><label class="form-label">Email Address</label><input type="email" class="form-control" id="d_email" placeholder="name@company.com"/></div>
         <div class="col-md-6"><label class="form-label">Phone Number</label><input type="text" class="form-control" id="d_phone" placeholder="+91 9000000000"/></div>
         <div class="col-12"><label class="form-label">WhatsApp Number (with country code)</label><input type="text" class="form-control" id="d_wa" placeholder="919000000000"/></div>
@@ -516,13 +470,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <input type="hidden" id="taskEditId"/>
       <div class="row g-3">
         <div class="col-12"><label class="form-label">Task Name *</label><input type="text" class="form-control" id="t_name" placeholder="B. Card-1 Machine Maintenance"/></div>
-        <div class="col-md-6">
-          <label class="form-label">Assign Doer *</label>
-          <select class="form-select" id="t_doer" onchange="autoFillDept()">
-            <option value="">— Select Doer —</option>
-          </select>
-        </div>
-        <div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control" id="t_dept" placeholder="Auto-filled" readonly/></div>
+        <div class="col-md-6"><label class="form-label">Assign Doer *</label><select class="form-select" id="t_doer" onchange="autoFillDept()"><option value="">— Select Doer —</option></select></div>
+        <div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control" id="t_dept" placeholder="Auto-filled"/></div>
         <div class="col-md-6">
           <label class="form-label">Frequency *</label>
           <select class="form-select" id="t_freq">
@@ -564,24 +513,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <script>
 // ══════════════════════════════════════════════════════════════
-//  CHECKLIST — Supabase Web App (UPDATED WITH ROLE-BASED ACCESS)
+//  CHECKLIST — Supabase Web App
 // ══════════════════════════════════════════════════════════════
 
+// ── CONFIG (loaded from config.json) ─────────────────────────
 let SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
 let SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg";
 let sb = null;
 
 const APP_CONFIG = {
   APP_NAME:      "CheckList",
-  SCORE_ON_TIME: 1,
+  // Score formula: (onTime/total*100)-100  → range -100 to 0
+  SCORE_ON_TIME: 1,   // stored as 1/0 boolean-int; formula applied in buildLeaderboard
   SCORE_LATE:    0,
   ADMIN_USER:    "admin",
   ADMIN_PASS:    "Admin@1234",
   USER_PASS:     "User@1234",
-  EMAIL_FROM:    "mis@yajurfibres.com",
 };
 
-let SESSION = { role: null, name: null, dept: null, user_type: null };
+let SESSION = { role: null, name: null, dept: null };
 let DOERS_CACHE = [];
 let TASKS_CACHE = [];
 let currentSubmitTask = null;
@@ -590,6 +540,7 @@ let chartCompliance = null, chartDept = null, chartScore = null;
 // ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
   setLoadStatus("Connecting to database...");
+
   try {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     setLoadStatus("Initializing tables...");
@@ -618,51 +569,58 @@ function showLogin() {
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
+// ── SUPABASE TABLE INIT ───────────────────────────────────────
+// Tables are created via Supabase SQL editor (see setup guide)
+// This function just verifies connectivity
 async function initSupabaseTables() {
   if (!sb) return;
+  // Test connection by querying doers table
   await sb.from('doers').select('id').limit(1);
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────
+let loginTab = 'admin';
+function switchLoginTab(tab) {
+  loginTab = tab;
+  document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
+  document.getElementById('tabUser').classList.toggle('active', tab === 'user');
+  document.getElementById('loginUser').value = tab === 'admin' ? 'admin' : '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').textContent = '';
+}
+
 async function doLogin() {
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value;
   document.getElementById('loginError').textContent = '';
 
-  if (!u || !p) { 
-    document.getElementById('loginError').textContent = 'Please enter credentials.'; 
-    return; 
-  }
+  if (!u || !p) { document.getElementById('loginError').textContent = 'Please enter credentials.'; return; }
 
-  // Admin login (hardcoded)
+  // Admin login
   if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
-    SESSION = { role: 'admin', user_type: 'Admin', name: 'Administrator', dept: '' };
+    SESSION = { role: 'admin', name: 'Administrator', dept: '' };
     startApp();
     return;
   }
 
-  // User login - check doers table with user_type
+  // User login — check against doers table
   if (p === APP_CONFIG.USER_PASS) {
-    if (sb) {
+    if (supabase) {
       const { data } = await sb.from('doers')
         .select('*').ilike('name', u).limit(1);
       if (data && data.length > 0) {
-        const doer = data[0];
-        SESSION = { 
-          role: 'doer', 
-          user_type: doer.user_type || 'User',
-          name: doer.name, 
-          dept: doer.department, 
-          id: doer.id,
-          email: doer.email,
-          whatsapp: doer.whatsapp
-        };
+        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id };
         startApp();
         return;
       }
+    } else {
+      // No DB: demo mode
+      SESSION = { role: 'user', name: u, dept: 'Demo' };
+      startApp();
+      return;
     }
   }
-  document.getElementById('loginError').textContent = 'Invalid credentials.';
+  document.getElementById('loginError').textContent = 'Invalid credentials. Check username/password.';
 }
 
 document.addEventListener('keydown', e => {
@@ -672,30 +630,11 @@ document.addEventListener('keydown', e => {
 function startApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
-  
-  // Set navbar role badge color and text
-  const roleEl = document.getElementById('navRole');
-  roleEl.textContent = SESSION.user_type.toUpperCase();
-  roleEl.classList.remove('admin', 'super', 'user');
-  if (SESSION.user_type === 'Admin') roleEl.classList.add('admin');
-  else if (SESSION.user_type === 'Super Admin') roleEl.classList.add('super');
-  else roleEl.classList.add('user');
-  
+  document.getElementById('navRole').textContent = SESSION.role.toUpperCase();
   document.getElementById('navUser').textContent = SESSION.name;
-
-  // Show/hide menu groups based on user_type
-  const isAdmin = SESSION.user_type === 'Admin' || SESSION.role === 'admin';
-  const isSuperAdminOrUser = SESSION.user_type === 'Super Admin' || SESSION.user_type === 'User';
-
-  document.getElementById('adminMenuGroup').style.display = isAdmin ? '' : 'none';
-  document.getElementById('userMenuGroup').style.display = isSuperAdminOrUser ? '' : 'none';
-
-  // Start with appropriate page
-  if (isAdmin) {
-    showPage('dashboard');
-  } else {
-    showPage('myTasks');
-  }
+  document.getElementById('adminMenuGroup').style.display = SESSION.role === 'admin' ? '' : 'none';
+  document.getElementById('userMenuGroup').style.display  = SESSION.role === 'user'  ? '' : 'none';
+  showPage(SESSION.role === 'admin' ? 'dashboard' : 'myTasks');
 }
 
 function doLogout() {
@@ -708,6 +647,7 @@ function doLogout() {
 
 // ── PAGE ROUTING ──────────────────────────────────────────────
 function showPage(page) {
+  // Mobile Support: Auto hide sidebar on selection
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
   if(sidebar) sidebar.classList.remove('show');
@@ -715,13 +655,10 @@ function showPage(page) {
 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-  
   const el = document.getElementById('page-' + page);
   if (el) el.classList.add('active');
-  
-  const m = document.getElementById('menu-' + page) || document.getElementById('menu-super-' + page) || document.getElementById('menu-my' + page.charAt(0).toUpperCase() + page.slice(1));
+  const m = document.getElementById('menu-' + page);
   if (m) m.classList.add('active');
-  
   const loaders = {
     dashboard: loadDashboard, doers: loadDoers, tasks: loadTasks,
     master: loadMaster, donelist: loadDoneList, scoring: loadScoring, myTasks: loadMyTasks
@@ -749,6 +686,7 @@ async function loadDashboard() {
   document.getElementById('st-pending').textContent = pending;
   document.getElementById('st-overdue').textContent = overdue;
 
+  // Charts
   const { data: scoring } = await sb.from('scoring').select('*');
   const sc = scoring || [];
   const onT = sc.filter(r => r.on_time).length;
@@ -770,11 +708,13 @@ function buildLeaderboard(scoring) {
     map[n].totalTasks++;
     r.on_time ? map[n].onTime++ : map[n].late++;
   });
+  // Formula: (onTime / totalTasks * 100) - 100
+  // -100 = all late, 0 = all on time
   Object.values(map).forEach(p => {
     p.score = p.totalTasks > 0
       ? Math.round((p.onTime / p.totalTasks) * 100) - 100
       : 0;
-    p.total = p.score;
+    p.total = p.score; // alias for leaderboard display
   });
   return Object.values(map).sort((a, b) => b.score - a.score);
 }
@@ -813,32 +753,20 @@ async function loadDoers() {
   if (!sb) return;
   const { data } = await sb.from('doers').select('*').order('created_at', { ascending: true });
   DOERS_CACHE = data || [];
-  
-  // Show/hide action buttons based on permission
-  const isAdmin = SESSION.user_type === 'Admin' || SESSION.role === 'admin';
-  const isSuperAdmin = SESSION.user_type === 'Super Admin';
-  document.getElementById('doerActions').style.display = (isAdmin || isSuperAdmin) ? '' : 'none';
-
   const tbody = document.getElementById('doerTbody');
-  tbody.innerHTML = DOERS_CACHE.map((r, i) => {
-    const userTypeBadge = r.user_type === 'Admin' ? `<span class="badge-admin">${r.user_type}</span>`
-                        : r.user_type === 'Super Admin' ? `<span class="badge-super">${r.user_type}</span>`
-                        : `<span class="badge-user">${r.user_type || 'User'}</span>`;
-    const actions = (isAdmin || isSuperAdmin) ? `
-      <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
-      <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>` : '';
-    
-    return `<tr>
+  tbody.innerHTML = DOERS_CACHE.map((r, i) => `
+    <tr>
       <td>${i+1}</td>
       <td><strong>${r.name||''}</strong></td>
       <td>${r.department||''}</td>
-      <td>${userTypeBadge}</td>
       <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
       <td>${r.phone||''}</td>
       <td>${r.whatsapp||''}</td>
-      <td>${actions}</td>
-    </tr>`;
-  }).join('');
+      <td>
+        <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
+        <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
+      </td>
+    </tr>`).join('');
 }
 
 function openDoerModal(id) {
@@ -848,14 +776,12 @@ function openDoerModal(id) {
     if (r) {
       document.getElementById('d_name').value  = r.name||'';
       document.getElementById('d_dept').value  = r.department||'';
-      document.getElementById('d_usertype').value = r.user_type || 'User';
       document.getElementById('d_email').value = r.email||'';
       document.getElementById('d_phone').value = r.phone||'';
       document.getElementById('d_wa').value    = r.whatsapp||'';
     }
   } else {
     ['d_name','d_dept','d_email','d_phone','d_wa'].forEach(id => document.getElementById(id).value='');
-    document.getElementById('d_usertype').value = 'User';
   }
   new bootstrap.Modal(document.getElementById('doerModal')).show();
 }
@@ -865,9 +791,7 @@ async function saveDoer() {
   const name = document.getElementById('d_name').value.trim();
   if (!name) { toast('Name is required','error'); return; }
   const row = {
-    name, 
-    department: document.getElementById('d_dept').value.trim(),
-    user_type: document.getElementById('d_usertype').value,
+    name, department: document.getElementById('d_dept').value.trim(),
     email: document.getElementById('d_email').value.trim(),
     phone: document.getElementById('d_phone').value.trim(),
     whatsapp: document.getElementById('d_wa').value.trim()
@@ -896,28 +820,20 @@ async function loadTasks() {
   if (!sb) return;
   const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
   TASKS_CACHE = data || [];
-  
-  const isAdmin = SESSION.user_type === 'Admin' || SESSION.role === 'admin';
-  const isSuperAdmin = SESSION.user_type === 'Super Admin';
-  document.getElementById('taskActions').style.display = (isAdmin || isSuperAdmin) ? '' : 'none';
-  document.getElementById('generateMasterBtn').style.display = (isAdmin || isSuperAdmin) ? '' : 'none';
-
   const tbody = document.getElementById('taskTbody');
-  tbody.innerHTML = TASKS_CACHE.map((r, i) => {
-    const actions = (isAdmin || isSuperAdmin) ? `
-      <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
-      <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>` : '';
-    
-    return `<tr>
+  tbody.innerHTML = TASKS_CACHE.map((r, i) => `
+    <tr>
       <td>${r.id}</td>
       <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
       <td>${r.Doer_Name||r.doer_name||''}</td>
       <td>${r.Department||r.department||''}</td>
       <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
       <td>${r.Start_Date||r.start_date||''}</td>
-      <td>${actions}</td>
-    </tr>`;
-  }).join('');
+      <td>
+        <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
+        <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
+      </td>
+    </tr>`).join('');
 }
 
 async function openTaskModal(id) {
@@ -934,7 +850,6 @@ async function openTaskModal(id) {
     }
   } else {
     ['t_name','t_dept'].forEach(id => document.getElementById(id).value='');
-    document.getElementById('t_doer').value = '';
     document.getElementById('t_freq').value = '2W';
     document.getElementById('t_date').value = new Date().toISOString().split('T')[0];
   }
@@ -944,13 +859,12 @@ function editTask(id) { openTaskModal(id); }
 
 async function loadDoersForSelect() {
   if (!sb) return;
-  const { data } = await sb.from('doers').select('id, name, department').order('name');
+  const { data } = await sb.from('doers').select('name, department, Name, Department').order('name');
   const sel = document.getElementById('t_doer');
   sel.innerHTML = '<option value="">— Select Doer —</option>' +
     (data||[]).map(d => {
-      const n = d.name||'';
-      const dep = d.department||'';
-      return `<option value="${n}" data-dept="${dep}" data-id="${d.id}">${n} (${dep})</option>`;
+      const n = d.name||d.Name||''; const dep = d.department||d.Department||'';
+      return `<option value="${n}" data-dept="${dep}">${n} (${dep})</option>`;
     }).join('');
 }
 
@@ -998,6 +912,7 @@ async function generateMaster() {
   const { data: tasks } = await sb.from('tasks').select('*');
   if (!tasks || !tasks.length) { toast('No tasks found.','error'); return; }
 
+  // Clear existing master
   await sb.from('master_schedule').delete().neq('id', 0);
 
   const rows = [];
@@ -1022,6 +937,7 @@ async function generateMaster() {
     }
   }
 
+  // Insert in batches of 500
   for (let i = 0; i < rows.length; i += 500) {
     const { error } = await sb.from('master_schedule').insert(rows.slice(i, i+500));
     if (error) { toast('Error: '+error.message,'error'); return; }
@@ -1044,6 +960,7 @@ function generateDates(startDate, freq, totalDays) {
 async function loadMaster() {
   if (!sb) return;
   const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
+  // Use a fresh tbody
   const t = document.getElementById('masterTbody');
   t.innerHTML = '';
   (data||[]).forEach(r => {
@@ -1078,9 +995,11 @@ async function loadScoring() {
   const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
   const scoring = sc || [];
 
+  // Leaderboard
   const lb = buildLeaderboard(scoring);
   renderLeaderboard(lb, 'scoringLeaderboard');
 
+  // Score chart
   const ctx = document.getElementById('chartScore').getContext('2d');
   if (chartScore) chartScore.destroy();
   const top10 = lb.slice(0, 10);
@@ -1093,6 +1012,7 @@ async function loadScoring() {
     options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
   });
 
+  // Score table
   const tbody = document.getElementById('scoreTbody');
   tbody.innerHTML = scoring.map(r => `
     <tr>
@@ -1104,7 +1024,7 @@ async function loadScoring() {
     </tr>`).join('');
 }
 
-// ── MY TASKS (USER & SUPER ADMIN) ────────────────────────
+// ── MY TASKS (USER) ───────────────────────────────────────────
 async function loadMyTasks() {
   if (!sb) { showNoTaskMsg(); return; }
   const now   = new Date();
@@ -1123,18 +1043,10 @@ async function loadMyTasks() {
 
   if (!tasks.length) { showNoTaskMsg(); return; }
 
-  const isSuperAdmin = SESSION.user_type === 'Super Admin';
-
   el.innerHTML = tasks.map(t => {
     const planned = new Date(t.planned_date);
     const overdue = planned < now;
     const daysLeft = Math.round((planned - now) / 86400000);
-    
-    // WhatsApp button only for Super Admin
-    const whatsappBtn = isSuperAdmin ? `<button class="btn-sm-icon" onclick="sendWhatsAppToAssignee('${t.id}')" title="Send WhatsApp to Assignee" style="background:#25D366;color:#fff;border:none;">
-      <i class="bi bi-whatsapp"></i>
-    </button>` : '';
-
     return `<div class="card-table mb-3">
       <div class="table-header d-flex flex-column flex-md-row gap-3 align-items-start align-items-md-center" style="background:${overdue?'#FFEBEE':'#E3F2FD'};">
         <div class="flex-grow-1">
@@ -1148,7 +1060,12 @@ async function loadMyTasks() {
           </div>
         </div>
         <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
-          ${whatsappBtn}
+          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
+            <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
+          </button>
+          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
+            <i class="bi bi-whatsapp" style="color:#25D366;"></i>
+          </button>
           <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
              Complete
           </button>
@@ -1157,6 +1074,7 @@ async function loadMyTasks() {
     </div>`;
   }).join('');
 
+  // Store tasks for submit
   window._pendingTasks = tasks;
 }
 
@@ -1214,9 +1132,11 @@ async function confirmSubmit() {
   const now = new Date();
   const planned = new Date(t.planned_date);
 
+  // On time = submitted before or on planned date (end of day)
   const plannedEOD = new Date(planned);
   plannedEOD.setHours(23, 59, 59, 999);
   const onTime = now <= plannedEOD;
+  // score column stores 1=ontime, 0=late; leaderboard uses formula
   const score  = onTime ? 1 : 0;
   const status = onTime ? 'Done On Time' : 'Done Late';
 
@@ -1235,9 +1155,11 @@ async function confirmSubmit() {
     remarks:       getV('chk_remarks'),
   };
 
+  // 1. Update master_schedule
   const { error: masterErr } = await sb.from('master_schedule').update(update).eq('id', t.id);
   if (masterErr) { toast('Error updating master: '+masterErr.message,'error'); return; }
 
+  // 2. Insert into done_list
   const { error: doneErr } = await sb.from('done_list').insert({
     doer_name:    t.doer_name,
     department:   t.department,
@@ -1252,6 +1174,7 @@ async function confirmSubmit() {
   });
   if (doneErr) console.warn('done_list insert:', doneErr.message);
 
+  // 3. Insert into scoring
   const { error: scoreErr } = await sb.from('scoring').insert({
     doer_name:    t.doer_name,
     department:   t.department,
@@ -1269,36 +1192,24 @@ async function confirmSubmit() {
   loadMyTasks();
 }
 
-// ── WHATSAPP (SUPER ADMIN ONLY) ───────────────────────────────
-async function sendWhatsAppToAssignee(taskId) {
-  if (SESSION.user_type !== 'Super Admin') {
-    toast('Only Super Admin can send WhatsApp','error');
-    return;
-  }
-
+// ── NOTIFICATIONS ─────────────────────────────────────────────
+async function sendNotification(taskId, type) {
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
-  
-  // Get doer details to get their WhatsApp number
-  const { data: doers } = await sb.from('doers')
-    .select('*').ilike('name', t.doer_name).limit(1);
-  
-  if (!doers || !doers.length) {
-    toast('Doer not found','error');
-    return;
+  const { data: doers } = await sb.from('doers').select('*').ilike('name', t.doer_name).limit(1);
+  const doer = doers && doers[0];
+  if (!doer) { toast('Doer contact not found','error'); return; }
+
+  if (type === 'email') {
+    if (!doer.email) { toast('No email on file','error'); return; }
+    toast(`Email reminder sent to ${doer.email}`, 'success');
+    // In production: call a backend API / Supabase Edge Function to send email
+  } else {
+    const phone = (doer.whatsapp||'').replace(/\D/g,'');
+    if (!phone) { toast('No WhatsApp number on file','error'); return; }
+    const msg = encodeURIComponent(`Hello ${t.doer_name}, pending maintenance task:\n*Task:* ${t.task_name}\n*Planned:* ${fmtDate(t.planned_date)}\nPlease complete on time. — CheckList`);
+    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
   }
-  
-  const doer = doers[0];
-  const phone = (doer.whatsapp||'').replace(/\D/g,'');
-  
-  if (!phone) { 
-    toast('WhatsApp number not found for this doer','error'); 
-    return; 
-  }
-  
-  const msg = encodeURIComponent(`Hello ${doer.name},\n\n*Pending Task Assignment*\n\n*Task:* ${t.task_name}\n*Department:* ${t.department}\n*Frequency:* ${t.frequency}\n*Planned Date:* ${fmtDate(t.planned_date)}\n\nPlease complete this task on time. Thank you!\n\n— CheckList Maintenance System`);
-  window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
-  toast('Opening WhatsApp...','info');
 }
 
 // ── CSV EXPORT ────────────────────────────────────────────────
@@ -1340,7 +1251,7 @@ function toast(msg, type='info') {
   setTimeout(() => div.remove(), 4500);
 }
 
-// Mobile Toggle
+// Mobile Toggle Functionality
 function toggleSidebar() {
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
