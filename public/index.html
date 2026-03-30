@@ -1,3 +1,5 @@
+--- START OF FILE Paste March 30, 2026 - 6:00PM ---
+
 this is index.html file 
 <!DOCTYPE html>
 <html lang="en">
@@ -260,6 +262,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div id="userMenuGroup" style="display:none;">
         <div class="section-label">My Work</div>
         <div class="sidebar-item active" onclick="showPage('myTasks')" id="menu-myTasks"><i class="bi bi-card-checklist"></i>My Tasks</div>
+        <div class="sidebar-item" onclick="showPage('tasks')" id="menu-tasks-user" style="display:none;"><i class="bi bi-list-task"></i>Tasks (View)</div>
         <div class="sidebar-item" onclick="showPage('donelist')" id="menu-myDone"><i class="bi bi-check2-all"></i>Done List</div>
         <div class="sidebar-item" onclick="showPage('scoring')" id="menu-myScoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
@@ -339,12 +342,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="page" id="page-tasks">
         <div class="d-flex align-items-center justify-content-between mb-2">
           <div><div class="page-title">Tasks</div><div class="page-sub">Define maintenance tasks & frequency</div></div>
-          <div class="d-flex gap-2">
+          <div class="d-flex gap-2" id="taskActionsHeader">
             <button class="btn-primary-custom" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
             <button class="btn-sm-icon" onclick="exportCsv('tasks')" title="Export CSV"><i class="bi bi-download"></i></button>
           </div>
         </div>
-        <div class="text-center mb-3 mt-2">
+        <div class="text-center mb-3 mt-2" id="generateMasterSection">
           <button class="btn-start" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button>
           <div style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">Generates 2-year schedule based on all tasks above</div>
         </div>
@@ -355,7 +358,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="taskTable">
-              <thead><tr><th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th>Actions</th></tr></thead>
+              <thead><tr><th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th class="task-action-col">Actions</th></tr></thead>
               <tbody id="taskTbody"></tbody>
             </table>
           </div>
@@ -541,7 +544,7 @@ const APP_CONFIG = {
   USER_PASS:     "User@1234",
 };
 
-let SESSION = { role: null, name: null, dept: null };
+let SESSION = { role: null, name: null, dept: null, user_type: null };
 let DOERS_CACHE = [];
 let TASKS_CACHE = [];
 let currentSubmitTask = null;
@@ -593,7 +596,7 @@ let loginTab = 'admin';
 function switchLoginTab(tab) {
   loginTab = tab;
   document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
-  document.getElementById('tabUser').classList.toggle('active', tab === 'user');
+  document.getElementById('tabUser').classList.toggle('active', tab === 'super_admin');
   document.getElementById('loginUser').value = tab === 'admin' ? 'admin' : '';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginError').textContent = '';
@@ -608,7 +611,7 @@ async function doLogin() {
 
   // Admin login
   if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
-    SESSION = { role: 'admin', name: 'Administrator', dept: '' };
+    SESSION = { role: 'admin', name: 'Administrator', dept: '', user_type: 'Admin' };
     startApp();
     return;
   }
@@ -619,13 +622,13 @@ async function doLogin() {
       const { data } = await sb.from('doers')
         .select('*').ilike('name', u).limit(1);
       if (data && data.length > 0) {
-        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id };
+        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id, user_type: data[0].user_type };
         startApp();
         return;
       }
     } else {
       // No DB: demo mode
-      SESSION = { role: 'user', name: u, dept: 'Demo' };
+      SESSION = { role: 'user', name: u, dept: 'Demo', user_type: 'User' };
       startApp();
       return;
     }
@@ -640,10 +643,15 @@ document.addEventListener('keydown', e => {
 function startApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
-  document.getElementById('navRole').textContent = SESSION.role.toUpperCase();
+  document.getElementById('navRole').textContent = SESSION.user_type ? SESSION.user_type.toUpperCase() : SESSION.role.toUpperCase();
   document.getElementById('navUser').textContent = SESSION.name;
   document.getElementById('adminMenuGroup').style.display = SESSION.role === 'admin' ? '' : 'none';
   document.getElementById('userMenuGroup').style.display  = SESSION.role === 'user'  ? '' : 'none';
+  
+  // Custom logic: Super Admin sees "Tasks" in their menu too
+  const userTaskBtn = document.getElementById('menu-tasks-user');
+  if(userTaskBtn) userTaskBtn.style.display = (SESSION.user_type === 'Super Admin') ? 'flex' : 'none';
+
   showPage(SESSION.role === 'admin' ? 'dashboard' : 'myTasks');
 }
 
@@ -667,7 +675,7 @@ function showPage(page) {
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
   const el = document.getElementById('page-' + page);
   if (el) el.classList.add('active');
-  const m = document.getElementById('menu-' + page);
+  const m = (SESSION.role === 'user' && page === 'tasks') ? document.getElementById('menu-tasks-user') : document.getElementById('menu-' + page);
   if (m) m.classList.add('active');
   const loaders = {
     dashboard: loadDashboard, doers: loadDoers, tasks: loadTasks,
@@ -835,6 +843,13 @@ async function loadTasks() {
   if (!sb) return;
   const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
   TASKS_CACHE = data || [];
+  
+  // Custom: Hide Management actions if not Admin
+  const isAdmin = SESSION.role === 'admin';
+  document.getElementById('taskActionsHeader').style.display = isAdmin ? 'flex' : 'none';
+  document.getElementById('generateMasterSection').style.display = isAdmin ? 'block' : 'none';
+  document.querySelectorAll('.task-action-col').forEach(el => el.style.display = isAdmin ? '' : 'none');
+
   const tbody = document.getElementById('taskTbody');
   tbody.innerHTML = TASKS_CACHE.map((r, i) => `
      <tr>
@@ -844,7 +859,7 @@ async function loadTasks() {
        <td>${r.Department||r.department||''}</td>
        <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
        <td>${r.Start_Date||r.start_date||''}</td>
-       <td>
+       <td class="task-action-col" style="display: ${isAdmin ? '' : 'none'}">
          <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
          <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
        </td>
@@ -852,6 +867,7 @@ async function loadTasks() {
 }
 
 async function openTaskModal(id) {
+  if (SESSION.role !== 'admin') return;
   await loadDoersForSelect();
   document.getElementById('taskEditId').value = id || '';
   if (id) {
@@ -890,6 +906,7 @@ function autoFillDept() {
 }
 
 async function saveTask() {
+  if (SESSION.role !== 'admin') return;
   const task_name = document.getElementById('t_name').value.trim();
   const doer_name = document.getElementById('t_doer').value;
   if (!task_name || !doer_name) { toast('Task name and doer required','error'); return; }
@@ -913,6 +930,7 @@ async function saveTask() {
 }
 
 async function deleteTask(id) {
+  if (SESSION.role !== 'admin') return;
   if (!confirm('Delete this task?')) return;
   await sb.from('tasks').delete().eq('id', id);
   toast('Task deleted','info');
@@ -921,6 +939,7 @@ async function deleteTask(id) {
 
 // ── GENERATE MASTER ───────────────────────────────────────────
 async function generateMaster() {
+  if (SESSION.role !== 'admin') return;
   if (!confirm('This will regenerate the entire Master schedule (2 years). Continue?')) return;
   toast('Generating schedule...','info');
 
