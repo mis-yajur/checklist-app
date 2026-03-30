@@ -122,6 +122,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .badge-late{background:#FFEBEE;color:#C62828;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
 .badge-pending{background:#FFF3E0;color:#E65100;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
 .badge-freq{background:var(--accent2);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:600;}
+.badge-usertype{background:var(--accent2);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:600;}
 
 /* SCORE CARDS */
 .score-card{border-radius:var(--radius);padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-sm);}
@@ -326,7 +327,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </div>
           <div class="table-scroll">
             <table class="table" id="doerTable">
-              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>Actions</th></tr></thead>
+              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>User Type</th><th>Actions</th></tr></thead>
               <tbody id="doerTbody"></tbody>
             </table>
           </div>
@@ -452,7 +453,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="col-md-6"><label class="form-label">Department *</label><input type="text" class="form-control" id="d_dept" placeholder="Yarn Division"/></div>
         <div class="col-md-6"><label class="form-label">Email Address</label><input type="email" class="form-control" id="d_email" placeholder="name@company.com"/></div>
         <div class="col-md-6"><label class="form-label">Phone Number</label><input type="text" class="form-control" id="d_phone" placeholder="+91 9000000000"/></div>
-        <div class="col-12"><label class="form-label">WhatsApp Number (with country code)</label><input type="text" class="form-control" id="d_wa" placeholder="919000000000"/></div>
+        <div class="col-md-6"><label class="form-label">WhatsApp Number (with country code)</label><input type="text" class="form-control" id="d_wa" placeholder="919000000000"/></div>
+        <div class="col-md-6">
+          <label class="form-label">User Type</label>
+          <select class="form-select" id="d_usertype">
+            <option value="User">User</option>
+            <option value="Super Admin">Super Admin</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -605,7 +614,7 @@ async function doLogin() {
 
   // User login — check against doers table
   if (p === APP_CONFIG.USER_PASS) {
-    if (supabase) {
+    if (sb) {
       const { data } = await sb.from('doers')
         .select('*').ilike('name', u).limit(1);
       if (data && data.length > 0) {
@@ -755,18 +764,19 @@ async function loadDoers() {
   DOERS_CACHE = data || [];
   const tbody = document.getElementById('doerTbody');
   tbody.innerHTML = DOERS_CACHE.map((r, i) => `
-    <tr>
-      <td>${i+1}</td>
-      <td><strong>${r.name||''}</strong></td>
-      <td>${r.department||''}</td>
-      <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
-      <td>${r.phone||''}</td>
-      <td>${r.whatsapp||''}</td>
-      <td>
-        <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
-        <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
-      </td>
-    </tr>`).join('');
+     <tr>
+       <td>${i+1}</td>
+       <td><strong>${r.name||''}</strong></td>
+       <td>${r.department||''}</td>
+       <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
+       <td>${r.phone||''}</td>
+       <td>${r.whatsapp||''}</td>
+       <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
+       <td>
+         <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
+         <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
+       </td>
+     </tr>`).join('');
 }
 
 function openDoerModal(id) {
@@ -779,9 +789,11 @@ function openDoerModal(id) {
       document.getElementById('d_email').value = r.email||'';
       document.getElementById('d_phone').value = r.phone||'';
       document.getElementById('d_wa').value    = r.whatsapp||'';
+      document.getElementById('d_usertype').value = r.user_type||'User';
     }
   } else {
     ['d_name','d_dept','d_email','d_phone','d_wa'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('d_usertype').value = 'User';
   }
   new bootstrap.Modal(document.getElementById('doerModal')).show();
 }
@@ -791,10 +803,12 @@ async function saveDoer() {
   const name = document.getElementById('d_name').value.trim();
   if (!name) { toast('Name is required','error'); return; }
   const row = {
-    name, department: document.getElementById('d_dept').value.trim(),
+    name, 
+    department: document.getElementById('d_dept').value.trim(),
     email: document.getElementById('d_email').value.trim(),
     phone: document.getElementById('d_phone').value.trim(),
-    whatsapp: document.getElementById('d_wa').value.trim()
+    whatsapp: document.getElementById('d_wa').value.trim(),
+    user_type: document.getElementById('d_usertype').value
   };
   const id = document.getElementById('doerEditId').value;
   bootstrap.Modal.getInstance(document.getElementById('doerModal')).hide();
@@ -822,18 +836,18 @@ async function loadTasks() {
   TASKS_CACHE = data || [];
   const tbody = document.getElementById('taskTbody');
   tbody.innerHTML = TASKS_CACHE.map((r, i) => `
-    <tr>
-      <td>${r.id}</td>
-      <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
-      <td>${r.Doer_Name||r.doer_name||''}</td>
-      <td>${r.Department||r.department||''}</td>
-      <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
-      <td>${r.Start_Date||r.start_date||''}</td>
-      <td>
-        <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
-        <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
-      </td>
-    </tr>`).join('');
+     <tr>
+       <td>${r.id}</td>
+       <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
+       <td>${r.Doer_Name||r.doer_name||''}</td>
+       <td>${r.Department||r.department||''}</td>
+       <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
+       <td>${r.Start_Date||r.start_date||''}</td>
+       <td>
+         <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
+         <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
+       </td>
+     </tr>`).join('');
 }
 
 async function openTaskModal(id) {
@@ -970,8 +984,8 @@ async function loadMaster() {
               : st ? `<span class="badge-ontime">${st}</span>`
               : `<span class="badge-pending">Pending</span>`;
     t.innerHTML += `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td>
-      <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
-      <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
+       <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
+       <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
   });
 }
 
@@ -984,8 +998,8 @@ async function loadDoneList() {
     const st = (r.status||'').trim();
     const badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>` : `<span class="badge-late">${st}</span>`;
     return `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-      <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
-      <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
+       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
+       <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
   }).join('');
 }
 
@@ -1015,13 +1029,13 @@ async function loadScoring() {
   // Score table
   const tbody = document.getElementById('scoreTbody');
   tbody.innerHTML = scoring.map(r => `
-    <tr>
-      <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-      <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
-      <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
-      <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
-      <td>${fmtDate(r.submitted_on)}</td>
-    </tr>`).join('');
+     <tr>
+       <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
+       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
+       <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
+       <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
+       <td>${fmtDate(r.submitted_on)}</td>
+     </tr>`).join('');
 }
 
 // ── MY TASKS (USER) ───────────────────────────────────────────
