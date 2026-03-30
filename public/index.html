@@ -1,4 +1,3 @@
-this is index.html file 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,7 +53,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* LOGIN */
 #loginScreen{display:none;position:fixed;inset:0;background:linear-gradient(135deg,var(--primary-dark) 0%,#1565C0 50%,#1E88E5 100%);align-items:center;justify-content:center;z-index:1000;}
-.login-card{background:#fff;border-radius:20px;padding:48px 40px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .4s ease;}
+.login-card{background:#fff;border-radius:20px;padding:48px 40px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .4s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
 .login-logo{font-family:'Playfair Display',serif;color:var(--primary);font-size:2rem;text-align:center;margin-bottom:6px;}
 .login-sub{text-align:center;color:var(--text-muted);font-size:.82rem;margin-bottom:28px;letter-spacing:1px;text-transform:uppercase;}
@@ -214,8 +213,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">
         <i class="bi bi-shield-lock me-1"></i>Admin
       </button>
-      <button class="login-tab" id="tabUser" onclick="switchLoginTab('super_admin')">
-        <i class="bi bi-person me-1"></i>Super Admin
+      <button class="login-tab" id="tabSuperAdmin" onclick="switchLoginTab('super_admin')">
+        <i class="bi bi-person-check me-1"></i>Super Admin
+      </button>
+      <button class="login-tab" id="tabUser" onclick="switchLoginTab('user')">
+        <i class="bi bi-person me-1"></i>User
       </button>
     </div>
     <div class="mb-3">
@@ -248,6 +250,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="app-layout">
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar" id="appSidebar">
+      <!-- ADMIN MENU -->
       <div id="adminMenuGroup">
         <div class="section-label">Management</div>
         <div class="sidebar-item active" onclick="showPage('dashboard')" id="menu-dashboard"><i class="bi bi-speedometer2"></i>Dashboard</div>
@@ -257,11 +260,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="sidebar-item" onclick="showPage('donelist')" id="menu-donelist"><i class="bi bi-check2-all"></i>Done List</div>
         <div class="sidebar-item" onclick="showPage('scoring')" id="menu-scoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
+      <!-- SUPER ADMIN MENU -->
+      <div id="superAdminMenuGroup" style="display:none;">
+        <div class="section-label">Supervisor</div>
+        <div class="sidebar-item active" onclick="showPage('myTasks')" id="menu-saMy"><i class="bi bi-card-checklist"></i>My Tasks</div>
+        <div class="sidebar-item" onclick="showPage('donelist')" id="menu-saDone"><i class="bi bi-check2-all"></i>Done List</div>
+        <div class="sidebar-item" onclick="showPage('scoring')" id="menu-saScoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
+      </div>
+      <!-- USER MENU (read-only done list, can complete own tasks) -->
       <div id="userMenuGroup" style="display:none;">
         <div class="section-label">My Work</div>
         <div class="sidebar-item active" onclick="showPage('myTasks')" id="menu-myTasks"><i class="bi bi-card-checklist"></i>My Tasks</div>
-        <div class="sidebar-item" onclick="showPage('donelist')" id="menu-myDone"><i class="bi bi-check2-all"></i>Done List</div>
-        <div class="sidebar-item" onclick="showPage('scoring')" id="menu-myScoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
+        <div class="sidebar-item" onclick="showPage('userDoneList')" id="menu-myDone"><i class="bi bi-check2-all"></i>Done List</div>
       </div>
     </aside>
 
@@ -382,7 +392,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
 
-      <!-- DONE LIST -->
+      <!-- DONE LIST (Admin / Super Admin) -->
       <div class="page" id="page-donelist">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div><div class="page-title">Done List</div><div class="page-sub">Completed maintenance records</div></div>
@@ -397,6 +407,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
             <table class="table" id="doneTable">
               <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th><th>Submitted By</th><th>On</th></tr></thead>
               <tbody id="doneTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- USER DONE LIST (read-only, filtered by own name) -->
+      <div class="page" id="page-userDoneList">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div><div class="page-title">Done List</div><div class="page-sub">Your completed maintenance records</div></div>
+        </div>
+        <div class="card-table">
+          <div class="table-header">
+            <span class="table-title"><i class="bi bi-check2-all me-2"></i>My Completed Tasks</span>
+            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('userDoneTable',this.value)"/>
+          </div>
+          <div class="table-scroll">
+            <table class="table" id="userDoneTable">
+              <thead><tr><th>Task</th><th>Dept</th><th>Planned</th><th>Actual</th><th>Status</th><th>Submitted On</th></tr></thead>
+              <tbody id="userDoneTbody"></tbody>
             </table>
           </div>
         </div>
@@ -432,7 +461,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
 
-      <!-- MY TASKS (USER) -->
+      <!-- MY TASKS (Super Admin / User) -->
       <div class="page" id="page-myTasks">
         <div class="page-title">My Pending Tasks</div>
         <div class="page-sub">Tasks due within the next 10 days</div>
@@ -538,6 +567,7 @@ const APP_CONFIG = {
   SCORE_LATE:    0,
   ADMIN_USER:    "admin",
   ADMIN_PASS:    "Admin@1234",
+  SUPER_ADMIN_PASS: "Super@1234",
   USER_PASS:     "User@1234",
 };
 
@@ -593,8 +623,13 @@ let loginTab = 'admin';
 function switchLoginTab(tab) {
   loginTab = tab;
   document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
+  document.getElementById('tabSuperAdmin').classList.toggle('active', tab === 'super_admin');
   document.getElementById('tabUser').classList.toggle('active', tab === 'user');
-  document.getElementById('loginUser').value = tab === 'admin' ? 'admin' : '';
+  if (tab === 'admin') {
+    document.getElementById('loginUser').value = 'admin';
+  } else {
+    document.getElementById('loginUser').value = '';
+  }
   document.getElementById('loginPass').value = '';
   document.getElementById('loginError').textContent = '';
 }
@@ -613,8 +648,25 @@ async function doLogin() {
     return;
   }
 
-  // User login — check against doers table
-  if (p === APP_CONFIG.USER_PASS) {
+  // Super Admin login — check doers table with user_type Super Admin + SUPER_ADMIN_PASS
+  if (loginTab === 'super_admin' && p === APP_CONFIG.SUPER_ADMIN_PASS) {
+    if (sb) {
+      const { data } = await sb.from('doers')
+        .select('*').ilike('name', u).limit(1);
+      if (data && data.length > 0) {
+        SESSION = { role: 'super_admin', name: data[0].name, dept: data[0].department, id: data[0].id };
+        startApp();
+        return;
+      }
+    } else {
+      SESSION = { role: 'super_admin', name: u, dept: 'Demo' };
+      startApp();
+      return;
+    }
+  }
+
+  // User login — check against doers table with USER_PASS
+  if (loginTab === 'user' && p === APP_CONFIG.USER_PASS) {
     if (sb) {
       const { data } = await sb.from('doers')
         .select('*').ilike('name', u).limit(1);
@@ -624,12 +676,12 @@ async function doLogin() {
         return;
       }
     } else {
-      // No DB: demo mode
       SESSION = { role: 'user', name: u, dept: 'Demo' };
       startApp();
       return;
     }
   }
+
   document.getElementById('loginError').textContent = 'Invalid credentials. Check username/password.';
 }
 
@@ -640,11 +692,23 @@ document.addEventListener('keydown', e => {
 function startApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
-  document.getElementById('navRole').textContent = SESSION.role.toUpperCase();
+  document.getElementById('navRole').textContent = SESSION.role.replace('_',' ').toUpperCase();
   document.getElementById('navUser').textContent = SESSION.name;
-  document.getElementById('adminMenuGroup').style.display = SESSION.role === 'admin' ? '' : 'none';
-  document.getElementById('userMenuGroup').style.display  = SESSION.role === 'user'  ? '' : 'none';
-  showPage(SESSION.role === 'admin' ? 'dashboard' : 'myTasks');
+
+  // Show correct menu group
+  document.getElementById('adminMenuGroup').style.display      = SESSION.role === 'admin'       ? '' : 'none';
+  document.getElementById('superAdminMenuGroup').style.display = SESSION.role === 'super_admin'  ? '' : 'none';
+  document.getElementById('userMenuGroup').style.display       = SESSION.role === 'user'         ? '' : 'none';
+
+  // Route to correct landing page
+  if (SESSION.role === 'admin') {
+    showPage('dashboard');
+  } else if (SESSION.role === 'super_admin') {
+    showPage('myTasks');
+  } else {
+    // role === 'user'
+    showPage('myTasks');
+  }
 }
 
 function doLogout() {
@@ -671,7 +735,8 @@ function showPage(page) {
   if (m) m.classList.add('active');
   const loaders = {
     dashboard: loadDashboard, doers: loadDoers, tasks: loadTasks,
-    master: loadMaster, donelist: loadDoneList, scoring: loadScoring, myTasks: loadMyTasks
+    master: loadMaster, donelist: loadDoneList, scoring: loadScoring,
+    myTasks: loadMyTasks, userDoneList: loadUserDoneList
   };
   if (loaders[page]) loaders[page]();
 }
@@ -990,7 +1055,7 @@ async function loadMaster() {
   });
 }
 
-// ── DONE LIST ─────────────────────────────────────────────────
+// ── DONE LIST (Admin / Super Admin — full view) ───────────────
 async function loadDoneList() {
   if (!sb) return;
   const { data } = await sb.from('done_list').select('*').order('submitted_on', { ascending: false });
@@ -1001,6 +1066,32 @@ async function loadDoneList() {
     return `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
        <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
        <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
+  }).join('');
+}
+
+// ── USER DONE LIST (read-only, own records only) ──────────────
+async function loadUserDoneList() {
+  if (!sb) return;
+  const { data } = await sb.from('done_list')
+    .select('*')
+    .ilike('submitted_by', SESSION.name)
+    .order('submitted_on', { ascending: false });
+  const tbody = document.getElementById('userDoneTbody');
+  if (!data || !data.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:30px;">No completed tasks yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(r => {
+    const st = (r.status||'').trim();
+    const badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>` : `<span class="badge-late">${st}</span>`;
+    return `<tr>
+      <td><strong>${r.task_name||''}</strong></td>
+      <td>${r.department||''}</td>
+      <td>${fmtDate(r.planned_date)}</td>
+      <td>${fmtDate(r.actual_date)}</td>
+      <td>${badge}</td>
+      <td>${fmtDate(r.submitted_on)}</td>
+    </tr>`;
   }).join('');
 }
 
@@ -1039,7 +1130,7 @@ async function loadScoring() {
      </tr>`).join('');
 }
 
-// ── MY TASKS (USER) ───────────────────────────────────────────
+// ── MY TASKS (Super Admin / User) ─────────────────────────────
 async function loadMyTasks() {
   if (!sb) { showNoTaskMsg(); return; }
   const now   = new Date();
@@ -1276,25 +1367,3 @@ function toggleSidebar() {
 </script>
 </body>
 </html>
-
-
-this is config.json code 
-
-{
-  "supabase_url": "https://xfecmmhabdjnudqfyrqz.supabase.co",
-  "supabase_anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg",
-  "app": {
-    "APP_NAME": "CheckList",
-    "ADMIN_USER": "admin",
-    "ADMIN_PASS": "Admin@1234",
-    "USER_PASS": "User@1234",
-    "SCORE_ON_TIME": 1,
-    "SCORE_LATE": 0,
-    "ROLES": {
-      "ADMIN": "Full Access: Management, Doers, Tasks, Schedule Generation, Scoring",
-      "SUPER_ADMIN": "Supervisor Access: My Tasks, Done List, Scoring",
-      "USER": "Operator Access: My Tasks, Done List (Read-only)"
-    },
-    "EMAIL_FROM": "mis@yajurfibres.com"
-  }
-}
