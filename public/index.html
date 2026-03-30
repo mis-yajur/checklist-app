@@ -293,19 +293,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="sidebar-item" onclick="showPage('scoring')" id="menu-scoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
 
-      <!-- SUPER ADMIN MENU -->
-      <div id="superAdminMenuGroup" style="display:none;">
-        <div class="section-label">Management</div>
-        <div class="sidebar-item active" onclick="showPage('dashboard')" id="menu-super-dashboard"><i class="bi bi-speedometer2"></i>Dashboard</div>
-        <div class="sidebar-item" onclick="showPage('doers')" id="menu-super-doers"><i class="bi bi-people-fill"></i>Doers</div>
-        <div class="sidebar-item" onclick="showPage('tasks')" id="menu-super-tasks"><i class="bi bi-list-task"></i>Tasks</div>
-        <div class="sidebar-item" onclick="showPage('master')" id="menu-super-master"><i class="bi bi-table"></i>Master Schedule</div>
-        <div class="section-label" style="margin-top: 20px;">Oversight</div>
-        <div class="sidebar-item" onclick="showPage('donelist')" id="menu-super-donelist"><i class="bi bi-check2-all"></i>Done List</div>
-        <div class="sidebar-item" onclick="showPage('scoring')" id="menu-super-scoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
-      </div>
-
-      <!-- USER MENU -->
+      <!-- USER & SUPER ADMIN MENU (Same for both) -->
       <div id="userMenuGroup" style="display:none;">
         <div class="section-label">My Work</div>
         <div class="sidebar-item active" onclick="showPage('myTasks')" id="menu-myTasks"><i class="bi bi-card-checklist"></i>My Tasks</div>
@@ -697,15 +685,13 @@ function startApp() {
 
   // Show/hide menu groups based on user_type
   const isAdmin = SESSION.user_type === 'Admin' || SESSION.role === 'admin';
-  const isSuperAdmin = SESSION.user_type === 'Super Admin';
-  const isUser = SESSION.user_type === 'User';
+  const isSuperAdminOrUser = SESSION.user_type === 'Super Admin' || SESSION.user_type === 'User';
 
   document.getElementById('adminMenuGroup').style.display = isAdmin ? '' : 'none';
-  document.getElementById('superAdminMenuGroup').style.display = isSuperAdmin ? '' : 'none';
-  document.getElementById('userMenuGroup').style.display = isUser ? '' : 'none';
+  document.getElementById('userMenuGroup').style.display = isSuperAdminOrUser ? '' : 'none';
 
   // Start with appropriate page
-  if (isAdmin || isSuperAdmin) {
+  if (isAdmin) {
     showPage('dashboard');
   } else {
     showPage('myTasks');
@@ -1118,7 +1104,7 @@ async function loadScoring() {
     </tr>`).join('');
 }
 
-// ── MY TASKS (USER) ───────────────────────────────────────────
+// ── MY TASKS (USER & SUPER ADMIN) ────────────────────────
 async function loadMyTasks() {
   if (!sb) { showNoTaskMsg(); return; }
   const now   = new Date();
@@ -1144,7 +1130,8 @@ async function loadMyTasks() {
     const overdue = planned < now;
     const daysLeft = Math.round((planned - now) / 86400000);
     
-    const whatsappBtn = isSuperAdmin ? `<button class="btn-sm-icon" onclick="sendWhatsApp('${t.id}')" title="WhatsApp" style="color:#25D366;">
+    // WhatsApp button only for Super Admin
+    const whatsappBtn = isSuperAdmin ? `<button class="btn-sm-icon" onclick="sendWhatsAppToAssignee('${t.id}')" title="Send WhatsApp to Assignee" style="background:#25D366;color:#fff;border:none;">
       <i class="bi bi-whatsapp"></i>
     </button>` : '';
 
@@ -1283,7 +1270,7 @@ async function confirmSubmit() {
 }
 
 // ── WHATSAPP (SUPER ADMIN ONLY) ───────────────────────────────
-async function sendWhatsApp(taskId) {
+async function sendWhatsAppToAssignee(taskId) {
   if (SESSION.user_type !== 'Super Admin') {
     toast('Only Super Admin can send WhatsApp','error');
     return;
@@ -1292,10 +1279,24 @@ async function sendWhatsApp(taskId) {
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
   
-  const phone = (SESSION.whatsapp||'').replace(/\D/g,'');
-  if (!phone) { toast('No WhatsApp number on file','error'); return; }
+  // Get doer details to get their WhatsApp number
+  const { data: doers } = await sb.from('doers')
+    .select('*').ilike('name', t.doer_name).limit(1);
   
-  const msg = encodeURIComponent(`Hello, pending maintenance task:\n*Task:* ${t.task_name}\n*Planned:* ${fmtDate(t.planned_date)}\nPlease complete on time. — CheckList`);
+  if (!doers || !doers.length) {
+    toast('Doer not found','error');
+    return;
+  }
+  
+  const doer = doers[0];
+  const phone = (doer.whatsapp||'').replace(/\D/g,'');
+  
+  if (!phone) { 
+    toast('WhatsApp number not found for this doer','error'); 
+    return; 
+  }
+  
+  const msg = encodeURIComponent(`Hello ${doer.name},\n\n*Pending Task Assignment*\n\n*Task:* ${t.task_name}\n*Department:* ${t.department}\n*Frequency:* ${t.frequency}\n*Planned Date:* ${fmtDate(t.planned_date)}\n\nPlease complete this task on time. Thank you!\n\n— CheckList Maintenance System`);
   window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
   toast('Opening WhatsApp...','info');
 }
