@@ -53,12 +53,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* LOGIN */
 #loginScreen{display:none;position:fixed;inset:0;background:linear-gradient(135deg,var(--primary-dark) 0%,#1565C0 50%,#1E88E5 100%);align-items:center;justify-content:center;z-index:1000;}
-.login-card{background:#fff;border-radius:20px;padding:48px 40px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .4s ease;}
+.login-card{background:#fff;border-radius:20px;padding:48px 40px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .4s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
 .login-logo{font-family:'Playfair Display',serif;color:var(--primary);font-size:2rem;text-align:center;margin-bottom:6px;}
 .login-sub{text-align:center;color:var(--text-muted);font-size:.82rem;margin-bottom:28px;letter-spacing:1px;text-transform:uppercase;}
 .login-tabs{display:flex;gap:0;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:24px;}
-.login-tab{flex:1;padding:8px;text-align:center;font-size:.84rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text-muted);transition:all .2s;border:none;}
+.login-tab{flex:1;padding:8px;text-align:center;font-size:.80rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text-muted);transition:all .2s;border:none;}
 .login-tab.active{background:var(--primary);color:#fff;}
 
 /* NAVBAR */
@@ -213,8 +213,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">
         <i class="bi bi-shield-lock me-1"></i>Admin
       </button>
-      <button class="login-tab" id="tabUser" onclick="switchLoginTab('super_admin')">
-        <i class="bi bi-person me-1"></i>Super Admin
+      <button class="login-tab" id="tabSuperAdmin" onclick="switchLoginTab('super_admin')">
+        <i class="bi bi-person-badge me-1"></i>Super Admin
+      </button>
+      <button class="login-tab" id="tabUser" onclick="switchLoginTab('user')">
+        <i class="bi bi-person me-1"></i>User
       </button>
     </div>
     <div class="mb-3">
@@ -260,7 +263,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="section-label">My Work</div>
         <div class="sidebar-item active" onclick="showPage('myTasks')" id="menu-myTasks"><i class="bi bi-card-checklist"></i>My Tasks</div>
         <div class="sidebar-item" onclick="showPage('donelist')" id="menu-myDone"><i class="bi bi-check2-all"></i>Done List</div>
-        <div class="sidebar-item" onclick="showPage('scoring')" id="menu-myScoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
+        <div id="scoringMenuItem"><div class="sidebar-item" onclick="showPage('scoring')" id="menu-myScoring"><i class="bi bi-trophy-fill"></i>Scoring</div></div>
       </div>
     </aside>
 
@@ -431,10 +434,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
 
-      <!-- MY TASKS (USER) - READ ONLY -->
+      <!-- MY TASKS (USER) -->
       <div class="page" id="page-myTasks">
         <div class="page-title">My Pending Tasks</div>
-        <div class="page-sub">Tasks due within the next 10 days — <span style="color:var(--danger);">view only</span> (no completion actions)</div>
+        <div id="myTasksSubtitle" class="page-sub">Tasks due within the next 10 days</div>
         <div id="myTasksContainer"></div>
       </div>
 
@@ -505,7 +508,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div></div>
 </div>
 
-<!-- SUBMIT TASK MODAL (admin only, not shown to users) -->
+<!-- SUBMIT TASK MODAL -->
 <div class="modal fade" id="submitModal" tabindex="-1">
   <div class="modal-dialog modal-lg"><div class="modal-content">
     <div class="modal-header"><h5 class="modal-title"><i class="bi bi-clipboard2-check me-2"></i>Complete Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
@@ -532,7 +535,8 @@ let sb = null;
 
 const APP_CONFIG = {
   APP_NAME:      "CheckList",
-  SCORE_ON_TIME: 1,
+  // Score formula: (onTime/total*100)-100  → range -100 to 0
+  SCORE_ON_TIME: 1,   // stored as 1/0 boolean-int; formula applied in buildLeaderboard
   SCORE_LATE:    0,
   ADMIN_USER:    "admin",
   ADMIN_PASS:    "Admin@1234",
@@ -577,16 +581,20 @@ function showLogin() {
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
+// ── SUPABASE TABLE INIT ───────────────────────────────────────
 async function initSupabaseTables() {
   if (!sb) return;
   await sb.from('doers').select('id').limit(1);
 }
 
+// ── LOGIN ─────────────────────────────────────────────────────
 let loginTab = 'admin';
 function switchLoginTab(tab) {
   loginTab = tab;
   document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
+  document.getElementById('tabSuperAdmin').classList.toggle('active', tab === 'super_admin');
   document.getElementById('tabUser').classList.toggle('active', tab === 'user');
+  
   document.getElementById('loginUser').value = tab === 'admin' ? 'admin' : '';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginError').textContent = '';
@@ -599,25 +607,35 @@ async function doLogin() {
 
   if (!u || !p) { document.getElementById('loginError').textContent = 'Please enter credentials.'; return; }
 
-  if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
-    SESSION = { role: 'admin', name: 'Administrator', dept: '' };
-    startApp();
-    return;
+  // Admin login logic
+  if (loginTab === 'admin') {
+    if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
+      SESSION = { role: 'admin', name: 'Administrator', dept: '' };
+      startApp();
+      return;
+    }
   }
 
+  // Super Admin & User logic — check against doers table
   if (p === APP_CONFIG.USER_PASS) {
     if (sb) {
       const { data } = await sb.from('doers')
         .select('*').ilike('name', u).limit(1);
+      
       if (data && data.length > 0) {
-        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id };
-        startApp();
-        return;
+        const doer = data[0];
+        const dbType = (doer.user_type || 'User').toLowerCase().replace(' ', '_');
+        
+        // Validate if chosen tab matches DB user type (Super Admin vs User)
+        if (loginTab === dbType || (loginTab === 'user' && !dbType)) {
+             SESSION = { role: loginTab, name: doer.name, dept: doer.department, id: doer.id };
+             startApp();
+             return;
+        } else {
+             document.getElementById('loginError').textContent = `User found, but not registered as ${loginTab.replace('_',' ')}.`;
+             return;
+        }
       }
-    } else {
-      SESSION = { role: 'user', name: u, dept: 'Demo' };
-      startApp();
-      return;
     }
   }
   document.getElementById('loginError').textContent = 'Invalid credentials. Check username/password.';
@@ -630,10 +648,16 @@ document.addEventListener('keydown', e => {
 function startApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
-  document.getElementById('navRole').textContent = SESSION.role.toUpperCase();
+  document.getElementById('navRole').textContent = SESSION.role.toUpperCase().replace('_',' ');
   document.getElementById('navUser').textContent = SESSION.name;
+  
+  // Show/Hide menus based on role
   document.getElementById('adminMenuGroup').style.display = SESSION.role === 'admin' ? '' : 'none';
-  document.getElementById('userMenuGroup').style.display  = SESSION.role === 'user'  ? '' : 'none';
+  document.getElementById('userMenuGroup').style.display  = (SESSION.role === 'user' || SESSION.role === 'super_admin') ? '' : 'none';
+  
+  // Restriction: Regular "User" doesn't see scoring menu
+  document.getElementById('scoringMenuItem').style.display = SESSION.role === 'user' ? 'none' : 'block';
+
   showPage(SESSION.role === 'admin' ? 'dashboard' : 'myTasks');
 }
 
@@ -645,6 +669,7 @@ function doLogout() {
   showLogin();
 }
 
+// ── PAGE ROUTING ──────────────────────────────────────────────
 function showPage(page) {
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
@@ -657,6 +682,7 @@ function showPage(page) {
   if (el) el.classList.add('active');
   const m = document.getElementById('menu-' + page);
   if (m) m.classList.add('active');
+  
   const loaders = {
     dashboard: loadDashboard, doers: loadDoers, tasks: loadTasks,
     master: loadMaster, donelist: loadDoneList, scoring: loadScoring, myTasks: loadMyTasks
@@ -706,10 +732,7 @@ function buildLeaderboard(scoring) {
     r.on_time ? map[n].onTime++ : map[n].late++;
   });
   Object.values(map).forEach(p => {
-    p.score = p.totalTasks > 0
-      ? Math.round((p.onTime / p.totalTasks) * 100) - 100
-      : 0;
-    p.total = p.score;
+    p.score = p.totalTasks > 0 ? Math.round((p.onTime / p.totalTasks) * 100) - 100 : 0;
   });
   return Object.values(map).sort((a, b) => b.score - a.score);
 }
@@ -730,7 +753,7 @@ function renderLeaderboard(data, containerId) {
   if (!data.length) { el.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:20px;">No data yet</div>'; return; }
   el.innerHTML = data.slice(0,5).map((p, i) => {
     const rc = i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    const scoreColor = p.total >= 0 ? 'var(--primary)' : 'var(--danger)';
+    const scoreColor = p.score >= 0 ? 'var(--primary)' : 'var(--danger)';
     return `<div class="score-card">
       <div class="score-rank ${rc}">${i+1}</div>
       <div style="flex:1;"><div style="font-weight:700;">${p.name}</div><div style="font-size:.76rem;color:var(--text-muted);">${p.dept}</div></div>
@@ -750,19 +773,19 @@ async function loadDoers() {
   DOERS_CACHE = data || [];
   const tbody = document.getElementById('doerTbody');
   tbody.innerHTML = DOERS_CACHE.map((r, i) => `
-      <tr>
-        <td>${i+1}</td>
-        <td><strong>${r.name||''}</strong></td>
-        <td>${r.department||''}</td>
-        <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
-        <td>${r.phone||''}</td>
-        <td>${r.whatsapp||''}</td>
-        <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
-        <td>
+     <tr>
+       <td>${i+1}</td>
+       <td><strong>${r.name||''}</strong></td>
+       <td>${r.department||''}</td>
+       <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
+       <td>${r.phone||''}</td>
+       <td>${r.whatsapp||''}</td>
+       <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
+       <td>
          <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
          <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
-        </td>
-      </tr>`).join('');
+       </td>
+     </tr>`).join('');
 }
 
 function openDoerModal(id) {
@@ -822,18 +845,18 @@ async function loadTasks() {
   TASKS_CACHE = data || [];
   const tbody = document.getElementById('taskTbody');
   tbody.innerHTML = TASKS_CACHE.map((r, i) => `
-      <tr>
-        <td>${r.id}</td>
-        <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
-        <td>${r.Doer_Name||r.doer_name||''}</td>
-        <td>${r.Department||r.department||''}</td>
-        <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
-        <td>${r.Start_Date||r.start_date||''}</td>
-        <td>
+     <tr>
+       <td>${r.id}</td>
+       <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
+       <td>${r.Doer_Name||r.doer_name||''}</td>
+       <td>${r.Department||r.department||''}</td>
+       <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
+       <td>${r.Start_Date||r.start_date||''}</td>
+       <td>
          <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
          <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
-        </td>
-      </tr>`).join('');
+       </td>
+     </tr>`).join('');
 }
 
 async function openTaskModal(id) {
@@ -927,18 +950,13 @@ async function generateMaster() {
         frequency:    freq,
         task_name:    t.Task_Name   || t.task_name,
         planned_date: d.toISOString(),
-        actual_date:  null,
-        status:       null,
-        air_pressure: null, gauge_check: null, spare_parts: null,
-        damaged_parts: null, grease: null, bearing_bush: null,
-        change_repair: null, remarks: null
+        status:       null
       });
     }
   }
 
   for (let i = 0; i < rows.length; i += 500) {
-    const { error } = await sb.from('master_schedule').insert(rows.slice(i, i+500));
-    if (error) { toast('Error: '+error.message,'error'); return; }
+    await sb.from('master_schedule').insert(rows.slice(i, i+500));
   }
   toast(`Generated ${rows.length} schedule rows!`,'success');
   loadMaster();
@@ -967,8 +985,8 @@ async function loadMaster() {
               : st ? `<span class="badge-ontime">${st}</span>`
               : `<span class="badge-pending">Pending</span>`;
     t.innerHTML += `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td>
-        <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
-        <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
+       <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
+       <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
   });
 }
 
@@ -981,8 +999,8 @@ async function loadDoneList() {
     const st = (r.status||'').trim();
     const badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>` : `<span class="badge-late">${st}</span>`;
     return `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-        <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
-        <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
+       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
+       <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
   }).join('');
 }
 
@@ -991,7 +1009,6 @@ async function loadScoring() {
   if (!sb) return;
   const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
   const scoring = sc || [];
-
   const lb = buildLeaderboard(scoring);
   renderLeaderboard(lb, 'scoringLeaderboard');
 
@@ -1009,18 +1026,25 @@ async function loadScoring() {
 
   const tbody = document.getElementById('scoreTbody');
   tbody.innerHTML = scoring.map(r => `
-      <tr>
-        <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-        <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
-        <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
-        <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
-        <td>${fmtDate(r.submitted_on)}</td>
-      </tr>`).join('');
+     <tr>
+       <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
+       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
+       <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
+       <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
+       <td>${fmtDate(r.submitted_on)}</td>
+     </tr>`).join('');
 }
 
-// ── MY TASKS (USER) - READ ONLY, NO EDIT/COMPLETE BUTTONS ────
+// ── MY TASKS (USER) ───────────────────────────────────────────
 async function loadMyTasks() {
   if (!sb) { showNoTaskMsg(); return; }
+  const isRegularUser = SESSION.role === 'user';
+  
+  // Non-Editable User UI adjustments
+  document.getElementById('myTasksSubtitle').innerHTML = isRegularUser 
+    ? 'View tasks due within the next 10 days (Read Only)' 
+    : 'Tasks due within the next 10 days';
+
   const now   = new Date();
   const limit = new Date(now.getTime() + 10 * 86400000);
 
@@ -1037,28 +1061,25 @@ async function loadMyTasks() {
 
   if (!tasks.length) { showNoTaskMsg(); return; }
 
-  // Users: read-only view – no action buttons
-  const isAdmin = (SESSION.role === 'admin');
-  
   el.innerHTML = tasks.map(t => {
     const planned = new Date(t.planned_date);
     const overdue = planned < now;
     const daysLeft = Math.round((planned - now) / 86400000);
-    // Only admin gets action buttons; regular users see only task details
-    const actionButtons = isAdmin ? `
-      <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
-        <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
-          <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
-        </button>
-        <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
-          <i class="bi bi-whatsapp" style="color:#25D366;"></i>
-        </button>
-        <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
-           Complete
-        </button>
-      </div>
-    ` : '';  // users get NO action buttons → read-only
     
+    // Determine visibility for action buttons based on role
+    const actionsHtml = isRegularUser ? '' : `
+        <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
+          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
+            <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
+          </button>
+          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
+            <i class="bi bi-whatsapp" style="color:#25D366;"></i>
+          </button>
+          <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
+             Complete
+          </button>
+        </div>`;
+
     return `<div class="card-table mb-3">
       <div class="table-header d-flex flex-column flex-md-row gap-3 align-items-start align-items-md-center" style="background:${overdue?'#FFEBEE':'#E3F2FD'};">
         <div class="flex-grow-1">
@@ -1071,7 +1092,7 @@ async function loadMyTasks() {
             ${overdue ? ' &nbsp;<span class="badge-late">OVERDUE</span>' : ` &nbsp;<span class="badge-pending">${daysLeft}d left</span>`}
           </div>
         </div>
-        ${actionButtons}
+        ${actionsHtml}
       </div>
     </div>`;
   }).join('');
@@ -1088,8 +1109,9 @@ function showNoTaskMsg() {
     </div>`;
 }
 
-// ── SUBMIT TASK (admin only, but kept for completeness) ──────
+// ── SUBMIT TASK ───────────────────────────────────────────────
 function openSubmitModal(taskId) {
+  if (SESSION.role === 'user') return; // Double protection
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
   currentSubmitTask = t;
@@ -1135,6 +1157,7 @@ async function confirmSubmit() {
   const plannedEOD = new Date(planned);
   plannedEOD.setHours(23, 59, 59, 999);
   const onTime = now <= plannedEOD;
+  const score  = onTime ? 1 : 0;
   const status = onTime ? 'Done On Time' : 'Done Late';
 
   const getV = id => { const el = document.getElementById(id); return el ? el.value : ''; };
@@ -1152,9 +1175,7 @@ async function confirmSubmit() {
     remarks:       getV('chk_remarks'),
   };
 
-  const { error: masterErr } = await sb.from('master_schedule').update(update).eq('id', t.id);
-  if (masterErr) { toast('Error updating master: '+masterErr.message,'error'); return; }
-
+  await sb.from('master_schedule').update(update).eq('id', t.id);
   await sb.from('done_list').insert({
     doer_name:    t.doer_name,
     department:   t.department,
@@ -1167,7 +1188,6 @@ async function confirmSubmit() {
     submitted_on: now.toISOString(),
     ...update
   });
-
   await sb.from('scoring').insert({
     doer_name:    t.doer_name,
     department:   t.department,
@@ -1175,17 +1195,18 @@ async function confirmSubmit() {
     planned_date: t.planned_date,
     actual_date:  now.toISOString(),
     on_time:      onTime,
-    score:        onTime ? 1 : 0,
+    score,
     submitted_on: now.toISOString(),
   });
 
   bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
-  toast(`Task submitted! Score: ${onTime?'+':''}${onTime?1:0} (${status})`, onTime?'success':'error');
+  toast(`Task submitted!`, onTime?'success':'error');
   loadMyTasks();
 }
 
 // ── NOTIFICATIONS ─────────────────────────────────────────────
 async function sendNotification(taskId, type) {
+  if (SESSION.role === 'user') return;
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
   const { data: doers } = await sb.from('doers').select('*').ilike('name', t.doer_name).limit(1);
@@ -1198,7 +1219,7 @@ async function sendNotification(taskId, type) {
   } else {
     const phone = (doer.whatsapp||'').replace(/\D/g,'');
     if (!phone) { toast('No WhatsApp number on file','error'); return; }
-    const msg = encodeURIComponent(`Hello ${t.doer_name}, pending maintenance task:\n*Task:* ${t.task_name}\n*Planned:* ${fmtDate(t.planned_date)}\nPlease complete on time. — CheckList`);
+    const msg = encodeURIComponent(`Hello ${t.doer_name}, pending task:\n*Task:* ${t.task_name}\n*Planned:* ${fmtDate(t.planned_date)}`);
     window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
   }
 }
@@ -1234,19 +1255,16 @@ function filterTable(tableId, query) {
 
 function toast(msg, type='info') {
   const icons = { success:'bi-check-circle-fill', error:'bi-x-circle-fill', info:'bi-info-circle-fill' };
-  const colors = { success:'#2E7D32', error:'#C62828', info:'#1565C0' };
   const div = document.createElement('div');
   div.className = `app-toast toast-${type}`;
-  div.innerHTML = `<i class="bi ${icons[type]||icons.info}" style="color:${colors[type]};font-size:1.1rem;"></i> ${msg}`;
+  div.innerHTML = `<i class="bi ${icons[type]}" style="font-size:1.1rem;"></i> ${msg}`;
   document.getElementById('toastContainer').appendChild(div);
   setTimeout(() => div.remove(), 4500);
 }
 
 function toggleSidebar() {
-  const sidebar = document.getElementById('appSidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  sidebar.classList.toggle('show');
-  overlay.classList.toggle('show');
+  document.getElementById('appSidebar').classList.toggle('show');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
 }
 </script>
 </body>
