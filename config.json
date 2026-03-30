@@ -1,31 +1,11 @@
-// Config from config.json (embedded)
-const CONFIG = {
-  "supabase_url": "https://xfecmmhabdjnudqfyrqz.supabase.co",
-  "supabase_anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg",
-  "app": {
-    "APP_NAME": "CheckList",
-    "ADMIN_USER": "admin",
-    "ADMIN_PASS": "Admin@1234",
-    "USER_PASS": "User@1234",
-    "SCORE_ON_TIME": 1,
-    "SCORE_LATE": 0,
-    "ROLES": {
-      "ADMIN": "Full Access: Management, Doers, Tasks, Schedule Generation, Scoring",
-      "SUPER_ADMIN": "Supervisor Access: My Tasks, Done List, Master Schedule (WhatsApp Nudge), Leaderboard",
-      "USER": "Operator Access: My Tasks, Done List (Read-only)"
-    },
-    "EMAIL_FROM": "mis@yajurfibres.com"
-  }
-};
-
-let SUPABASE_URL = CONFIG.supabase_url;
-let SUPABASE_ANON = CONFIG.supabase_anon_key;
+let SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
+let SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
 const APP_CONFIG = {
-  APP_NAME: CONFIG.app.APP_NAME,
-  SCORE_ON_TIME: CONFIG.app.SCORE_ON_TIME,
-  SCORE_LATE: CONFIG.app.SCORE_LATE,
-  ADMIN_USER: CONFIG.app.ADMIN_USER,
-  ADMIN_PASS: CONFIG.app.ADMIN_PASS,
-  USER_PASS: CONFIG.app.USER_PASS,
-  EMAIL_FROM: CONFIG.app.EMAIL_FROM,
+  APP_NAME:      "CheckList",
+  SCORE_ON_TIME: 1,
+  SCORE_LATE:    0,
+  ADMIN_USER:    "admin",
+  ADMIN_PASS:    "Admin@1234",
+  USER_PASS:     "User@1234",
+  EMAIL_FROM:    "mis@yajurfibres.com",
 };
