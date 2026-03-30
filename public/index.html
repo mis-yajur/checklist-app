@@ -214,12 +214,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <i class="bi bi-shield-lock me-1"></i>Admin
       </button>
       <button class="login-tab" id="tabUser" onclick="switchLoginTab('super_admin')">
-        <i class="bi bi-person me-1"></i>Super Admin
+        <i class="bi bi-person me-1"></i>Staff / Doer
       </button>
     </div>
     <div class="mb-3">
       <label class="form-label">Username</label>
-      <input type="text" id="loginUser" class="form-control" placeholder="Enter username" value="admin"/>
+      <input type="text" id="loginUser" class="form-control" placeholder="Enter name" value="admin"/>
     </div>
     <div class="mb-4">
       <label class="form-label">Password</label>
@@ -238,8 +238,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <button class="menu-toggle-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
     <span class="brand me-2">&#9745; CheckList</span>
     <span id="navRole" class="badge-role">ADMIN</span>
-    <div class="ms-auto d-flex align-items-center gap-2">
-      <span id="navUser" class="d-none d-sm-inline" style="color:#B3D9FF;font-size:.82rem;font-weight:500;"></span>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <span id="navUser" class="d-none d-sm-inline" style="color:#FFF;font-size:.85rem;font-weight:600;"></span>
       <button class="nav-btn" onclick="doLogout()"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
     </div>
   </nav>
@@ -433,8 +433,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
       <!-- MY TASKS (USER) -->
       <div class="page" id="page-myTasks">
-        <div class="page-title">My Pending Tasks</div>
-        <div class="page-sub">Tasks due within the next 10 days</div>
+        <div class="page-title">My Tasks</div>
+        <div class="page-sub">Pending maintenance items assigned to me</div>
         <div id="myTasksContainer"></div>
       </div>
 
@@ -532,8 +532,7 @@ let sb = null;
 
 const APP_CONFIG = {
   APP_NAME:      "CheckList",
-  // Score formula: (onTime/total*100)-100  → range -100 to 0
-  SCORE_ON_TIME: 1,   // stored as 1/0 boolean-int; formula applied in buildLeaderboard
+  SCORE_ON_TIME: 1,
   SCORE_LATE:    0,
   ADMIN_USER:    "admin",
   ADMIN_PASS:    "Admin@1234",
@@ -549,7 +548,6 @@ let chartCompliance = null, chartDept = null, chartScore = null;
 // ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
   setLoadStatus("Connecting to database...");
-
   try {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     setLoadStatus("Initializing tables...");
@@ -559,7 +557,6 @@ window.addEventListener('load', async () => {
   } catch(e) {
     console.error(e);
     setLoadStatus("⚠️ DB connection issue: " + e.message);
-    await new Promise(r => setTimeout(r, 2000));
   }
   hideLoading();
   showLogin();
@@ -578,12 +575,8 @@ function showLogin() {
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
-// ── SUPABASE TABLE INIT ───────────────────────────────────────
-// Tables are created via Supabase SQL editor (see setup guide)
-// This function just verifies connectivity
 async function initSupabaseTables() {
   if (!sb) return;
-  // Test connection by querying doers table
   await sb.from('doers').select('id').limit(1);
 }
 
@@ -605,66 +598,62 @@ async function doLogin() {
 
   if (!u || !p) { document.getElementById('loginError').textContent = 'Please enter credentials.'; return; }
 
-  // Admin login
+  // Admin hardcoded login
   if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
     SESSION = { role: 'admin', name: 'Administrator', dept: '', userType: 'Admin' };
     startApp();
     return;
   }
 
-  // User login — check against doers table
+  // User/Doer login (Staff)
   if (p === APP_CONFIG.USER_PASS) {
     if (sb) {
-      const { data } = await sb.from('doers')
-        .select('*').ilike('name', u).limit(1);
+      const { data } = await sb.from('doers').select('*').ilike('name', u).limit(1);
       if (data && data.length > 0) {
         SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id, userType: data[0].user_type };
         startApp();
         return;
       }
-    } else {
-      // No DB: demo mode
-      SESSION = { role: 'user', name: u, dept: 'Demo', userType: 'User' };
-      startApp();
-      return;
     }
   }
-  document.getElementById('loginError').textContent = 'Invalid credentials. Check username/password.';
+  document.getElementById('loginError').textContent = 'Invalid credentials. Please check Name/Password.';
 }
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') doLogin();
-});
 
 function startApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
-  document.getElementById('navRole').textContent = SESSION.userType ? SESSION.userType.toUpperCase() : SESSION.role.toUpperCase();
-  document.getElementById('navUser').textContent = SESSION.name;
-  document.getElementById('adminMenuGroup').style.display = SESSION.role === 'admin' ? '' : 'none';
-  document.getElementById('userMenuGroup').style.display  = SESSION.role === 'user'  ? '' : 'none';
   
-  // Logic for Restrictive "User" (e.g. Prosun)
-  if(SESSION.userType === 'User') {
-      document.getElementById('menu-myScoring').style.display = 'none';
-  } else {
-      document.getElementById('menu-myScoring').style.display = 'flex';
-  }
+  const displayRole = SESSION.userType ? SESSION.userType.toUpperCase() : SESSION.role.toUpperCase();
+  document.getElementById('navRole').textContent = displayRole;
+  document.getElementById('navUser').textContent = SESSION.name;
 
-  showPage(SESSION.role === 'admin' ? 'dashboard' : 'myTasks');
+  if (SESSION.role === 'admin') {
+    document.getElementById('adminMenuGroup').style.display = 'block';
+    document.getElementById('userMenuGroup').style.display = 'none';
+    showPage('dashboard');
+  } else {
+    document.getElementById('adminMenuGroup').style.display = 'none';
+    document.getElementById('userMenuGroup').style.display = 'block';
+    
+    // IF standard "User", hide Scoring tab completely
+    if (SESSION.userType === 'User') {
+       document.getElementById('menu-myScoring').style.display = 'none';
+    } else {
+       document.getElementById('menu-myScoring').style.display = 'flex';
+    }
+    showPage('myTasks');
+  }
 }
 
 function doLogout() {
   SESSION = {};
   document.getElementById('appShell').style.display = 'none';
   document.getElementById('loginPass').value = '';
-  document.getElementById('loginError').textContent = '';
   showLogin();
 }
 
 // ── PAGE ROUTING ──────────────────────────────────────────────
 function showPage(page) {
-  // Mobile Support: Auto hide sidebar on selection
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
   if(sidebar) sidebar.classList.remove('show');
@@ -672,10 +661,16 @@ function showPage(page) {
 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  
   const el = document.getElementById('page-' + page);
   if (el) el.classList.add('active');
-  const m = document.getElementById('menu-' + page);
-  if (m) m.classList.add('active');
+  
+  const m = document.getElementById('menu-' + page) || document.getElementById('menu-myDone') || document.getElementById('menu-myScoring');
+  // Simple active class toggle for sidebar items
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+     if(item.id.includes(page)) item.classList.add('active');
+  });
+
   const loaders = {
     dashboard: loadDashboard, doers: loadDoers, tasks: loadTasks,
     master: loadMaster, donelist: loadDoneList, scoring: loadScoring, myTasks: loadMyTasks
@@ -683,7 +678,7 @@ function showPage(page) {
   if (loaders[page]) loaders[page]();
 }
 
-// ── DASHBOARD ─────────────────────────────────────────────────
+// ── DASHBOARD (ADMIN) ─────────────────────────────────────────
 async function loadDashboard() {
   if (!sb) return;
   const [{ count: dCount }, { data: master }, { data: done }] = await Promise.all([
@@ -703,7 +698,6 @@ async function loadDashboard() {
   document.getElementById('st-pending').textContent = pending;
   document.getElementById('st-overdue').textContent = overdue;
 
-  // Charts
   const { data: scoring } = await sb.from('scoring').select('*');
   const sc = scoring || [];
   const onT = sc.filter(r => r.on_time).length;
@@ -725,13 +719,8 @@ function buildLeaderboard(scoring) {
     map[n].totalTasks++;
     r.on_time ? map[n].onTime++ : map[n].late++;
   });
-  // Formula: (onTime / totalTasks * 100) - 100
-  // -100 = all late, 0 = all on time
   Object.values(map).forEach(p => {
-    p.score = p.totalTasks > 0
-      ? Math.round((p.onTime / p.totalTasks) * 100) - 100
-      : 0;
-    p.total = p.score; // alias for leaderboard display
+    p.score = p.totalTasks > 0 ? Math.round((p.onTime / p.totalTasks) * 100) - 100 : 0;
   });
   return Object.values(map).sort((a, b) => b.score - a.score);
 }
@@ -752,14 +741,12 @@ function renderLeaderboard(data, containerId) {
   if (!data.length) { el.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:20px;">No data yet</div>'; return; }
   el.innerHTML = data.slice(0,5).map((p, i) => {
     const rc = i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    const scoreColor = p.total >= 0 ? 'var(--primary)' : 'var(--danger)';
     return `<div class="score-card">
       <div class="score-rank ${rc}">${i+1}</div>
       <div style="flex:1;"><div style="font-weight:700;">${p.name}</div><div style="font-size:.76rem;color:var(--text-muted);">${p.dept}</div></div>
       <div style="text-align:right;">
-        <div style="font-size:1.4rem;font-weight:700;color:${scoreColor};">${p.score}</div>
-        <div style="font-size:.7rem;color:var(--text-muted);">score (max 0)</div>
-        <div style="font-size:.72rem;margin-top:2px;"><span style="color:#2E7D32;">✓ ${p.onTime}</span> &nbsp; <span style="color:#C62828;">✗ ${p.late}</span></div>
+        <div style="font-size:1.4rem;font-weight:700;color:var(--primary);">${p.score}</div>
+        <div style="font-size:.7rem;color:var(--text-muted);">score</div>
       </div>
     </div>`;
   }).join('');
@@ -776,7 +763,7 @@ async function loadDoers() {
        <td>${i+1}</td>
        <td><strong>${r.name||''}</strong></td>
        <td>${r.department||''}</td>
-       <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
+       <td>${r.email||''}</td>
        <td>${r.phone||''}</td>
        <td>${r.whatsapp||''}</td>
        <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
@@ -800,41 +787,33 @@ function openDoerModal(id) {
       document.getElementById('d_usertype').value = r.user_type||'User';
     }
   } else {
-    ['d_name','d_dept','d_email','d_phone','d_wa'].forEach(id => document.getElementById(id).value='');
+    ['d_name','d_dept','d_email','d_phone','d_wa'].forEach(f => document.getElementById(f).value='');
     document.getElementById('d_usertype').value = 'User';
   }
   new bootstrap.Modal(document.getElementById('doerModal')).show();
 }
-function editDoer(id) { openDoerModal(id); }
 
 async function saveDoer() {
   const name = document.getElementById('d_name').value.trim();
-  if (!name) { toast('Name is required','error'); return; }
+  if (!name) return toast('Name required','error');
   const row = {
-    name, 
-    department: document.getElementById('d_dept').value.trim(),
-    email: document.getElementById('d_email').value.trim(),
-    phone: document.getElementById('d_phone').value.trim(),
-    whatsapp: document.getElementById('d_wa').value.trim(),
-    user_type: document.getElementById('d_usertype').value
+    name, department: document.getElementById('d_dept').value.trim(),
+    email: document.getElementById('d_email').value.trim(), phone: document.getElementById('d_phone').value.trim(),
+    whatsapp: document.getElementById('d_wa').value.trim(), user_type: document.getElementById('d_usertype').value
   };
   const id = document.getElementById('doerEditId').value;
   bootstrap.Modal.getInstance(document.getElementById('doerModal')).hide();
-  if (id) {
-    const { error } = await sb.from('doers').update(row).eq('id', id);
-    error ? toast('Update failed: '+error.message,'error') : toast('Doer updated','success');
-  } else {
-    const { error } = await sb.from('doers').insert(row);
-    error ? toast('Insert failed: '+error.message,'error') : toast('Doer added','success');
-  }
+  if (id) await sb.from('doers').update(row).eq('id', id);
+  else await sb.from('doers').insert(row);
   loadDoers();
+  toast('Doer saved','success');
 }
 
 async function deleteDoer(id) {
-  if (!confirm('Delete this doer?')) return;
-  await sb.from('doers').delete().eq('id', id);
-  toast('Doer deleted','info');
-  loadDoers();
+  if (confirm('Delete this doer?')) {
+    await sb.from('doers').delete().eq('id', id);
+    loadDoers();
+  }
 }
 
 // ── TASKS ─────────────────────────────────────────────────────
@@ -843,14 +822,14 @@ async function loadTasks() {
   const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
   TASKS_CACHE = data || [];
   const tbody = document.getElementById('taskTbody');
-  tbody.innerHTML = TASKS_CACHE.map((r, i) => `
+  tbody.innerHTML = TASKS_CACHE.map(r => `
      <tr>
        <td>${r.id}</td>
-       <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
-       <td>${r.Doer_Name||r.doer_name||''}</td>
-       <td>${r.Department||r.department||''}</td>
-       <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
-       <td>${r.Start_Date||r.start_date||''}</td>
+       <td><strong>${r.Task_Name||r.task_name}</strong></td>
+       <td>${r.Doer_Name||r.doer_name}</td>
+       <td>${r.Department||r.department}</td>
+       <td><span class="badge-freq">${r.Frequency||r.frequency}</span></td>
+       <td>${fmtDate(r.Start_Date||r.start_date)}</td>
        <td>
          <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
          <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
@@ -859,432 +838,174 @@ async function loadTasks() {
 }
 
 async function openTaskModal(id) {
-  await loadDoersForSelect();
+  const { data: doers } = await sb.from('doers').select('name, department');
+  const sel = document.getElementById('t_doer');
+  sel.innerHTML = '<option value="">— Select Doer —</option>' + (doers||[]).map(d => `<option value="${d.name}" data-dept="${d.department}">${d.name}</option>`).join('');
+  
   document.getElementById('taskEditId').value = id || '';
   if (id) {
-    const r = TASKS_CACHE.find(t => t.id === id);
-    if (r) {
-      document.getElementById('t_name').value = r.Task_Name||r.task_name||'';
-      document.getElementById('t_doer').value = r.Doer_Name||r.doer_name||'';
-      document.getElementById('t_dept').value = r.Department||r.department||'';
-      document.getElementById('t_freq').value = r.Frequency||r.frequency||'2W';
-      document.getElementById('t_date').value = r.Start_Date||r.start_date||'';
-    }
+    const r = TASKS_CACHE.find(t => t.id == id);
+    document.getElementById('t_name').value = r.Task_Name||r.task_name;
+    document.getElementById('t_doer').value = r.Doer_Name||r.doer_name;
+    document.getElementById('t_dept').value = r.Department||r.department;
+    document.getElementById('t_freq').value = r.Frequency||r.frequency;
+    document.getElementById('t_date').value = (r.Start_Date||r.start_date).split('T')[0];
   } else {
-    ['t_name','t_dept'].forEach(id => document.getElementById(id).value='');
-    document.getElementById('t_freq').value = '2W';
+    ['t_name','t_dept'].forEach(f => document.getElementById(f).value='');
     document.getElementById('t_date').value = new Date().toISOString().split('T')[0];
   }
   new bootstrap.Modal(document.getElementById('taskModal')).show();
 }
-function editTask(id) { openTaskModal(id); }
-
-async function loadDoersForSelect() {
-  if (!sb) return;
-  const { data } = await sb.from('doers').select('name, department, Name, Department').order('name');
-  const sel = document.getElementById('t_doer');
-  sel.innerHTML = '<option value="">— Select Doer —</option>' +
-    (data||[]).map(d => {
-      const n = d.name||d.Name||''; const dep = d.department||d.Department||'';
-      return `<option value="${n}" data-dept="${dep}">${n} (${dep})</option>`;
-    }).join('');
-}
 
 function autoFillDept() {
   const sel = document.getElementById('t_doer');
-  const opt = sel.selectedOptions[0];
-  document.getElementById('t_dept').value = opt ? (opt.dataset.dept||'') : '';
+  document.getElementById('t_dept').value = sel.selectedOptions[0].dataset.dept || '';
 }
 
 async function saveTask() {
-  const task_name = document.getElementById('t_name').value.trim();
-  const doer_name = document.getElementById('t_doer').value;
-  if (!task_name || !doer_name) { toast('Task name and doer required','error'); return; }
   const row = {
-    Task_Name:  task_name,
-    Doer_Name:  doer_name,
-    Department: document.getElementById('t_dept').value.trim(),
-    Frequency:  document.getElementById('t_freq').value,
+    Task_Name: document.getElementById('t_name').value, Doer_Name: document.getElementById('t_doer').value,
+    Department: document.getElementById('t_dept').value, Frequency: document.getElementById('t_freq').value,
     Start_Date: document.getElementById('t_date').value
   };
   const id = document.getElementById('taskEditId').value;
   bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide();
-  if (id) {
-    const { error } = await sb.from('tasks').update(row).eq('id', id);
-    error ? toast('Update failed: '+error.message,'error') : toast('Task updated','success');
-  } else {
-    const { error } = await sb.from('tasks').insert(row);
-    error ? toast('Insert failed: '+error.message,'error') : toast('Task added','success');
-  }
+  if (id) await sb.from('tasks').update(row).eq('id', id);
+  else await sb.from('tasks').insert(row);
   loadTasks();
 }
 
-async function deleteTask(id) {
-  if (!confirm('Delete this task?')) return;
-  await sb.from('tasks').delete().eq('id', id);
-  toast('Task deleted','info');
-  loadTasks();
-}
+async function deleteTask(id) { if(confirm('Delete?')) { await sb.from('tasks').delete().eq('id', id); loadTasks(); } }
 
-// ── GENERATE MASTER ───────────────────────────────────────────
+// ── MASTER GENERATION ─────────────────────────────────────────
 async function generateMaster() {
-  if (!confirm('This will regenerate the entire Master schedule (2 years). Continue?')) return;
-  toast('Generating schedule...','info');
-
+  if (!confirm('Regenerate 2-year schedule?')) return;
   const { data: tasks } = await sb.from('tasks').select('*');
-  if (!tasks || !tasks.length) { toast('No tasks found.','error'); return; }
-
-  // Clear existing master
   await sb.from('master_schedule').delete().neq('id', 0);
-
   const rows = [];
-  for (const t of tasks) {
-    const startDate = t.Start_Date || t.start_date;
-    const freq      = t.Frequency  || t.frequency;
-    const dates = generateDates(new Date(startDate), freq, 730);
-    for (const d of dates) {
+  tasks.forEach(t => {
+    let cur = new Date(t.Start_Date || t.start_date);
+    const end = new Date(cur.getTime() + 730 * 86400000);
+    const intervals = { D:1, W:7, '2W':15, M:30, '2M':60, '3M':90, '6M':180, Y:365 };
+    const step = intervals[t.Frequency || t.frequency] || 30;
+    while (cur <= end) {
       rows.push({
-        doer_name:    t.Doer_Name   || t.doer_name,
-        department:   t.Department  || t.department,
-        task_ref_id:  t.id,
-        frequency:    freq,
-        task_name:    t.Task_Name   || t.task_name,
-        planned_date: d.toISOString(),
-        actual_date:  null,
-        status:       null,
-        air_pressure: null, gauge_check: null, spare_parts: null,
-        damaged_parts: null, grease: null, bearing_bush: null,
-        change_repair: null, remarks: null
+        doer_name: t.Doer_Name || t.doer_name, department: t.Department || t.department,
+        task_name: t.Task_Name || t.task_name, planned_date: cur.toISOString(),
+        frequency: t.Frequency || t.frequency, task_ref_id: t.id
       });
+      cur.setDate(cur.getDate() + step);
     }
-  }
-
-  // Insert in batches of 500
-  for (let i = 0; i < rows.length; i += 500) {
-    const { error } = await sb.from('master_schedule').insert(rows.slice(i, i+500));
-    if (error) { toast('Error: '+error.message,'error'); return; }
-  }
-  toast(`Generated ${rows.length} schedule rows!`,'success');
+  });
+  for (let i = 0; i < rows.length; i += 500) await sb.from('master_schedule').insert(rows.slice(i, i+500));
+  toast('Schedule generated','success');
   loadMaster();
 }
 
-function generateDates(startDate, freq, totalDays) {
-  const dates = [];
-  const end = new Date(startDate.getTime() + totalDays * 86400000);
-  const intervals = { D:1, W:7, '2W':15, M:30, '2M':60, '3M':90, '6M':180, Y:365, '2Y':730 };
-  const interval = intervals[(freq||'').toUpperCase()] || intervals[freq] || 30;
-  let cur = new Date(startDate);
-  while (cur <= end) { dates.push(new Date(cur)); cur.setDate(cur.getDate() + interval); }
-  return dates;
-}
-
-// ── MASTER DISPLAY ────────────────────────────────────────────
 async function loadMaster() {
-  if (!sb) return;
-  const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
-  // Use a fresh tbody
-  const t = document.getElementById('masterTbody');
-  t.innerHTML = '';
-  (data||[]).forEach(r => {
-    const st = (r.status||'').trim();
-    let badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>`
-              : st === 'Done Late'    ? `<span class="badge-late">${st}</span>`
-              : st ? `<span class="badge-ontime">${st}</span>`
-              : `<span class="badge-pending">Pending</span>`;
-    t.innerHTML += `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td>
-       <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
-  });
+  const { data } = await sb.from('master_schedule').select('*').order('planned_date');
+  document.getElementById('masterTbody').innerHTML = (data||[]).map(r => `
+    <tr><td>${r.doer_name}</td><td>${r.department}</td><td>${r.task_ref_id}</td><td>${r.frequency}</td>
+    <td>${r.task_name}</td><td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td>
+    <td>${r.status || 'Pending'}</td></tr>`).join('');
 }
 
 // ── DONE LIST ─────────────────────────────────────────────────
 async function loadDoneList() {
-  if (!sb) return;
   const { data } = await sb.from('done_list').select('*').order('submitted_on', { ascending: false });
-  const tbody = document.getElementById('doneTbody');
-  tbody.innerHTML = (data||[]).map(r => {
-    const st = (r.status||'').trim();
-    const badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>` : `<span class="badge-late">${st}</span>`;
-    return `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
-       <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
-  }).join('');
+  document.getElementById('doneTbody').innerHTML = (data||[]).map(r => `
+    <tr><td>${r.doer_name}</td><td>${r.department}</td><td>${r.task_name}</td>
+    <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${r.status}</td>
+    <td>${r.submitted_by}</td><td>${fmtDate(r.submitted_on)}</td></tr>`).join('');
 }
 
 // ── SCORING ───────────────────────────────────────────────────
 async function loadScoring() {
-  if (!sb) return;
-  const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
-  const scoring = sc || [];
-
-  // Leaderboard
-  const lb = buildLeaderboard(scoring);
+  const { data } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
+  const lb = buildLeaderboard(data || []);
   renderLeaderboard(lb, 'scoringLeaderboard');
-
-  // Score chart
-  const ctx = document.getElementById('chartScore').getContext('2d');
-  if (chartScore) chartScore.destroy();
-  const top10 = lb.slice(0, 10);
-  chartScore = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: top10.map(p => p.name),
-      datasets: [{ label: 'Score (%)', data: top10.map(p => p.score), backgroundColor: top10.map(p => p.score >= -50 ? '#1565C0' : '#C62828'), borderRadius: 6 }]
-    },
-    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
-  });
-
-  // Score table
-  const tbody = document.getElementById('scoreTbody');
-  tbody.innerHTML = scoring.map(r => `
-     <tr>
-       <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
-       <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
-       <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
-       <td>${fmtDate(r.submitted_on)}</td>
-     </tr>`).join('');
+  document.getElementById('scoreTbody').innerHTML = (data||[]).map(r => `
+    <tr><td>${r.doer_name}</td><td>${r.department}</td><td>${r.task_name}</td><td>${fmtDate(r.planned_date)}</td>
+    <td>${fmtDate(r.actual_date)}</td><td>${r.on_time?'YES':'NO'}</td><td>${r.on_time?'On Time':'Late'}</td><td>${fmtDate(r.submitted_on)}</td></tr>`).join('');
 }
 
-// ── MY TASKS (USER) ───────────────────────────────────────────
+// ── MY TASKS (STAFF/USER) ─────────────────────────────────────
 async function loadMyTasks() {
-  if (!sb) { showNoTaskMsg(); return; }
-  const now   = new Date();
-  const limit = new Date(now.getTime() + 10 * 86400000);
-
-  const { data } = await sb
-    .from('master_schedule')
+  if (!sb) return;
+  // REMOVED: 10-day limit so users can see all assigned tasks
+  const { data: tasks } = await sb.from('master_schedule')
     .select('*')
     .ilike('doer_name', SESSION.name)
     .is('status', null)
-    .lte('planned_date', limit.toISOString())
     .order('planned_date', { ascending: true });
 
   const el = document.getElementById('myTasksContainer');
-  const tasks = data || [];
+  if (!tasks || !tasks.length) {
+    el.innerHTML = '<div class="text-center p-5"><i class="bi bi-emoji-smile display-1 text-muted"></i><h4 class="mt-3">All caught up!</h4><p>No pending tasks assigned to you.</p></div>';
+    return;
+  }
 
-  if (!tasks.length) { showNoTaskMsg(); return; }
+  const isReadOnly = SESSION.userType === 'User';
 
   el.innerHTML = tasks.map(t => {
-    const planned = new Date(t.planned_date);
-    const overdue = planned < now;
-    const daysLeft = Math.round((planned - now) / 86400000);
-    
-    // Non-Editable Logic for "User" type
-    const showActions = SESSION.userType !== 'User';
-
+    const overdue = new Date(t.planned_date) < new Date();
     return `<div class="card-table mb-3">
-      <div class="table-header d-flex flex-column flex-md-row gap-3 align-items-start align-items-md-center" style="background:${overdue?'#FFEBEE':'#E3F2FD'};">
-        <div class="flex-grow-1">
-          <div style="font-weight:700;color:${overdue?'#C62828':'var(--primary-dark)'};">
-            <i class="bi bi-gear-fill me-2"></i>${t.task_name}
-          </div>
-          <div style="font-size:.78rem;color:var(--text-muted);margin-top:3px;">
-            Dept: ${t.department} &nbsp;|&nbsp; Freq: <span class="badge-freq">${t.frequency}</span>
-            <br class="d-md-none"> Planned: <strong>${fmtDate(t.planned_date)}</strong>
-            ${overdue ? ' &nbsp;<span class="badge-late">OVERDUE</span>' : ` &nbsp;<span class="badge-pending">${daysLeft}d left</span>`}
-          </div>
+      <div class="table-header" style="background:${overdue?'#FFEBEE':'#E3F2FD'};">
+        <div>
+          <div style="font-weight:700;">${t.task_name}</div>
+          <div style="font-size:.75rem;color:var(--text-muted);">Planned: ${fmtDate(t.planned_date)} | Freq: ${t.frequency}</div>
         </div>
-        ${showActions ? `
-        <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
-            <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
-          </button>
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
-            <i class="bi bi-whatsapp" style="color:#25D366;"></i>
-          </button>
-          <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
-             Complete
-          </button>
-        </div>` : ''}
+        ${!isReadOnly ? `
+        <div class="d-flex gap-2">
+          <button class="btn-sm-icon text-success" onclick="openSubmitModal('${t.id}')"><i class="bi bi-check-circle-fill me-1"></i>Complete</button>
+        </div>` : '<span class="badge bg-secondary">Read Only</span>'}
       </div>
     </div>`;
   }).join('');
-
-  // Store tasks for submit
-  window._pendingTasks = tasks;
+  window._pending = tasks;
 }
 
-function showNoTaskMsg() {
-  document.getElementById('myTasksContainer').innerHTML = `
-    <div style="text-align:center;padding:60px;color:var(--text-muted);">
-      <i class="bi bi-emoji-smile" style="font-size:3rem;color:var(--accent);"></i>
-      <div style="font-size:1.1rem;margin-top:12px;font-weight:600;">All caught up!</div>
-      <div style="font-size:.85rem;margin-top:4px;">No pending tasks in next 10 days.</div>
-    </div>`;
-}
-
-// ── SUBMIT TASK ───────────────────────────────────────────────
-function openSubmitModal(taskId) {
-  const t = (window._pendingTasks||[]).find(x => x.id == taskId);
-  if (!t) return;
+function openSubmitModal(id) {
+  const t = window._pending.find(x => x.id == id);
   currentSubmitTask = t;
-  const checks = [
-    { key:'air_pressure',   label:'M/C cleaning by air pressure' },
-    { key:'gauge_check',    label:'All gauge must be checking that M/C' },
-    { key:'spare_parts',    label:'All spare parts are checking and cleaning' },
-    { key:'damaged_parts',  label:'Damaged spare parts must be replaced or repairing' },
-    { key:'grease',         label:'The M/C must be greased and all bearing checked' },
-    { key:'bearing_bush',   label:'If any bearing and bush are damaged they must be replaced' },
-  ];
+  const fields = ['air_pressure','gauge_check','spare_parts','damaged_parts','grease','bearing_bush'];
   document.getElementById('submitModalBody').innerHTML = `
-    <div style="background:var(--accent2);border-radius:8px;padding:12px 16px;margin-bottom:16px;">
-      <strong>${t.task_name}</strong><br>
-      <small style="color:var(--text-muted);">Planned: ${fmtDate(t.planned_date)} &nbsp;|&nbsp; Dept: ${t.department}</small>
-    </div>
-    ${checks.map(c => `
-      <div class="check-item">
-        <select class="form-select form-select-sm" id="chk_${c.key}" style="width:130px;">
-          <option value="">—</option>
-          <option value="Done">Done</option>
-          <option value="Not Done">Not Done</option>
-          <option value="N/A">N/A</option>
-        </select>
-        <label style="font-size:.85rem;">${c.label}</label>
-      </div>`).join('')}
-    <div class="mt-3">
-      <label class="form-label">Change or Repair Parts Name</label>
-      <input type="text" class="form-control" id="chk_change_repair" placeholder="List parts if any"/>
-    </div>
-    <div class="mt-3">
-      <label class="form-label">Remarks</label>
-      <textarea class="form-control" id="chk_remarks" rows="2" placeholder="Any notes..."></textarea>
-    </div>`;
+    <div class="p-3 mb-3 bg-light rounded"><strong>${t.task_name}</strong></div>
+    ${fields.map(f => `<div class="check-item"><select class="form-select w-25" id="chk_${f}"><option value="Done">Done</option><option value="Not Done">Not Done</option></select><label class="ms-2">${f.replace('_',' ')}</label></div>`).join('')}
+    <div class="mt-3"><label class="form-label">Remarks</label><textarea class="form-control" id="chk_remarks"></textarea></div>`;
   new bootstrap.Modal(document.getElementById('submitModal')).show();
 }
 
 async function confirmSubmit() {
-  if (!currentSubmitTask) return;
   const t = currentSubmitTask;
   const now = new Date();
-  const planned = new Date(t.planned_date);
-
-  // On time = submitted before or on planned date (end of day)
-  const plannedEOD = new Date(planned);
-  plannedEOD.setHours(23, 59, 59, 999);
-  const onTime = now <= plannedEOD;
-  // score column stores 1=ontime, 0=late; leaderboard uses formula
-  const score  = onTime ? 1 : 0;
+  const onTime = now <= new Date(t.planned_date + 'T23:59:59');
   const status = onTime ? 'Done On Time' : 'Done Late';
-
-  const getV = id => { const el = document.getElementById(id); return el ? el.value : ''; };
-
-  const update = {
-    actual_date:   now.toISOString(),
-    status,
-    air_pressure:  getV('chk_air_pressure'),
-    gauge_check:   getV('chk_gauge_check'),
-    spare_parts:   getV('chk_spare_parts'),
-    damaged_parts: getV('chk_damaged_parts'),
-    grease:        getV('chk_grease'),
-    bearing_bush:  getV('chk_bearing_bush'),
-    change_repair: getV('chk_change_repair'),
-    remarks:       getV('chk_remarks'),
-  };
-
-  // 1. Update master_schedule
-  const { error: masterErr } = await sb.from('master_schedule').update(update).eq('id', t.id);
-  if (masterErr) { toast('Error updating master: '+masterErr.message,'error'); return; }
-
-  // 2. Insert into done_list
-  const { error: doneErr } = await sb.from('done_list').insert({
-    doer_name:    t.doer_name,
-    department:   t.department,
-    task_name:    t.task_name,
-    frequency:    t.frequency,
-    planned_date: t.planned_date,
-    actual_date:  now.toISOString(),
-    status,
-    submitted_by: SESSION.name,
-    submitted_on: now.toISOString(),
-    ...update
-  });
-  if (doneErr) console.warn('done_list insert:', doneErr.message);
-
-  // 3. Insert into scoring
-  const { error: scoreErr } = await sb.from('scoring').insert({
-    doer_name:    t.doer_name,
-    department:   t.department,
-    task_name:    t.task_name,
-    planned_date: t.planned_date,
-    actual_date:  now.toISOString(),
-    on_time:      onTime,
-    score,
-    submitted_on: now.toISOString(),
-  });
-  if (scoreErr) console.warn('scoring insert:', scoreErr.message);
-
+  
+  const update = { actual_date: now.toISOString(), status, remarks: document.getElementById('chk_remarks').value };
+  await sb.from('master_schedule').update(update).eq('id', t.id);
+  await sb.from('done_list').insert({ ...update, doer_name: t.doer_name, department: t.department, task_name: t.task_name, planned_date: t.planned_date, submitted_by: SESSION.name, submitted_on: now.toISOString() });
+  await sb.from('scoring').insert({ doer_name: t.doer_name, department: t.department, task_name: t.task_name, planned_date: t.planned_date, actual_date: now.toISOString(), on_time: onTime, submitted_on: now.toISOString() });
+  
   bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
-  toast(`Task submitted! Score: ${onTime?'+':''}${score} (${status})`, onTime?'success':'error');
+  toast('Task completed!','success');
   loadMyTasks();
 }
 
-// ── NOTIFICATIONS ─────────────────────────────────────────────
-async function sendNotification(taskId, type) {
-  const t = (window._pendingTasks||[]).find(x => x.id == taskId);
-  if (!t) return;
-  const { data: doers } = await sb.from('doers').select('*').ilike('name', t.doer_name).limit(1);
-  const doer = doers && doers[0];
-  if (!doer) { toast('Doer contact not found','error'); return; }
-
-  if (type === 'email') {
-    if (!doer.email) { toast('No email on file','error'); return; }
-    toast(`Email reminder sent to ${doer.email}`, 'success');
-    // In production: call a backend API / Supabase Edge Function to send email
-  } else {
-    const phone = (doer.whatsapp||'').replace(/\D/g,'');
-    if (!phone) { toast('No WhatsApp number on file','error'); return; }
-    const msg = encodeURIComponent(`Hello ${t.doer_name}, pending maintenance task:\n*Task:* ${t.task_name}\n*Planned:* ${fmtDate(t.planned_date)}\nPlease complete on time. — CheckList`);
-    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
-  }
-}
-
-// ── CSV EXPORT ────────────────────────────────────────────────
-async function exportCsv(table) {
-  if (!sb) return;
-  const { data } = await sb.from(table).select('*');
-  if (!data || !data.length) { toast('No data to export','error'); return; }
-  const keys = Object.keys(data[0]);
-  const csv  = [keys.join(','), ...data.map(r => keys.map(k => `"${r[k]??''}"`).join(','))].join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
-  a.download = table + '_export.csv';
-  a.click();
-  toast('CSV downloaded','success');
-}
-
 // ── HELPERS ───────────────────────────────────────────────────
-function fmtDate(d) {
-  if (!d) return '';
-  const dt = new Date(d);
-  if (isNaN(dt)) return String(d);
-  return dt.toLocaleDateString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric' });
-}
-
-function filterTable(tableId, query) {
-  const q = query.toLowerCase();
-  document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
-    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
-  });
-}
-
-function toast(msg, type='info') {
-  const icons = { success:'bi-check-circle-fill', error:'bi-x-circle-fill', info:'bi-info-circle-fill' };
-  const colors = { success:'#2E7D32', error:'#C62828', info:'#1565C0' };
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('en-IN') : ''; }
+function toast(m, t) {
   const div = document.createElement('div');
-  div.className = `app-toast toast-${type}`;
-  div.innerHTML = `<i class="bi ${icons[type]||icons.info}" style="color:${colors[type]};font-size:1.1rem;"></i> ${msg}`;
+  div.className = `app-toast toast-${t}`;
+  div.innerHTML = m;
   document.getElementById('toastContainer').appendChild(div);
-  setTimeout(() => div.remove(), 4500);
+  setTimeout(() => div.remove(), 3000);
 }
-
-// Mobile Toggle Functionality
-function toggleSidebar() {
-  const sidebar = document.getElementById('appSidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  sidebar.classList.toggle('show');
-  overlay.classList.toggle('show');
+function filterTable(id, q) {
+  const rows = document.querySelectorAll(`#${id} tbody tr`);
+  rows.forEach(r => r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none');
 }
+function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('show'); document.getElementById('sidebarOverlay').classList.toggle('show'); }
 </script>
 </body>
 </html>
