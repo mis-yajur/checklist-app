@@ -1,4 +1,5 @@
-{
+// Config from config.json (embedded)
+const CONFIG = {
   "supabase_url": "https://xfecmmhabdjnudqfyrqz.supabase.co",
   "supabase_anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg",
   "app": {
@@ -15,4 +16,16 @@
     },
     "EMAIL_FROM": "mis@yajurfibres.com"
   }
-}
+};
+
+let SUPABASE_URL = CONFIG.supabase_url;
+let SUPABASE_ANON = CONFIG.supabase_anon_key;
+const APP_CONFIG = {
+  APP_NAME: CONFIG.app.APP_NAME,
+  SCORE_ON_TIME: CONFIG.app.SCORE_ON_TIME,
+  SCORE_LATE: CONFIG.app.SCORE_LATE,
+  ADMIN_USER: CONFIG.app.ADMIN_USER,
+  ADMIN_PASS: CONFIG.app.ADMIN_PASS,
+  USER_PASS: CONFIG.app.USER_PASS,
+  EMAIL_FROM: CONFIG.app.EMAIL_FROM,
+};
