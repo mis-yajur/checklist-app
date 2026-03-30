@@ -1,4 +1,3 @@
-this is index.html file 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -212,14 +211,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="login-sub">Maintenance Management System</div>
     <div class="login-tabs">
       <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">
-        <i class="bi bi-shield-lock me-1"></i>Admin
+        <i class="bi bi-shield-lock me-1"></i>System Admin
       </button>
-      <button class="login-tab" id="tabUser" onclick="switchLoginTab('super_admin')">
-        <i class="bi bi-person me-1"></i>Super Admin
+      <button class="login-tab" id="tabUser" onclick="switchLoginTab('user')">
+        <i class="bi bi-person me-1"></i>Staff Login
       </button>
     </div>
     <div class="mb-3">
-      <label class="form-label">Username</label>
+      <label class="form-label" id="lblUser">Admin Username</label>
       <input type="text" id="loginUser" class="form-control" placeholder="Enter username" value="admin"/>
     </div>
     <div class="mb-4">
@@ -412,7 +411,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           <div class="col-md-5">
             <div class="card-table h-100">
               <div class="table-header"><span class="table-title"><i class="bi bi-trophy me-2" style="color:var(--gold);"></i>Leaderboard</span></div>
-              <div id="scoringLeaderboard" style="padding:16px;"></div>
+              <div id="scoringLeaderboard" style="padding:166px;"></div>
             </div>
           </div>
           <div class="col-md-7">
@@ -533,8 +532,7 @@ let sb = null;
 
 const APP_CONFIG = {
   APP_NAME:      "CheckList",
-  // Score formula: (onTime/total*100)-100  → range -100 to 0
-  SCORE_ON_TIME: 1,   // stored as 1/0 boolean-int; formula applied in buildLeaderboard
+  SCORE_ON_TIME: 1,   
   SCORE_LATE:    0,
   ADMIN_USER:    "admin",
   ADMIN_PASS:    "Admin@1234",
@@ -579,22 +577,26 @@ function showLogin() {
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
-// ── SUPABASE TABLE INIT ───────────────────────────────────────
-// Tables are created via Supabase SQL editor (see setup guide)
-// This function just verifies connectivity
 async function initSupabaseTables() {
   if (!sb) return;
-  // Test connection by querying doers table
   await sb.from('doers').select('id').limit(1);
 }
 
-// ── LOGIN ─────────────────────────────────────────────────────
+// ── LOGIN UPDATED ─────────────────────────────────────────────
 let loginTab = 'admin';
 function switchLoginTab(tab) {
   loginTab = tab;
   document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
   document.getElementById('tabUser').classList.toggle('active', tab === 'user');
-  document.getElementById('loginUser').value = tab === 'admin' ? 'admin' : '';
+  
+  const lbl = document.getElementById('lblUser');
+  if(tab === 'admin') {
+    lbl.textContent = 'Admin Username';
+    document.getElementById('loginUser').value = 'admin';
+  } else {
+    lbl.textContent = 'Staff Full Name';
+    document.getElementById('loginUser').value = '';
+  }
   document.getElementById('loginPass').value = '';
   document.getElementById('loginError').textContent = '';
 }
@@ -606,28 +608,30 @@ async function doLogin() {
 
   if (!u || !p) { document.getElementById('loginError').textContent = 'Please enter credentials.'; return; }
 
-  // Admin login
+  // 1. System Admin Master Login
   if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
-    SESSION = { role: 'admin', name: 'Administrator', dept: '' };
+    SESSION = { role: 'Admin', name: 'Administrator', dept: '' };
     startApp();
     return;
   }
 
-  // User login — check against doers table
+  // 2. Staff/User Login (Check Doers table)
   if (p === APP_CONFIG.USER_PASS) {
     if (sb) {
       const { data } = await sb.from('doers')
         .select('*').ilike('name', u).limit(1);
+      
       if (data && data.length > 0) {
-        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id };
+        // Here we read the actual 'user_type' from your Supabase table
+        SESSION = { 
+          role: data[0].user_type || 'User', 
+          name: data[0].name, 
+          dept: data[0].department, 
+          id: data[0].id 
+        };
         startApp();
         return;
       }
-    } else {
-      // No DB: demo mode
-      SESSION = { role: 'user', name: u, dept: 'Demo' };
-      startApp();
-      return;
     }
   }
   document.getElementById('loginError').textContent = 'Invalid credentials. Check username/password.';
@@ -642,9 +646,14 @@ function startApp() {
   document.getElementById('appShell').style.display = 'block';
   document.getElementById('navRole').textContent = SESSION.role.toUpperCase();
   document.getElementById('navUser').textContent = SESSION.name;
-  document.getElementById('adminMenuGroup').style.display = SESSION.role === 'admin' ? '' : 'none';
-  document.getElementById('userMenuGroup').style.display  = SESSION.role === 'user'  ? '' : 'none';
-  showPage(SESSION.role === 'admin' ? 'dashboard' : 'myTasks');
+
+  // Logic: "Admin" and "Super Admin" see management. "User" sees My Work.
+  const isPowerUser = (SESSION.role === 'Admin' || SESSION.role === 'Super Admin');
+
+  document.getElementById('adminMenuGroup').style.display = isPowerUser ? '' : 'none';
+  document.getElementById('userMenuGroup').style.display  = !isPowerUser ? '' : 'none';
+  
+  showPage(isPowerUser ? 'dashboard' : 'myTasks');
 }
 
 function doLogout() {
@@ -657,7 +666,6 @@ function doLogout() {
 
 // ── PAGE ROUTING ──────────────────────────────────────────────
 function showPage(page) {
-  // Mobile Support: Auto hide sidebar on selection
   const sidebar = document.getElementById('appSidebar');
   const overlay = document.getElementById('sidebarOverlay');
   if(sidebar) sidebar.classList.remove('show');
@@ -667,8 +675,11 @@ function showPage(page) {
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
   const el = document.getElementById('page-' + page);
   if (el) el.classList.add('active');
-  const m = document.getElementById('menu-' + page);
+  
+  // Handle menu active state for both menu groups
+  const m = document.getElementById('menu-' + page) || (page === 'donelist' ? document.getElementById('menu-myDone') : (page === 'scoring' ? document.getElementById('menu-myScoring') : null));
   if (m) m.classList.add('active');
+
   const loaders = {
     dashboard: loadDashboard, doers: loadDoers, tasks: loadTasks,
     master: loadMaster, donelist: loadDoneList, scoring: loadScoring, myTasks: loadMyTasks
@@ -696,7 +707,6 @@ async function loadDashboard() {
   document.getElementById('st-pending').textContent = pending;
   document.getElementById('st-overdue').textContent = overdue;
 
-  // Charts
   const { data: scoring } = await sb.from('scoring').select('*');
   const sc = scoring || [];
   const onT = sc.filter(r => r.on_time).length;
@@ -718,13 +728,9 @@ function buildLeaderboard(scoring) {
     map[n].totalTasks++;
     r.on_time ? map[n].onTime++ : map[n].late++;
   });
-  // Formula: (onTime / totalTasks * 100) - 100
-  // -100 = all late, 0 = all on time
   Object.values(map).forEach(p => {
-    p.score = p.totalTasks > 0
-      ? Math.round((p.onTime / p.totalTasks) * 100) - 100
-      : 0;
-    p.total = p.score; // alias for leaderboard display
+    p.score = p.totalTasks > 0 ? Math.round((p.onTime / p.totalTasks) * 100) - 100 : 0;
+    p.total = p.score;
   });
   return Object.values(map).sort((a, b) => b.score - a.score);
 }
@@ -752,7 +758,6 @@ function renderLeaderboard(data, containerId) {
       <div style="text-align:right;">
         <div style="font-size:1.4rem;font-weight:700;color:${scoreColor};">${p.score}</div>
         <div style="font-size:.7rem;color:var(--text-muted);">score (max 0)</div>
-        <div style="font-size:.72rem;margin-top:2px;"><span style="color:#2E7D32;">✓ ${p.onTime}</span> &nbsp; <span style="color:#C62828;">✗ ${p.late}</span></div>
       </div>
     </div>`;
   }).join('');
@@ -769,7 +774,7 @@ async function loadDoers() {
        <td>${i+1}</td>
        <td><strong>${r.name||''}</strong></td>
        <td>${r.department||''}</td>
-       <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
+       <td>${r.email||''}</td>
        <td>${r.phone||''}</td>
        <td>${r.whatsapp||''}</td>
        <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
@@ -874,13 +879,10 @@ function editTask(id) { openTaskModal(id); }
 
 async function loadDoersForSelect() {
   if (!sb) return;
-  const { data } = await sb.from('doers').select('name, department, Name, Department').order('name');
+  const { data } = await sb.from('doers').select('name, department').order('name');
   const sel = document.getElementById('t_doer');
   sel.innerHTML = '<option value="">— Select Doer —</option>' +
-    (data||[]).map(d => {
-      const n = d.name||d.Name||''; const dep = d.department||d.Department||'';
-      return `<option value="${n}" data-dept="${dep}">${n} (${dep})</option>`;
-    }).join('');
+    (data||[]).map(d => `<option value="${d.name}" data-dept="${d.department}">${d.name} (${d.department})</option>`).join('');
 }
 
 function autoFillDept() {
@@ -921,43 +923,24 @@ async function deleteTask(id) {
 
 // ── GENERATE MASTER ───────────────────────────────────────────
 async function generateMaster() {
-  if (!confirm('This will regenerate the entire Master schedule (2 years). Continue?')) return;
-  toast('Generating schedule...','info');
-
+  if (!confirm('Regenerate 2-year Master schedule?')) return;
+  toast('Generating...','info');
   const { data: tasks } = await sb.from('tasks').select('*');
-  if (!tasks || !tasks.length) { toast('No tasks found.','error'); return; }
-
-  // Clear existing master
+  if (!tasks) return;
   await sb.from('master_schedule').delete().neq('id', 0);
-
   const rows = [];
   for (const t of tasks) {
-    const startDate = t.Start_Date || t.start_date;
-    const freq      = t.Frequency  || t.frequency;
-    const dates = generateDates(new Date(startDate), freq, 730);
+    const dates = generateDates(new Date(t.Start_Date || t.start_date), t.Frequency || t.frequency, 730);
     for (const d of dates) {
       rows.push({
-        doer_name:    t.Doer_Name   || t.doer_name,
-        department:   t.Department  || t.department,
-        task_ref_id:  t.id,
-        frequency:    freq,
-        task_name:    t.Task_Name   || t.task_name,
-        planned_date: d.toISOString(),
-        actual_date:  null,
-        status:       null,
-        air_pressure: null, gauge_check: null, spare_parts: null,
-        damaged_parts: null, grease: null, bearing_bush: null,
-        change_repair: null, remarks: null
+        doer_name: t.Doer_Name || t.doer_name, department: t.Department || t.department,
+        task_ref_id: t.id, frequency: t.Frequency || t.frequency, task_name: t.Task_Name || t.task_name,
+        planned_date: d.toISOString()
       });
     }
   }
-
-  // Insert in batches of 500
-  for (let i = 0; i < rows.length; i += 500) {
-    const { error } = await sb.from('master_schedule').insert(rows.slice(i, i+500));
-    if (error) { toast('Error: '+error.message,'error'); return; }
-  }
-  toast(`Generated ${rows.length} schedule rows!`,'success');
+  for (let i = 0; i < rows.length; i += 500) { await sb.from('master_schedule').insert(rows.slice(i, i+500)); }
+  toast(`Generated ${rows.length} rows!`,'success');
   loadMaster();
 }
 
@@ -965,7 +948,7 @@ function generateDates(startDate, freq, totalDays) {
   const dates = [];
   const end = new Date(startDate.getTime() + totalDays * 86400000);
   const intervals = { D:1, W:7, '2W':15, M:30, '2M':60, '3M':90, '6M':180, Y:365, '2Y':730 };
-  const interval = intervals[(freq||'').toUpperCase()] || intervals[freq] || 30;
+  const interval = intervals[(freq||'').toUpperCase()] || 30;
   let cur = new Date(startDate);
   while (cur <= end) { dates.push(new Date(cur)); cur.setDate(cur.getDate() + interval); }
   return dates;
@@ -975,19 +958,14 @@ function generateDates(startDate, freq, totalDays) {
 async function loadMaster() {
   if (!sb) return;
   const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
-  // Use a fresh tbody
   const t = document.getElementById('masterTbody');
-  t.innerHTML = '';
-  (data||[]).forEach(r => {
+  t.innerHTML = (data||[]).map(r => {
     const st = (r.status||'').trim();
-    let badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>`
-              : st === 'Done Late'    ? `<span class="badge-late">${st}</span>`
-              : st ? `<span class="badge-ontime">${st}</span>`
-              : `<span class="badge-pending">Pending</span>`;
-    t.innerHTML += `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td>
-       <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
+    let badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>` : st ? `<span class="badge-late">${st}</span>` : `<span class="badge-pending">Pending</span>`;
+    return `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td>
+       <td>${r.frequency||''}</td><td>${r.task_name||''}</td>
        <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
-  });
+  }).join('');
 }
 
 // ── DONE LIST ─────────────────────────────────────────────────
@@ -1009,12 +987,9 @@ async function loadScoring() {
   if (!sb) return;
   const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
   const scoring = sc || [];
-
-  // Leaderboard
   const lb = buildLeaderboard(scoring);
   renderLeaderboard(lb, 'scoringLeaderboard');
 
-  // Score chart
   const ctx = document.getElementById('chartScore').getContext('2d');
   if (chartScore) chartScore.destroy();
   const top10 = lb.slice(0, 10);
@@ -1022,84 +997,50 @@ async function loadScoring() {
     type: 'bar',
     data: {
       labels: top10.map(p => p.name),
-      datasets: [{ label: 'Score (%)', data: top10.map(p => p.score), backgroundColor: top10.map(p => p.score >= -50 ? '#1565C0' : '#C62828'), borderRadius: 6 }]
+      datasets: [{ label: 'Score (%)', data: top10.map(p => p.score), backgroundColor: '#1565C0', borderRadius: 6 }]
     },
     options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
   });
 
-  // Score table
   const tbody = document.getElementById('scoreTbody');
   tbody.innerHTML = scoring.map(r => `
      <tr>
        <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
        <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
-       <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
-       <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
+       <td>${r.on_time ? 'YES' : 'NO'}</td>
+       <td>${r.on_time ? 'On Time' : 'Late'}</td>
        <td>${fmtDate(r.submitted_on)}</td>
      </tr>`).join('');
 }
 
 // ── MY TASKS (USER) ───────────────────────────────────────────
 async function loadMyTasks() {
-  if (!sb) { showNoTaskMsg(); return; }
-  const now   = new Date();
+  if (!sb) return;
+  const now = new Date();
   const limit = new Date(now.getTime() + 10 * 86400000);
-
-  const { data } = await sb
-    .from('master_schedule')
-    .select('*')
-    .ilike('doer_name', SESSION.name)
-    .is('status', null)
-    .lte('planned_date', limit.toISOString())
-    .order('planned_date', { ascending: true });
-
+  const { data } = await sb.from('master_schedule').select('*').ilike('doer_name', SESSION.name).is('status', null).lte('planned_date', limit.toISOString()).order('planned_date', { ascending: true });
   const el = document.getElementById('myTasksContainer');
   const tasks = data || [];
+  window._pendingTasks = tasks;
 
-  if (!tasks.length) { showNoTaskMsg(); return; }
+  if (!tasks.length) { 
+    el.innerHTML = '<div class="text-center p-5 text-muted">No pending tasks for next 10 days.</div>'; 
+    return; 
+  }
 
   el.innerHTML = tasks.map(t => {
     const planned = new Date(t.planned_date);
     const overdue = planned < now;
-    const daysLeft = Math.round((planned - now) / 86400000);
     return `<div class="card-table mb-3">
-      <div class="table-header d-flex flex-column flex-md-row gap-3 align-items-start align-items-md-center" style="background:${overdue?'#FFEBEE':'#E3F2FD'};">
-        <div class="flex-grow-1">
-          <div style="font-weight:700;color:${overdue?'#C62828':'var(--primary-dark)'};">
-            <i class="bi bi-gear-fill me-2"></i>${t.task_name}
-          </div>
-          <div style="font-size:.78rem;color:var(--text-muted);margin-top:3px;">
-            Dept: ${t.department} &nbsp;|&nbsp; Freq: <span class="badge-freq">${t.frequency}</span>
-            <br class="d-md-none"> Planned: <strong>${fmtDate(t.planned_date)}</strong>
-            ${overdue ? ' &nbsp;<span class="badge-late">OVERDUE</span>' : ` &nbsp;<span class="badge-pending">${daysLeft}d left</span>`}
-          </div>
+      <div class="table-header" style="background:${overdue?'#FFEBEE':'#E3F2FD'};">
+        <div>
+          <div style="font-weight:700;">${t.task_name}</div>
+          <div style="font-size:.78rem;color:var(--text-muted);">Planned: ${fmtDate(t.planned_date)} ${overdue?'<span class="badge-late">OVERDUE</span>':''}</div>
         </div>
-        <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
-            <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
-          </button>
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
-            <i class="bi bi-whatsapp" style="color:#25D366;"></i>
-          </button>
-          <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
-             Complete
-          </button>
-        </div>
+        <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">Complete</button>
       </div>
     </div>`;
   }).join('');
-
-  // Store tasks for submit
-  window._pendingTasks = tasks;
-}
-
-function showNoTaskMsg() {
-  document.getElementById('myTasksContainer').innerHTML = `
-    <div style="text-align:center;padding:60px;color:var(--text-muted);">
-      <i class="bi bi-emoji-smile" style="font-size:3rem;color:var(--accent);"></i>
-      <div style="font-size:1.1rem;margin-top:12px;font-weight:600;">All caught up!</div>
-      <div style="font-size:.85rem;margin-top:4px;">No pending tasks in next 10 days.</div>
-    </div>`;
 }
 
 // ── SUBMIT TASK ───────────────────────────────────────────────
@@ -1107,37 +1048,12 @@ function openSubmitModal(taskId) {
   const t = (window._pendingTasks||[]).find(x => x.id == taskId);
   if (!t) return;
   currentSubmitTask = t;
-  const checks = [
-    { key:'air_pressure',   label:'M/C cleaning by air pressure' },
-    { key:'gauge_check',    label:'All gauge must be checking that M/C' },
-    { key:'spare_parts',    label:'All spare parts are checking and cleaning' },
-    { key:'damaged_parts',  label:'Damaged spare parts must be replaced or repairing' },
-    { key:'grease',         label:'The M/C must be greased and all bearing checked' },
-    { key:'bearing_bush',   label:'If any bearing and bush are damaged they must be replaced' },
-  ];
+  const checks = ['air_pressure', 'gauge_check', 'spare_parts', 'damaged_parts', 'grease', 'bearing_bush'];
   document.getElementById('submitModalBody').innerHTML = `
-    <div style="background:var(--accent2);border-radius:8px;padding:12px 16px;margin-bottom:16px;">
-      <strong>${t.task_name}</strong><br>
-      <small style="color:var(--text-muted);">Planned: ${fmtDate(t.planned_date)} &nbsp;|&nbsp; Dept: ${t.department}</small>
-    </div>
-    ${checks.map(c => `
-      <div class="check-item">
-        <select class="form-select form-select-sm" id="chk_${c.key}" style="width:130px;">
-          <option value="">—</option>
-          <option value="Done">Done</option>
-          <option value="Not Done">Not Done</option>
-          <option value="N/A">N/A</option>
-        </select>
-        <label style="font-size:.85rem;">${c.label}</label>
-      </div>`).join('')}
-    <div class="mt-3">
-      <label class="form-label">Change or Repair Parts Name</label>
-      <input type="text" class="form-control" id="chk_change_repair" placeholder="List parts if any"/>
-    </div>
-    <div class="mt-3">
-      <label class="form-label">Remarks</label>
-      <textarea class="form-control" id="chk_remarks" rows="2" placeholder="Any notes..."></textarea>
-    </div>`;
+    <div class="mb-3"><strong>${t.task_name}</strong> (Planned: ${fmtDate(t.planned_date)})</div>
+    ${checks.map(c => `<div class="check-item"><select class="form-select form-select-sm" id="chk_${c}" style="width:120px;"><option value="Done">Done</option><option value="Not Done">Not Done</option></select> <label>${c.replace('_',' ')}</label></div>`).join('')}
+    <div class="mt-3"><label class="form-label">Parts Change/Repair</label><input type="text" class="form-control" id="chk_change_repair"/></div>
+    <div class="mt-3"><label class="form-label">Remarks</label><textarea class="form-control" id="chk_remarks"></textarea></div>`;
   new bootstrap.Modal(document.getElementById('submitModal')).show();
 }
 
@@ -1145,133 +1061,49 @@ async function confirmSubmit() {
   if (!currentSubmitTask) return;
   const t = currentSubmitTask;
   const now = new Date();
-  const planned = new Date(t.planned_date);
-
-  // On time = submitted before or on planned date (end of day)
-  const plannedEOD = new Date(planned);
-  plannedEOD.setHours(23, 59, 59, 999);
-  const onTime = now <= plannedEOD;
-  // score column stores 1=ontime, 0=late; leaderboard uses formula
-  const score  = onTime ? 1 : 0;
+  const onTime = now <= new Date(new Date(t.planned_date).setHours(23,59,59));
   const status = onTime ? 'Done On Time' : 'Done Late';
+  const getV = id => document.getElementById(id).value;
 
-  const getV = id => { const el = document.getElementById(id); return el ? el.value : ''; };
-
-  const update = {
-    actual_date:   now.toISOString(),
-    status,
-    air_pressure:  getV('chk_air_pressure'),
-    gauge_check:   getV('chk_gauge_check'),
-    spare_parts:   getV('chk_spare_parts'),
-    damaged_parts: getV('chk_damaged_parts'),
-    grease:        getV('chk_grease'),
-    bearing_bush:  getV('chk_bearing_bush'),
-    change_repair: getV('chk_change_repair'),
-    remarks:       getV('chk_remarks'),
-  };
-
-  // 1. Update master_schedule
-  const { error: masterErr } = await sb.from('master_schedule').update(update).eq('id', t.id);
-  if (masterErr) { toast('Error updating master: '+masterErr.message,'error'); return; }
-
-  // 2. Insert into done_list
-  const { error: doneErr } = await sb.from('done_list').insert({
-    doer_name:    t.doer_name,
-    department:   t.department,
-    task_name:    t.task_name,
-    frequency:    t.frequency,
-    planned_date: t.planned_date,
-    actual_date:  now.toISOString(),
-    status,
-    submitted_by: SESSION.name,
-    submitted_on: now.toISOString(),
-    ...update
-  });
-  if (doneErr) console.warn('done_list insert:', doneErr.message);
-
-  // 3. Insert into scoring
-  const { error: scoreErr } = await sb.from('scoring').insert({
-    doer_name:    t.doer_name,
-    department:   t.department,
-    task_name:    t.task_name,
-    planned_date: t.planned_date,
-    actual_date:  now.toISOString(),
-    on_time:      onTime,
-    score,
-    submitted_on: now.toISOString(),
-  });
-  if (scoreErr) console.warn('scoring insert:', scoreErr.message);
+  const update = { actual_date: now.toISOString(), status, air_pressure: getV('chk_air_pressure'), remarks: getV('chk_remarks') };
+  await sb.from('master_schedule').update(update).eq('id', t.id);
+  await sb.from('done_list').insert({ ...update, doer_name: t.doer_name, task_name: t.task_name, planned_date: t.planned_date, submitted_by: SESSION.name, submitted_on: now.toISOString() });
+  await sb.from('scoring').insert({ doer_name: t.doer_name, department: t.department, task_name: t.task_name, planned_date: t.planned_date, actual_date: now.toISOString(), on_time: onTime, score: onTime?1:0, submitted_on: now.toISOString() });
 
   bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
-  toast(`Task submitted! Score: ${onTime?'+':''}${score} (${status})`, onTime?'success':'error');
+  toast('Submitted successfully!', 'success');
   loadMyTasks();
-}
-
-// ── NOTIFICATIONS ─────────────────────────────────────────────
-async function sendNotification(taskId, type) {
-  const t = (window._pendingTasks||[]).find(x => x.id == taskId);
-  if (!t) return;
-  const { data: doers } = await sb.from('doers').select('*').ilike('name', t.doer_name).limit(1);
-  const doer = doers && doers[0];
-  if (!doer) { toast('Doer contact not found','error'); return; }
-
-  if (type === 'email') {
-    if (!doer.email) { toast('No email on file','error'); return; }
-    toast(`Email reminder sent to ${doer.email}`, 'success');
-    // In production: call a backend API / Supabase Edge Function to send email
-  } else {
-    const phone = (doer.whatsapp||'').replace(/\D/g,'');
-    if (!phone) { toast('No WhatsApp number on file','error'); return; }
-    const msg = encodeURIComponent(`Hello ${t.doer_name}, pending maintenance task:\n*Task:* ${t.task_name}\n*Planned:* ${fmtDate(t.planned_date)}\nPlease complete on time. — CheckList`);
-    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
-  }
-}
-
-// ── CSV EXPORT ────────────────────────────────────────────────
-async function exportCsv(table) {
-  if (!sb) return;
-  const { data } = await sb.from(table).select('*');
-  if (!data || !data.length) { toast('No data to export','error'); return; }
-  const keys = Object.keys(data[0]);
-  const csv  = [keys.join(','), ...data.map(r => keys.map(k => `"${r[k]??''}"`).join(','))].join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
-  a.download = table + '_export.csv';
-  a.click();
-  toast('CSV downloaded','success');
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
 function fmtDate(d) {
   if (!d) return '';
-  const dt = new Date(d);
-  if (isNaN(dt)) return String(d);
-  return dt.toLocaleDateString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric' });
+  return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric' });
 }
-
 function filterTable(tableId, query) {
   const q = query.toLowerCase();
-  document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
-    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
-  });
+  document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none');
 }
-
 function toast(msg, type='info') {
-  const icons = { success:'bi-check-circle-fill', error:'bi-x-circle-fill', info:'bi-info-circle-fill' };
-  const colors = { success:'#2E7D32', error:'#C62828', info:'#1565C0' };
   const div = document.createElement('div');
   div.className = `app-toast toast-${type}`;
-  div.innerHTML = `<i class="bi ${icons[type]||icons.info}" style="color:${colors[type]};font-size:1.1rem;"></i> ${msg}`;
+  div.innerHTML = msg;
   document.getElementById('toastContainer').appendChild(div);
-  setTimeout(() => div.remove(), 4500);
+  setTimeout(() => div.remove(), 3000);
 }
-
-// Mobile Toggle Functionality
 function toggleSidebar() {
-  const sidebar = document.getElementById('appSidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  sidebar.classList.toggle('show');
-  overlay.classList.toggle('show');
+  document.getElementById('appSidebar').classList.toggle('show');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+async function exportCsv(table) {
+  const { data } = await sb.from(table).select('*');
+  if (!data) return;
+  const keys = Object.keys(data[0]);
+  const csv = [keys.join(','), ...data.map(r => keys.map(k => `"${r[k]??''}"`).join(','))].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
+  a.download = table + '.csv';
+  a.click();
 }
 </script>
 </body>
