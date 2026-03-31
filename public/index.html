@@ -1,197 +1,720 @@
-this is index.html file 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>CheckList — Maintenance Management</title>
-
-<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
-<!-- Bootstrap 5 -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-<!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 :root {
-  --primary:       #1565C0;
-  --primary-dark:  #0D47A1;
-  --primary-light: #1976D2;
-  --accent:        #42A5F5;
-  --accent2:       #E3F2FD;
-  --gold:          #FFB300;
-  --success:       #2E7D32;
-  --danger:        #C62828;
-  --warning:       #F57F17;
-  --bg:            #F0F7FF;
-  --surface:       #FFFFFF;
-  --border:        #BBDEFB;
-  --text:          #0D1B2A;
-  --text-muted:    #546E7A;
-  --shadow-sm:     0 2px 8px rgba(21,101,192,.10);
-  --shadow-md:     0 4px 20px rgba(21,101,192,.16);
-  --shadow-lg:     0 8px 40px rgba(21,101,192,.22);
-  --radius:        14px;
-  --radius-sm:     8px;
+  --ink:        #0A0E1A;
+  --ink-soft:   #3D4560;
+  --ink-muted:  #7A85A3;
+  --paper:      #F7F8FC;
+  --surface:    #FFFFFF;
+  --border:     #E4E8F5;
+  --border-mid: #C8D0E8;
+  --blue:       #1A56DB;
+  --blue-dark:  #0F3A9E;
+  --blue-light: #3B82F6;
+  --blue-pale:  #EEF3FF;
+  --teal:       #0891B2;
+  --teal-pale:  #E0F5FA;
+  --gold:       #D97706;
+  --gold-pale:  #FEF3C7;
+  --green:      #059669;
+  --green-pale: #D1FAE5;
+  --red:        #DC2626;
+  --red-pale:   #FEE2E2;
+  --amber:      #D97706;
+  --amber-pale: #FEF3C7;
+  --radius:     12px;
+  --radius-sm:  7px;
+  --radius-lg:  18px;
+  --shadow-xs:  0 1px 3px rgba(10,14,26,.06), 0 1px 2px rgba(10,14,26,.04);
+  --shadow-sm:  0 2px 8px rgba(10,14,26,.08), 0 1px 3px rgba(10,14,26,.05);
+  --shadow-md:  0 4px 16px rgba(10,14,26,.10), 0 2px 6px rgba(10,14,26,.06);
+  --shadow-lg:  0 8px 32px rgba(10,14,26,.13), 0 4px 10px rgba(10,14,26,.07);
+  --nav-h:      60px;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-::-webkit-scrollbar{width:6px;height:6px;}
-::-webkit-scrollbar-thumb{background:var(--accent);border-radius:99px;}
 
-/* LOADING */
-#loadingScreen{position:fixed;inset:0;background:var(--primary-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s;}
-#loadingScreen .logo-big{font-family:'Playfair Display',serif;color:#fff;font-size:3rem;letter-spacing:2px;}
-#loadingScreen .sub{color:var(--accent);font-size:.95rem;margin-top:6px;letter-spacing:3px;text-transform:uppercase;}
-.spinner-ring{width:56px;height:56px;border:4px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .9s linear infinite;margin-top:32px;}
-@keyframes spin{to{transform:rotate(360deg);}}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* LOGIN */
-#loginScreen{display:none;position:fixed;inset:0;background:linear-gradient(135deg,var(--primary-dark) 0%,#1565C0 50%,#1E88E5 100%);align-items:center;justify-content:center;z-index:1000;}
-.login-card{background:#fff;border-radius:20px;padding:48px 40px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .4s ease;}
-@keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
-.login-logo{font-family:'Playfair Display',serif;color:var(--primary);font-size:2rem;text-align:center;margin-bottom:6px;}
-.login-sub{text-align:center;color:var(--text-muted);font-size:.82rem;margin-bottom:28px;letter-spacing:1px;text-transform:uppercase;}
-.login-tabs{display:flex;gap:0;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:24px;}
-.login-tab{flex:1;padding:8px;text-align:center;font-size:.84rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text-muted);transition:all .2s;border:none;}
-.login-tab.active{background:var(--primary);color:#fff;}
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
 
-/* NAVBAR */
-.app-navbar{background:linear-gradient(90deg,var(--primary-dark) 0%,var(--primary) 100%);padding:0 24px;height:62px;display:flex;align-items:center;box-shadow:var(--shadow-md);position:sticky;top:0;z-index:1100;}
-.app-navbar .brand{font-family:'Playfair Display',serif;color:#fff;font-size:1.5rem;letter-spacing:1px;}
-.badge-role{font-size:.7rem;background:var(--gold);color:#000;border-radius:20px;padding:2px 10px;font-weight:700;margin-left:10px;vertical-align:middle;}
-.nav-btn{background:rgba(255,255,255,.12);color:#fff!important;border:1px solid rgba(255,255,255,.25)!important;border-radius:var(--radius-sm);padding:6px 14px;font-size:.82rem;font-weight:500;transition:all .2s;cursor:pointer;}
-.nav-btn:hover{background:rgba(255,255,255,.22);}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue-light); }
 
-/* SIDEBAR */
-.app-layout{display:flex;min-height:calc(100vh - 62px);}
-.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);padding:20px 12px;flex-shrink:0;box-shadow:2px 0 12px rgba(21,101,192,.06); transition: transform 0.3s ease; z-index: 1050;}
-.section-label{font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:1.5px;padding:14px 12px 6px;}
-.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:.88rem;font-weight:500;color:var(--text-muted);transition:all .2s;}
-.sidebar-item:hover{background:var(--accent2);color:var(--primary);}
-.sidebar-item.active{background:var(--primary);color:#fff;}
-.sidebar-item i{font-size:1rem;width:20px;text-align:center;}
-
-/* MAIN */
-.main-content{flex:1;padding:28px;overflow-x:hidden;}
-.page{display:none;}.page.active{display:block;}
-.page-title{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--primary-dark);margin-bottom:4px;}
-.page-sub{color:var(--text-muted);font-size:.85rem;margin-bottom:24px;}
-
-/* STAT CARDS */
-.stat-card{background:var(--surface);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow-sm);border:1px solid var(--border);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s;}
-.stat-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
-.stat-card .icon-wrap{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
-.stat-val{font-size:2rem;font-weight:700;color:var(--primary-dark);line-height:1;}
-.stat-lbl{font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
-
-/* TABLES */
-.card-table{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow:hidden;}
-.card-table .table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:linear-gradient(90deg,var(--accent2) 0%,#fff 100%);}
-.card-table .table-title{font-weight:700;color:var(--primary-dark);font-size:.95rem;}
-.table{margin-bottom:0;font-size:.83rem;}
-.table thead th{background:var(--primary);color:#fff;font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;border:none;padding:10px 12px;position:sticky;top:0;}
-.table tbody tr{transition:background .15s;}
-.table tbody tr:hover{background:var(--accent2);}
-.table tbody td{padding:9px 12px;vertical-align:middle;border-color:#EEF5FF;}
-.table-scroll{max-height:400px;overflow-y:auto;}
-
-/* BUTTONS */
-.btn-primary-custom{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;border:none;border-radius:var(--radius-sm);padding:9px 20px;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(21,101,192,.25);}
-.btn-primary-custom:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(21,101,192,.35);}
-.btn-success-custom{background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;border:none;border-radius:var(--radius-sm);padding:9px 20px;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .2s;}
-.btn-sm-icon{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:.8rem;transition:all .2s;}
-.btn-sm-icon:hover{background:var(--accent2);}
-.btn-danger-sm{border-color:#FFCDD2;color:var(--danger);}
-.btn-danger-sm:hover{background:#FFEBEE;}
-.btn-start{background:linear-gradient(135deg,var(--gold),#FF8F00);color:#000;border:none;border-radius:50px;padding:16px 48px;font-size:1.05rem;font-weight:800;letter-spacing:1px;cursor:pointer;box-shadow:0 6px 24px rgba(255,179,0,.4);transition:all .25s;text-transform:uppercase;}
-.btn-start:hover{transform:translateY(-3px) scale(1.03);}
-
-/* FORM */
-.form-label{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:4px;}
-.form-control,.form-select{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:.86rem;color:var(--text);transition:border .2s,box-shadow .2s;}
-.form-control:focus,.form-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(21,101,192,.12);outline:none;}
-
-/* BADGES */
-.badge-ontime{background:#E8F5E9;color:#2E7D32;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
-.badge-late{background:#FFEBEE;color:#C62828;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
-.badge-pending{background:#FFF3E0;color:#E65100;border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:700;}
-.badge-freq{background:var(--accent2);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:600;}
-.badge-usertype{background:var(--accent2);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:.73rem;font-weight:600;}
-
-/* SCORE CARDS */
-.score-card{border-radius:var(--radius);padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-sm);}
-.score-rank{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--primary-dark);width:36px;text-align:center;}
-.score-rank.gold{color:var(--gold);}
-.score-rank.silver{color:#90A4AE;}
-.score-rank.bronze{color:#A1887F;}
-
-/* CHART CARD */
-.chart-card{background:var(--surface);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
-.chart-title{font-weight:700;color:var(--primary-dark);margin-bottom:14px;font-size:.92rem;}
-
-/* TOAST */
-.toast-container{position:fixed;bottom:24px;right:24px;z-index:9000;}
-.app-toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px;box-shadow:var(--shadow-lg);margin-bottom:10px;min-width:260px;display:flex;align-items:center;gap:10px;animation:toastIn .3s ease;font-size:.85rem;font-weight:500;}
-@keyframes toastIn{from{transform:translateX(60px);opacity:0;}to{transform:translateX(0);opacity:1;}}
-.toast-success{border-left:4px solid var(--success);}
-.toast-error{border-left:4px solid var(--danger);}
-.toast-info{border-left:4px solid var(--accent);}
-
-/* MODAL */
-.modal-header{background:linear-gradient(90deg,var(--primary-dark),var(--primary));color:#fff;border-radius:12px 12px 0 0;}
-.modal-header .btn-close{filter:invert(1);}
-.modal-content{border-radius:14px;border:none;box-shadow:var(--shadow-lg);}
-
-/* PROGRESS */
-.prog-bar-wrap{background:#E3F2FD;border-radius:99px;height:8px;overflow:hidden;}
-.prog-bar-fill{background:linear-gradient(90deg,var(--primary),var(--accent));height:100%;border-radius:99px;transition:width .6s ease;}
-.check-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border);}
-.check-item:last-child{border-bottom:none;}
-
-/* MOBILE COMPATIBILITY OVERRIDES */
-.menu-toggle-btn {
-  display: none;
-  background: transparent;
-  border: none;
+/* ── LOADING ───────────────────────────────────────────── */
+#loadingScreen {
+  position: fixed; inset: 0;
+  background: var(--ink);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9999;
+  transition: opacity .5s ease;
+}
+.load-logo {
+  font-family: 'DM Serif Display', serif;
   color: #fff;
-  font-size: 1.5rem;
-  margin-right: 15px;
-  cursor: pointer;
+  font-size: 2.6rem;
+  letter-spacing: -0.5px;
+}
+.load-logo span { color: #60A5FA; }
+.load-sub {
+  color: #6B7DB3;
+  font-size: .72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 5px;
+  font-family: 'Space Mono', monospace;
+}
+.load-ring {
+  width: 42px; height: 42px;
+  border: 3px solid rgba(255,255,255,.12);
+  border-top-color: #60A5FA;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin-top: 28px;
+}
+.load-status {
+  color: #6B7DB3;
+  font-size: .76rem;
+  margin-top: 14px;
+  font-family: 'Space Mono', monospace;
+  min-height: 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── LOGIN ─────────────────────────────────────────────── */
+#loginScreen {
+  display: none;
+  position: fixed; inset: 0;
+  background: var(--ink);
+  align-items: center; justify-content: center;
+  z-index: 1000;
+  overflow: hidden;
+}
+#loginScreen::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 80%, rgba(26,86,219,.25) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 80% 20%, rgba(8,145,178,.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.login-grid {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(900px, 95vw);
+  height: min(540px, 90vh);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,.5);
+  animation: fadeUp .5s ease;
+}
+@keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+.login-visual {
+  background: linear-gradient(140deg, #1A3A6E 0%, #0F2553 50%, #0A1A3F 100%);
+  padding: 48px 40px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.login-visual::before {
+  content: '';
+  position: absolute; top: -60px; right: -60px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(96,165,250,.15) 0%, transparent 70%);
+}
+.login-visual::after {
+  content: '';
+  position: absolute; bottom: -40px; left: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(8,145,178,.12) 0%, transparent 70%);
+}
+.lv-brand {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  color: #fff;
+}
+.lv-brand span { color: #60A5FA; }
+.lv-tagline {
+  font-size: .7rem;
+  color: #4B6CB7;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-family: 'Space Mono', monospace;
+  margin-top: 4px;
+}
+.lv-features { list-style: none; }
+.lv-features li {
+  color: #94AAD6;
+  font-size: .84rem;
+  padding: 7px 0;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.lv-features li:last-child { border: none; }
+.lv-features li i { color: #60A5FA; font-size: .9rem; width: 18px; }
+.lv-copy {
+  font-size: .68rem;
+  color: #3B5080;
+  font-family: 'Space Mono', monospace;
 }
 
-@media (max-width: 991.98px) {
-  .menu-toggle-btn { display: block; }
+.login-form-wrap {
+  background: var(--surface);
+  padding: 44px 40px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.lf-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.6rem;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.lf-sub { color: var(--ink-muted); font-size: .82rem; margin-bottom: 28px; }
+.role-pills {
+  display: flex; gap: 6px;
+  background: var(--paper);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 24px;
+}
+.role-pill {
+  flex: 1; padding: 7px 6px;
+  border: none; border-radius: 5px;
+  font-size: .78rem; font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--ink-muted);
+  transition: all .2s;
+  font-family: 'DM Sans', sans-serif;
+  text-align: center;
+}
+.role-pill.active {
+  background: var(--surface);
+  color: var(--blue);
+  box-shadow: var(--shadow-sm);
+}
+.lf-label {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.lf-input {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: .9rem;
+  color: var(--ink);
+  background: var(--paper);
+  outline: none;
+  transition: border .2s, box-shadow .2s, background .2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.lf-input:focus {
+  border-color: var(--blue);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(26,86,219,.10);
+}
+.lf-mb { margin-bottom: 16px; }
+.btn-login {
+  width: 100%;
+  padding: 11px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .2s;
+  letter-spacing: .3px;
+  margin-top: 4px;
+}
+.btn-login:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,86,219,.3); }
+.login-hint {
+  font-size: .74rem;
+  color: var(--ink-muted);
+  text-align: center;
+  margin-top: 14px;
+  line-height: 1.5;
+}
+.login-hint strong { color: var(--blue); font-weight: 600; }
+.login-error {
+  color: var(--red);
+  font-size: .8rem;
+  text-align: center;
+  min-height: 20px;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* ── NAVBAR ─────────────────────────────────────────────── */
+.app-navbar {
+  height: var(--nav-h);
+  background: var(--ink);
+  display: flex; align-items: center;
+  padding: 0 20px 0 0;
+  position: sticky; top: 0; z-index: 1100;
+  box-shadow: 0 1px 0 rgba(255,255,255,.05), var(--shadow-md);
+}
+.nav-sidebar-toggle {
+  width: var(--nav-h);
+  height: var(--nav-h);
+  background: none; border: none; color: #94AAD6;
+  font-size: 1.3rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: color .2s;
+  flex-shrink: 0;
+}
+.nav-sidebar-toggle:hover { color: #fff; }
+.nav-brand {
+  font-family: 'DM Serif Display', serif;
+  color: #fff;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+.nav-brand span { color: #60A5FA; }
+.nav-role-badge {
+  font-size: .65rem;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 1.5px;
+  padding: 3px 9px;
+  border-radius: 99px;
+  margin-left: 10px;
+  flex-shrink: 0;
+}
+.role-admin    { background: rgba(26,86,219,.18); color: #93BBFF; border: 1px solid rgba(26,86,219,.3); }
+.role-superadmin { background: rgba(217,119,6,.18); color: #FCD34D; border: 1px solid rgba(217,119,6,.35); }
+.role-user     { background: rgba(5,150,105,.18); color: #6EE7B7; border: 1px solid rgba(5,150,105,.3); }
+.nav-user-name {
+  color: #6B7DB3;
+  font-size: .8rem;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.btn-nav-logout {
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1);
+  color: #94AAD6;
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'DM Sans', sans-serif;
+  display: flex; align-items: center; gap: 6px;
+  flex-shrink: 0;
+}
+.btn-nav-logout:hover { background: rgba(220,38,38,.2); border-color: rgba(220,38,38,.3); color: #FCA5A5; }
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+.app-layout {
+  display: flex;
+  min-height: calc(100vh - var(--nav-h));
+}
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0; top: var(--nav-h);
+  background: rgba(0,0,0,.45);
+  z-index: 1040;
+  backdrop-filter: blur(2px);
+}
+.sidebar-overlay.show { display: block; }
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sidebar {
+  width: 232px;
+  background: var(--ink);
+  flex-shrink: 0;
+  padding: 16px 10px 24px;
+  display: flex; flex-direction: column;
+  gap: 2px;
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  z-index: 1050;
+  overflow-y: auto;
+}
+.sidebar-sep {
+  font-size: .65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #3B4F72;
+  padding: 14px 12px 6px;
+  font-family: 'Space Mono', monospace;
+}
+.sidebar-sep:first-child { padding-top: 4px; }
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: .85rem;
+  font-weight: 500;
+  color: #6B7DB3;
+  transition: all .18s;
+  user-select: none;
+}
+.sidebar-item i { font-size: .95rem; width: 18px; flex-shrink: 0; }
+.sidebar-item:hover { background: rgba(255,255,255,.05); color: #B0C4F0; }
+.sidebar-item.active { background: rgba(26,86,219,.25); color: #93BBFF; }
+.sidebar-item.active i { color: #60A5FA; }
+
+/* ── MAIN ─────────────────────────────────────────────────── */
+.main-content { flex: 1; padding: 28px 28px 40px; overflow-x: hidden; min-width: 0; }
+.page { display: none; }
+.page.active { display: block; animation: pageFade .25s ease; }
+@keyframes pageFade { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+.pg-header { margin-bottom: 24px; }
+.pg-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.65rem;
+  color: var(--ink);
+  letter-spacing: -.3px;
+}
+.pg-sub { color: var(--ink-muted); font-size: .82rem; margin-top: 3px; }
+
+/* ── STAT CARDS ──────────────────────────────────────────── */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow .2s, transform .2s;
+  position: relative; overflow: hidden;
+}
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.stat-card.blue::before  { background: linear-gradient(90deg, var(--blue), var(--blue-light)); }
+.stat-card.green::before { background: linear-gradient(90deg, var(--green), #34D399); }
+.stat-card.amber::before { background: linear-gradient(90deg, var(--amber), #FBBF24); }
+.stat-card.red::before   { background: linear-gradient(90deg, var(--red), #F87171); }
+.stat-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
+.stat-val { font-size: 2rem; font-weight: 700; color: var(--ink); line-height: 1; font-family: 'Space Mono', monospace; }
+.stat-lbl { font-size: .73rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 600; }
+
+/* ── CARD TABLE ──────────────────────────────────────────── */
+.card-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.card-head {
+  padding: 14px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.card-head-title {
+  font-weight: 700;
+  color: var(--ink);
+  font-size: .9rem;
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+.card-head-title i { color: var(--blue); }
+.search-input {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 12px;
+  font-size: .82rem;
+  color: var(--ink);
+  outline: none;
+  font-family: 'DM Sans', sans-serif;
+  width: 160px;
+  transition: border .2s, box-shadow .2s;
+}
+.search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,86,219,.08); }
+
+.tbl-scroll { max-height: 440px; overflow-y: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.data-table thead th {
+  background: var(--ink);
+  color: #94AAD6;
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  padding: 9px 14px;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  white-space: nowrap;
+  position: sticky; top: 0;
+  border-right: 1px solid rgba(255,255,255,.04);
+}
+.data-table thead th:last-child { border-right: none; }
+.data-table tbody td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink-soft);
+  vertical-align: middle;
+}
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr { transition: background .12s; }
+.data-table tbody tr:hover td { background: var(--blue-pale); }
+.data-table tbody tr:hover td:first-child { border-left: 3px solid var(--blue); }
+
+/* ── BADGES ──────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+.badge-ontime  { background: var(--green-pale); color: var(--green); }
+.badge-late    { background: var(--red-pale);   color: var(--red); }
+.badge-pending { background: var(--amber-pale); color: var(--amber); }
+.badge-overdue { background: var(--red-pale);   color: var(--red); }
+.badge-freq    { background: var(--blue-pale);  color: var(--blue); font-family: 'Space Mono', monospace; }
+.badge-role    { background: var(--teal-pale);  color: var(--teal); }
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--blue);
+  color: #fff; border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  font-size: .83rem; font-weight: 700;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all .2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 3px 10px rgba(26,86,219,.3); }
+
+.btn-success {
+  background: var(--green);
+  color: #fff; border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  font-size: .83rem; font-weight: 700;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all .2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-success:hover { background: #047857; transform: translateY(-1px); }
+
+.btn-icon {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: all .18s;
+  color: var(--ink-soft);
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.btn-icon:hover { background: var(--blue-pale); border-color: var(--blue); color: var(--blue); }
+.btn-icon.danger:hover { background: var(--red-pale); border-color: var(--red); color: var(--red); }
+
+.btn-generate {
+  background: linear-gradient(135deg, #1A56DB 0%, #0891B2 100%);
+  color: #fff; border: none;
+  border-radius: var(--radius);
+  padding: 14px 40px;
+  font-size: .95rem; font-weight: 800;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all .25s;
+  display: inline-flex; align-items: center; gap: 10px;
+  box-shadow: 0 6px 24px rgba(26,86,219,.35);
+  letter-spacing: .5px;
+}
+.btn-generate:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 32px rgba(26,86,219,.45); }
+
+/* ── CHART GRID ──────────────────────────────────────────── */
+.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-xs);
+}
+.chart-title {
+  font-weight: 700; color: var(--ink);
+  font-size: .87rem; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 7px;
+}
+.chart-title i { color: var(--blue); }
+
+/* ── LEADERBOARD ─────────────────────────────────────────── */
+.lb-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.lb-item:last-child { border-bottom: none; padding-bottom: 0; }
+.lb-rank {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem;
+  width: 32px; text-align: center; flex-shrink: 0;
+  color: var(--ink-muted);
+}
+.lb-rank.r1 { color: #D97706; }
+.lb-rank.r2 { color: #6B7DB3; }
+.lb-rank.r3 { color: #A87040; }
+.lb-name { font-weight: 700; color: var(--ink); font-size: .87rem; }
+.lb-dept { font-size: .74rem; color: var(--ink-muted); margin-top: 1px; }
+.lb-score {
+  margin-left: auto; text-align: right;
+  font-family: 'Space Mono', monospace;
+}
+.lb-score-val { font-size: 1.4rem; font-weight: 700; }
+.lb-score-meta { font-size: .67rem; color: var(--ink-muted); }
+
+/* ── MY TASKS (USER) ─────────────────────────────────────── */
+.task-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+  transition: box-shadow .2s;
+}
+.task-card:hover { box-shadow: var(--shadow-sm); }
+.task-card.overdue { border-left: 4px solid var(--red); }
+.task-card.due-soon { border-left: 4px solid var(--amber); }
+.task-card.ok { border-left: 4px solid var(--green); }
+.task-head {
+  padding: 14px 18px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.task-name { font-weight: 700; color: var(--ink); font-size: .95rem; }
+.task-meta { font-size: .78rem; color: var(--ink-muted); margin-top: 5px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.task-meta-sep { color: var(--border-mid); }
+.task-date-chip {
+  font-family: 'Space Mono', monospace;
+  font-size: .72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px;
+}
+.task-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+
+/* ── EMPTY STATE ─────────────────────────────────────────── */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--ink-muted);
+}
+.empty-state i { font-size: 3rem; color: var(--border-mid); display: block; margin-bottom: 12px; }
+.empty-state strong { color: var(--ink-soft); font-size: 1rem; display: block; }
+.empty-state span { font-size: .83rem; }
+
+/* ── MODAL ───────────────────────────────────────────────── */
+.modal-content { border: none; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); }
+.modal-header {
+  background: var(--ink);
+  color: #fff; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 16px 22px;
+}
+.modal-header .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.15rem; }
+.modal-header .btn-close { filter: invert(1); opacity: .6; }
+.modal-header .btn-close:hover { opacity: 1; }
+.form-label { font-size: .78rem; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+.form-control, .form-select {
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  padding: 9px 12px; font-size: .86rem; color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  transition: border .2s, box-shadow .2s;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,86,219,.10); outline: none;
+}
+.check-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+}
+.check-row:last-of-type { border-bottom: none; }
+.check-row label { font-size: .83rem; color: var(--ink-soft); flex: 1; }
+
+/* ── TOAST ───────────────────────────────────────────────── */
+.toast-wrap { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.app-toast {
+  background: var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  min-width: 260px;
+  max-width: 340px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn .3s ease;
+  font-size: .83rem; font-weight: 500;
+  color: #D0DCF5;
+  border: 1px solid rgba(255,255,255,.08);
+}
+@keyframes toastIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.t-icon { font-size: 1rem; flex-shrink: 0; }
+.t-success .t-icon { color: #34D399; }
+.t-error   .t-icon { color: #F87171; }
+.t-info    .t-icon { color: #60A5FA; }
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .chart-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
   .sidebar {
-    position: fixed;
-    top: 62px;
-    left: 0;
-    height: calc(100vh - 62px);
+    position: fixed; top: var(--nav-h); left: 0;
+    height: calc(100vh - var(--nav-h));
     transform: translateX(-100%);
   }
-  .sidebar.show {
-    transform: translateX(0);
-  }
-  .main-content { padding: 15px; }
-  .sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    top: 62px;
-    background: rgba(0,0,0,0.4);
-    z-index: 1040;
-  }
-  .sidebar-overlay.show { display: block; }
-  .login-card { width: 90%; padding: 30px 20px; }
-  .stat-card { padding: 15px; }
+  .sidebar.show { transform: translateX(0); box-shadow: var(--shadow-lg); }
+  .main-content { padding: 16px 14px 32px; }
+  .login-grid { grid-template-columns: 1fr; height: auto; }
+  .login-visual { display: none; }
+  .login-form-wrap { padding: 32px 24px; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .stat-val { font-size: 1.5rem; }
-  .btn-start { padding: 12px 24px; font-size: 0.9rem; }
+  .btn-generate { padding: 12px 24px; font-size: .88rem; }
+  .task-head { flex-direction: column; }
+  .task-actions { width: 100%; }
 }
 </style>
 </head>
@@ -199,162 +722,170 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <!-- LOADING -->
 <div id="loadingScreen">
-  <div class="logo-big">&#9745; CheckList</div>
-  <div class="sub">Maintenance Management System</div>
-  <div class="spinner-ring"></div>
-  <div id="loadStatus" style="color:#90CAF9;margin-top:16px;font-size:.82rem;"></div>
+  <div class="load-logo">&#9745; Check<span>List</span></div>
+  <div class="load-sub">Maintenance Management System</div>
+  <div class="load-ring"></div>
+  <div class="load-status" id="loadStatus">Initializing…</div>
 </div>
 
 <!-- LOGIN -->
 <div id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo">&#9745; CheckList</div>
-    <div class="login-sub">Maintenance Management System</div>
-    <div class="login-tabs">
-      <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">
-        <i class="bi bi-shield-lock me-1"></i>Admin
-      </button>
-      <button class="login-tab" id="tabUser" onclick="switchLoginTab('super_admin')">
-        <i class="bi bi-person me-1"></i>Super Admin
-      </button>
+  <div class="login-grid">
+    <div class="login-visual">
+      <div>
+        <div class="lv-brand">&#9745; Check<span>List</span></div>
+        <div class="lv-tagline">Maintenance OS</div>
+      </div>
+      <ul class="lv-features">
+        <li><i class="bi bi-calendar2-check"></i> Auto-generated 2-year schedules</li>
+        <li><i class="bi bi-trophy"></i> Scoring & leaderboard</li>
+        <li><i class="bi bi-people"></i> Role-based access control</li>
+        <li><i class="bi bi-bell"></i> WhatsApp & email reminders</li>
+        <li><i class="bi bi-download"></i> CSV export for all data</li>
+      </ul>
+      <div class="lv-copy">© 2025 CheckList · All rights reserved</div>
     </div>
-    <div class="mb-3">
-      <label class="form-label">Username</label>
-      <input type="text" id="loginUser" class="form-control" placeholder="Enter username" value="admin"/>
+    <div class="login-form-wrap">
+      <div class="lf-title">Welcome back</div>
+      <div class="lf-sub">Sign in to continue</div>
+      <div class="role-pills" id="rolePills">
+        <button class="role-pill active" id="pill-admin" onclick="switchRole('admin')"><i class="bi bi-shield-lock me-1"></i>Admin</button>
+        <button class="role-pill" id="pill-super_admin" onclick="switchRole('super_admin')"><i class="bi bi-star me-1"></i>Super Admin</button>
+        <button class="role-pill" id="pill-user" onclick="switchRole('user')"><i class="bi bi-person me-1"></i>User</button>
+      </div>
+      <div class="lf-mb">
+        <div class="lf-label">Username</div>
+        <input type="text" class="lf-input" id="loginUser" placeholder="Enter username" autocomplete="username"/>
+      </div>
+      <div class="lf-mb">
+        <div class="lf-label">Password</div>
+        <input type="password" class="lf-input" id="loginPass" placeholder="Enter password" autocomplete="current-password"/>
+      </div>
+      <button class="btn-login" onclick="doLogin()"><i class="bi bi-box-arrow-in-right me-2"></i>Sign In</button>
+      <div class="login-error" id="loginError"></div>
+      <div class="login-hint">
+        Admin: <strong>admin / Admin@1234</strong><br>
+        Super Admin: <strong>superadmin / Super@1234</strong><br>
+        User: <em>doer name</em> / <strong>User@1234</strong>
+      </div>
     </div>
-    <div class="mb-4">
-      <label class="form-label">Password</label>
-      <input type="password" id="loginPass" class="form-control" placeholder="Enter password"/>
-    </div>
-    <button class="btn-primary-custom w-100 py-2" onclick="doLogin()">
-      <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
-    </button>
-    <div id="loginError" class="text-danger text-center mt-3" style="font-size:.82rem;"></div>
   </div>
 </div>
 
 <!-- APP SHELL -->
 <div id="appShell" style="display:none;">
   <nav class="app-navbar">
-    <button class="menu-toggle-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
-    <span class="brand me-2">&#9745; CheckList</span>
-    <span id="navRole" class="badge-role">ADMIN</span>
-    <div class="ms-auto d-flex align-items-center gap-2">
-      <span id="navUser" class="d-none d-sm-inline" style="color:#B3D9FF;font-size:.82rem;font-weight:500;"></span>
-      <button class="nav-btn" onclick="doLogout()"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
+    <button class="nav-sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+    <div class="nav-brand">&#9745; Check<span>List</span></div>
+    <span class="nav-role-badge" id="navRoleBadge"></span>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <span class="nav-user-name d-none d-sm-block" id="navUserName"></span>
+      <button class="btn-nav-logout" onclick="doLogout()"><i class="bi bi-box-arrow-right"></i><span class="d-none d-sm-inline">Logout</span></button>
     </div>
   </nav>
 
   <div class="app-layout">
-    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <aside class="sidebar" id="appSidebar">
+      <!-- ADMIN + SUPER ADMIN menus -->
       <div id="adminMenuGroup">
-        <div class="section-label">Management</div>
-        <div class="sidebar-item active" onclick="showPage('dashboard')" id="menu-dashboard"><i class="bi bi-speedometer2"></i>Dashboard</div>
-        <div class="sidebar-item" onclick="showPage('doers')" id="menu-doers"><i class="bi bi-people-fill"></i>Doers</div>
-        <div class="sidebar-item" onclick="showPage('tasks')" id="menu-tasks"><i class="bi bi-list-task"></i>Tasks</div>
-        <div class="sidebar-item" onclick="showPage('master')" id="menu-master"><i class="bi bi-table"></i>Master Schedule</div>
-        <div class="sidebar-item" onclick="showPage('donelist')" id="menu-donelist"><i class="bi bi-check2-all"></i>Done List</div>
-        <div class="sidebar-item" onclick="showPage('scoring')" id="menu-scoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
+        <div class="sidebar-sep">Management</div>
+        <div class="sidebar-item active" id="menu-dashboard" onclick="showPage('dashboard')"><i class="bi bi-speedometer2"></i>Dashboard</div>
+        <div class="sidebar-item" id="menu-doers" onclick="showPage('doers')"><i class="bi bi-people-fill"></i>Doers</div>
+        <div class="sidebar-item" id="menu-tasks" onclick="showPage('tasks')"><i class="bi bi-list-task"></i>Tasks</div>
+        <div class="sidebar-item" id="menu-master" onclick="showPage('master')"><i class="bi bi-table"></i>Master Schedule</div>
+        <div class="sidebar-item" id="menu-donelist" onclick="showPage('donelist')"><i class="bi bi-check2-all"></i>Done List</div>
+        <div class="sidebar-item" id="menu-scoring" onclick="showPage('scoring')"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
+      <!-- USER menu -->
       <div id="userMenuGroup" style="display:none;">
-        <div class="section-label">My Work</div>
-        <div class="sidebar-item active" onclick="showPage('myTasks')" id="menu-myTasks"><i class="bi bi-card-checklist"></i>My Tasks</div>
-        <div class="sidebar-item" onclick="showPage('donelist')" id="menu-myDone"><i class="bi bi-check2-all"></i>Done List</div>
-        <div class="sidebar-item" onclick="showPage('scoring')" id="menu-myScoring"><i class="bi bi-trophy-fill"></i>Scoring</div>
+        <div class="sidebar-sep">My Work</div>
+        <div class="sidebar-item active" id="menu-myTasks" onclick="showPage('myTasks')"><i class="bi bi-card-checklist"></i>My Tasks</div>
+        <div class="sidebar-item" id="menu-myDone" onclick="showPage('donelist')"><i class="bi bi-check2-all"></i>Done List</div>
+        <div class="sidebar-item" id="menu-myScoring" onclick="showPage('scoring')"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
     </aside>
 
     <main class="main-content">
 
-      <!-- DASHBOARD -->
+      <!-- ── DASHBOARD ──────────────────────────────────── -->
       <div class="page active" id="page-dashboard">
-        <div class="page-title">Dashboard</div>
-        <div class="page-sub">Maintenance Overview</div>
-        <div class="row g-3 mb-4">
-          <div class="col-6 col-md-3">
-            <div class="stat-card">
-              <div class="d-flex align-items-center gap-2 gap-md-3">
-                <div class="icon-wrap d-none d-md-flex" style="background:#E3F2FD;"><i class="bi bi-people-fill" style="color:var(--primary);"></i></div>
-                <div><div class="stat-val" id="st-doers">—</div><div class="stat-lbl">Doers</div></div>
-              </div>
-            </div>
+        <div class="pg-header">
+          <div class="pg-title">Dashboard</div>
+          <div class="pg-sub">Live maintenance overview</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon" style="background:var(--blue-pale);"><i class="bi bi-people-fill" style="color:var(--blue);"></i></div>
+            <div class="stat-val" id="st-doers">—</div><div class="stat-lbl">Doers</div>
           </div>
-          <div class="col-6 col-md-3">
-            <div class="stat-card">
-              <div class="d-flex align-items-center gap-2 gap-md-3">
-                <div class="icon-wrap d-none d-md-flex" style="background:#E8F5E9;"><i class="bi bi-check2-all" style="color:#2E7D32;"></i></div>
-                <div><div class="stat-val" id="st-done">—</div><div class="stat-lbl">Done</div></div>
-              </div>
-            </div>
+          <div class="stat-card green">
+            <div class="stat-icon" style="background:var(--green-pale);"><i class="bi bi-check2-all" style="color:var(--green);"></i></div>
+            <div class="stat-val" id="st-done">—</div><div class="stat-lbl">Completed</div>
           </div>
-          <div class="col-6 col-md-3">
-            <div class="stat-card">
-              <div class="d-flex align-items-center gap-2 gap-md-3">
-                <div class="icon-wrap d-none d-md-flex" style="background:#FFF3E0;"><i class="bi bi-clock-history" style="color:#E65100;"></i></div>
-                <div><div class="stat-val" id="st-pending">—</div><div class="stat-lbl">Pending</div></div>
-              </div>
-            </div>
+          <div class="stat-card amber">
+            <div class="stat-icon" style="background:var(--amber-pale);"><i class="bi bi-clock-history" style="color:var(--amber);"></i></div>
+            <div class="stat-val" id="st-pending">—</div><div class="stat-lbl">Pending</div>
           </div>
-          <div class="col-6 col-md-3">
-            <div class="stat-card">
-              <div class="d-flex align-items-center gap-2 gap-md-3">
-                <div class="icon-wrap d-none d-md-flex" style="background:#FFEBEE;"><i class="bi bi-exclamation-triangle-fill" style="color:#C62828;"></i></div>
-                <div><div class="stat-val" id="st-overdue">—</div><div class="stat-lbl">Overdue</div></div>
-              </div>
-            </div>
+          <div class="stat-card red">
+            <div class="stat-icon" style="background:var(--red-pale);"><i class="bi bi-exclamation-triangle-fill" style="color:var(--red);"></i></div>
+            <div class="stat-val" id="st-overdue">—</div><div class="stat-lbl">Overdue</div>
           </div>
         </div>
-        <div class="row g-3">
-          <div class="col-md-6"><div class="chart-card"><div class="chart-title"><i class="bi bi-pie-chart-fill me-2" style="color:var(--primary);"></i>Compliance Rate</div><canvas id="chartCompliance" height="200"></canvas></div></div>
-          <div class="col-md-6"><div class="chart-card"><div class="chart-title"><i class="bi bi-bar-chart-fill me-2" style="color:var(--primary);"></i>Tasks by Department</div><canvas id="chartDept" height="200"></canvas></div></div>
-          <div class="col-12"><div class="chart-card"><div class="chart-title"><i class="bi bi-trophy-fill me-2" style="color:var(--gold);"></i>Top Performers</div><div id="leaderboardEl"></div></div></div>
+        <div class="chart-grid">
+          <div class="chart-card"><div class="chart-title"><i class="bi bi-pie-chart-fill"></i>Compliance Rate</div><canvas id="chartCompliance" height="200"></canvas></div>
+          <div class="chart-card"><div class="chart-title"><i class="bi bi-bar-chart-fill"></i>Tasks by Department</div><canvas id="chartDept" height="200"></canvas></div>
+        </div>
+        <div class="card-wrap">
+          <div class="card-head"><span class="card-head-title"><i class="bi bi-trophy-fill" style="color:var(--gold);"></i>Top Performers</span></div>
+          <div style="padding:16px;" id="dashLeaderboard"></div>
         </div>
       </div>
 
-      <!-- DOERS -->
+      <!-- ── DOERS ──────────────────────────────────────── -->
       <div class="page" id="page-doers">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <div><div class="page-title">Doers</div><div class="page-sub">Manage maintenance personnel</div></div>
-          <div class="d-flex gap-2">
-            <button class="btn-primary-custom" onclick="openDoerModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
-            <button class="btn-sm-icon" onclick="exportCsv('doers')" title="Export CSV"><i class="bi bi-download"></i></button>
+        <div class="pg-header d-flex align-items-start justify-content-between flex-wrap gap-3">
+          <div><div class="pg-title">Doers</div><div class="pg-sub">Manage maintenance personnel</div></div>
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn-primary" onclick="openDoerModal()"><i class="bi bi-plus-lg"></i>Add Doer</button>
+            <button class="btn-icon" onclick="exportCsv('doers')"><i class="bi bi-download"></i>CSV</button>
           </div>
         </div>
-        <div class="card-table">
-          <div class="table-header">
-            <span class="table-title"><i class="bi bi-people me-2"></i>Doer List</span>
-            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('doerTable',this.value)"/>
+        <div class="card-wrap">
+          <div class="card-head">
+            <span class="card-head-title"><i class="bi bi-people"></i>Doer List</span>
+            <input type="text" class="search-input" placeholder="Search…" oninput="filterTable('doerTable',this.value)"/>
           </div>
-          <div class="table-scroll">
-            <table class="table" id="doerTable">
-              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>User Type</th><th>Actions</th></tr></thead>
+          <div class="tbl-scroll">
+            <table class="data-table" id="doerTable">
+              <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Email</th><th>Phone</th><th>WhatsApp</th><th>Role</th><th>Actions</th></tr></thead>
               <tbody id="doerTbody"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- TASKS -->
+      <!-- ── TASKS ──────────────────────────────────────── -->
       <div class="page" id="page-tasks">
-        <div class="d-flex align-items-center justify-content-between mb-2">
-          <div><div class="page-title">Tasks</div><div class="page-sub">Define maintenance tasks & frequency</div></div>
-          <div class="d-flex gap-2">
-            <button class="btn-primary-custom" onclick="openTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add</button>
-            <button class="btn-sm-icon" onclick="exportCsv('tasks')" title="Export CSV"><i class="bi bi-download"></i></button>
+        <div class="pg-header d-flex align-items-start justify-content-between flex-wrap gap-3">
+          <div><div class="pg-title">Tasks</div><div class="pg-sub">Define maintenance tasks &amp; frequency</div></div>
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn-primary" onclick="openTaskModal()"><i class="bi bi-plus-lg"></i>Add Task</button>
+            <button class="btn-icon" onclick="exportCsv('tasks')"><i class="bi bi-download"></i>CSV</button>
           </div>
         </div>
-        <div class="text-center mb-3 mt-2">
-          <button class="btn-start" onclick="generateMaster()"><i class="bi bi-play-circle-fill me-2"></i>START — Generate Master Schedule</button>
-          <div style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">Generates 2-year schedule based on all tasks above</div>
+        <div class="text-center mb-4">
+          <button class="btn-generate" onclick="generateMaster()"><i class="bi bi-play-circle-fill"></i>START — Generate Master Schedule</button>
+          <div style="font-size:.76rem;color:var(--ink-muted);margin-top:8px;">Generates a 2-year schedule based on all tasks above</div>
         </div>
-        <div class="card-table">
-          <div class="table-header">
-            <span class="table-title"><i class="bi bi-list-task me-2"></i>Task List</span>
-            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('taskTable',this.value)"/>
+        <div class="card-wrap">
+          <div class="card-head">
+            <span class="card-head-title"><i class="bi bi-list-task"></i>Task List</span>
+            <input type="text" class="search-input" placeholder="Search…" oninput="filterTable('taskTable',this.value)"/>
           </div>
-          <div class="table-scroll">
-            <table class="table" id="taskTable">
+          <div class="tbl-scroll">
+            <table class="data-table" id="taskTable">
               <thead><tr><th>ID</th><th>Task Name</th><th>Doer</th><th>Department</th><th>Frequency</th><th>Start Date</th><th>Actions</th></tr></thead>
               <tbody id="taskTbody"></tbody>
             </table>
@@ -362,19 +893,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
 
-      <!-- MASTER -->
+      <!-- ── MASTER SCHEDULE ────────────────────────────── -->
       <div class="page" id="page-master">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <div><div class="page-title">Master Schedule</div><div class="page-sub">Auto-generated 2-year maintenance calendar</div></div>
-          <button class="btn-sm-icon" onclick="exportCsv('master_schedule')" title="Export CSV"><i class="bi bi-download"></i> CSV</button>
+        <div class="pg-header d-flex align-items-start justify-content-between flex-wrap gap-3">
+          <div><div class="pg-title">Master Schedule</div><div class="pg-sub">Auto-generated 2-year maintenance calendar</div></div>
+          <button class="btn-icon" onclick="exportCsv('master_schedule')"><i class="bi bi-download"></i>CSV</button>
         </div>
-        <div class="card-table">
-          <div class="table-header">
-            <span class="table-title"><i class="bi bi-calendar2-week me-2"></i>All Scheduled Tasks</span>
-            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('masterTable',this.value)"/>
+        <div class="card-wrap">
+          <div class="card-head">
+            <span class="card-head-title"><i class="bi bi-calendar2-week"></i>All Scheduled Tasks</span>
+            <input type="text" class="search-input" placeholder="Search…" oninput="filterTable('masterTable',this.value)"/>
           </div>
-          <div class="table-scroll">
-            <table class="table" id="masterTable">
+          <div class="tbl-scroll">
+            <table class="data-table" id="masterTable">
               <thead><tr><th>Name</th><th>Department</th><th>Task ID</th><th>Freq</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th></tr></thead>
               <tbody id="masterTbody"></tbody>
             </table>
@@ -382,60 +913,60 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
 
-      <!-- DONE LIST -->
+      <!-- ── DONE LIST ──────────────────────────────────── -->
       <div class="page" id="page-donelist">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <div><div class="page-title">Done List</div><div class="page-sub">Completed maintenance records</div></div>
-          <button class="btn-sm-icon" onclick="exportCsv('done_list')" title="Export CSV"><i class="bi bi-download"></i> CSV</button>
+        <div class="pg-header d-flex align-items-start justify-content-between flex-wrap gap-3">
+          <div><div class="pg-title">Done List</div><div class="pg-sub">Completed maintenance records</div></div>
+          <button class="btn-icon" onclick="exportCsv('done_list')"><i class="bi bi-download"></i>CSV</button>
         </div>
-        <div class="card-table">
-          <div class="table-header">
-            <span class="table-title"><i class="bi bi-check2-all me-2"></i>Completed Tasks</span>
-            <input type="text" class="form-control" style="width:150px;" placeholder="Search..." oninput="filterTable('doneTable',this.value)"/>
+        <div class="card-wrap">
+          <div class="card-head">
+            <span class="card-head-title"><i class="bi bi-check2-all"></i>Completed Tasks</span>
+            <input type="text" class="search-input" placeholder="Search…" oninput="filterTable('doneTable',this.value)"/>
           </div>
-          <div class="table-scroll">
-            <table class="table" id="doneTable">
-              <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th><th>Submitted By</th><th>On</th></tr></thead>
+          <div class="tbl-scroll">
+            <table class="data-table" id="doneTable">
+              <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>Status</th><th>Submitted By</th><th>Submitted On</th></tr></thead>
               <tbody id="doneTbody"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- SCORING -->
+      <!-- ── SCORING ─────────────────────────────────────── -->
       <div class="page" id="page-scoring">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <div><div class="page-title">Scoring & Leaderboard</div><div class="page-sub">+10 On Time &nbsp;|&nbsp; -100 Late</div></div>
-          <button class="btn-sm-icon" onclick="exportCsv('scoring')" title="Export CSV"><i class="bi bi-download"></i> CSV</button>
+        <div class="pg-header d-flex align-items-start justify-content-between flex-wrap gap-3">
+          <div><div class="pg-title">Scoring &amp; Leaderboard</div><div class="pg-sub">Score formula: (On-Time / Total × 100) − 100 · range: −100 (all late) to 0 (all on time)</div></div>
+          <button class="btn-icon" onclick="exportCsv('scoring')"><i class="bi bi-download"></i>CSV</button>
         </div>
-        <div class="row g-3">
+        <div class="row g-3 mb-3">
           <div class="col-md-5">
-            <div class="card-table h-100">
-              <div class="table-header"><span class="table-title"><i class="bi bi-trophy me-2" style="color:var(--gold);"></i>Leaderboard</span></div>
-              <div id="scoringLeaderboard" style="padding:16px;"></div>
+            <div class="card-wrap h-100">
+              <div class="card-head"><span class="card-head-title"><i class="bi bi-trophy" style="color:var(--gold);"></i>Leaderboard</span></div>
+              <div style="padding:16px;" id="scoringLeaderboard"></div>
             </div>
           </div>
           <div class="col-md-7">
-            <div class="chart-card"><div class="chart-title">Score Distribution</div><canvas id="chartScore" height="180"></canvas></div>
+            <div class="chart-card h-100"><div class="chart-title"><i class="bi bi-bar-chart-fill"></i>Score Distribution</div><canvas id="chartScore" height="200"></canvas></div>
           </div>
-          <div class="col-12">
-            <div class="card-table">
-              <div class="table-header"><span class="table-title">All Score Records</span></div>
-              <div class="table-scroll">
-                <table class="table" id="scoreTable">
-                  <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>On Time</th><th>Score</th><th>Date</th></tr></thead>
-                  <tbody id="scoreTbody"></tbody>
-                </table>
-              </div>
-            </div>
+        </div>
+        <div class="card-wrap">
+          <div class="card-head"><span class="card-head-title"><i class="bi bi-table"></i>All Score Records</span></div>
+          <div class="tbl-scroll">
+            <table class="data-table" id="scoreTable">
+              <thead><tr><th>Name</th><th>Dept</th><th>Task</th><th>Planned</th><th>Actual</th><th>On Time</th><th>Score</th><th>Date</th></tr></thead>
+              <tbody id="scoreTbody"></tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <!-- MY TASKS (USER) -->
+      <!-- ── MY TASKS (READ-ONLY USER VIEW) ─────────────── -->
       <div class="page" id="page-myTasks">
-        <div class="page-title">My Pending Tasks</div>
-        <div class="page-sub">Tasks due within the next 10 days</div>
+        <div class="pg-header">
+          <div class="pg-title">My Pending Tasks</div>
+          <div class="pg-sub">Tasks where status is empty &amp; planned date is within the next 10 days — sorted ascending by date</div>
+        </div>
         <div id="myTasksContainer"></div>
       </div>
 
@@ -443,18 +974,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 
-<!-- DOER MODAL -->
+<!-- ── DOER MODAL ──────────────────────────────────────────── -->
 <div class="modal fade" id="doerModal" tabindex="-1">
   <div class="modal-dialog"><div class="modal-content">
-    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Doer</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-    <div class="modal-body">
+    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Doer Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body p-4">
       <input type="hidden" id="doerEditId"/>
       <div class="row g-3">
-        <div class="col-md-6"><label class="form-label">Full Name *</label><input type="text" class="form-control" id="d_name" placeholder="Swapan Kr Ghorai"/></div>
-        <div class="col-md-6"><label class="form-label">Department *</label><input type="text" class="form-control" id="d_dept" placeholder="Yarn Division"/></div>
+        <div class="col-md-6"><label class="form-label">Full Name *</label><input type="text" class="form-control" id="d_name" placeholder="e.g. Swapan Kr Ghorai"/></div>
+        <div class="col-md-6"><label class="form-label">Department *</label><input type="text" class="form-control" id="d_dept" placeholder="e.g. Yarn Division"/></div>
         <div class="col-md-6"><label class="form-label">Email Address</label><input type="email" class="form-control" id="d_email" placeholder="name@company.com"/></div>
         <div class="col-md-6"><label class="form-label">Phone Number</label><input type="text" class="form-control" id="d_phone" placeholder="+91 9000000000"/></div>
-        <div class="col-md-6"><label class="form-label">WhatsApp Number (with country code)</label><input type="text" class="form-control" id="d_wa" placeholder="919000000000"/></div>
+        <div class="col-md-6"><label class="form-label">WhatsApp (with country code)</label><input type="text" class="form-control" id="d_wa" placeholder="919000000000"/></div>
         <div class="col-md-6">
           <label class="form-label">User Type</label>
           <select class="form-select" id="d_usertype">
@@ -467,21 +998,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      <button class="btn-primary-custom" onclick="saveDoer()"><i class="bi bi-check-lg me-1"></i>Save Doer</button>
+      <button class="btn-primary" onclick="saveDoer()"><i class="bi bi-check-lg"></i>Save Doer</button>
     </div>
   </div></div>
 </div>
 
-<!-- TASK MODAL -->
+<!-- ── TASK MODAL ──────────────────────────────────────────── -->
 <div class="modal fade" id="taskModal" tabindex="-1">
   <div class="modal-dialog modal-lg"><div class="modal-content">
-    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-list-task me-2"></i>Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-    <div class="modal-body">
+    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-list-task me-2"></i>Task Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body p-4">
       <input type="hidden" id="taskEditId"/>
       <div class="row g-3">
-        <div class="col-12"><label class="form-label">Task Name *</label><input type="text" class="form-control" id="t_name" placeholder="B. Card-1 Machine Maintenance"/></div>
+        <div class="col-12"><label class="form-label">Task Name *</label><input type="text" class="form-control" id="t_name" placeholder="e.g. B. Card-1 Machine Maintenance"/></div>
         <div class="col-md-6"><label class="form-label">Assign Doer *</label><select class="form-select" id="t_doer" onchange="autoFillDept()"><option value="">— Select Doer —</option></select></div>
-        <div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control" id="t_dept" placeholder="Auto-filled"/></div>
+        <div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control" id="t_dept" placeholder="Auto-filled from doer"/></div>
         <div class="col-md-6">
           <label class="form-label">Frequency *</label>
           <select class="form-select" id="t_freq">
@@ -501,150 +1032,150 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      <button class="btn-primary-custom" onclick="saveTask()"><i class="bi bi-check-lg me-1"></i>Save Task</button>
+      <button class="btn-primary" onclick="saveTask()"><i class="bi bi-check-lg"></i>Save Task</button>
     </div>
   </div></div>
 </div>
 
-<!-- SUBMIT TASK MODAL -->
+<!-- ── SUBMIT TASK MODAL ───────────────────────────────────── -->
 <div class="modal fade" id="submitModal" tabindex="-1">
   <div class="modal-dialog modal-lg"><div class="modal-content">
     <div class="modal-header"><h5 class="modal-title"><i class="bi bi-clipboard2-check me-2"></i>Complete Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-    <div class="modal-body" id="submitModalBody"></div>
+    <div class="modal-body p-4" id="submitModalBody"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      <button class="btn-success-custom" onclick="confirmSubmit()"><i class="bi bi-check2-circle me-1"></i>Submit Completion</button>
+      <button class="btn-success" onclick="confirmSubmit()"><i class="bi bi-check2-circle"></i>Submit Completion</button>
     </div>
   </div></div>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-// ══════════════════════════════════════════════════════════════
-//  CHECKLIST — Supabase Web App
-// ══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  CHECKLIST — Refined Supabase Web App
+// ═══════════════════════════════════════════════════════════════
 
-// ── CONFIG (loaded from config.json) ─────────────────────────
-let SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
-let SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg";
-let sb = null;
+const SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZWNtbWhhYmRqbnVkcWZ5cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODU4ODcsImV4cCI6MjA5MDI2MTg4N30.MnLYX-Jl2HWqvXIhejCT00VeLE3W4qpTRRwBmMnhGMg";
 
-const APP_CONFIG = {
-  APP_NAME:      "CheckList",
-  // Score formula: (onTime/total*100)-100  → range -100 to 0
-  SCORE_ON_TIME: 1,   // stored as 1/0 boolean-int; formula applied in buildLeaderboard
-  SCORE_LATE:    0,
-  ADMIN_USER:    "admin",
-  ADMIN_PASS:    "Admin@1234",
-  USER_PASS:     "User@1234",
+const CFG = {
+  ADMIN_USER:       "admin",
+  ADMIN_PASS:       "Admin@1234",
+  SUPERADMIN_USER:  "superadmin",
+  SUPERADMIN_PASS:  "Super@1234",
+  USER_PASS:        "User@1234",
 };
 
-let SESSION = { role: null, name: null, dept: null };
+let sb = null;
+let SESSION = {};
 let DOERS_CACHE = [];
 let TASKS_CACHE = [];
 let currentSubmitTask = null;
-let chartCompliance = null, chartDept = null, chartScore = null;
+let _chartCompliance = null, _chartDept = null, _chartScore = null;
 
 // ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
-  setLoadStatus("Connecting to database...");
-
+  setStatus("Connecting to database…");
   try {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    setLoadStatus("Initializing tables...");
-    await initSupabaseTables();
-    setLoadStatus("Ready!");
-    await new Promise(r => setTimeout(r, 400));
+    setStatus("Verifying connection…");
+    await sb.from('doers').select('id').limit(1);
+    setStatus("Ready!");
+    await sleep(350);
   } catch(e) {
-    console.error(e);
-    setLoadStatus("⚠️ DB connection issue: " + e.message);
-    await new Promise(r => setTimeout(r, 2000));
+    setStatus("⚠ " + e.message);
+    await sleep(2000);
   }
-  hideLoading();
-  showLogin();
+  fadeOutLoader();
+  document.getElementById('loginScreen').style.display = 'flex';
 });
 
-function setLoadStatus(msg) {
-  const el = document.getElementById('loadStatus');
-  if (el) el.textContent = msg;
-}
-function hideLoading() {
+function setStatus(msg) { const el = document.getElementById('loadStatus'); if (el) el.textContent = msg; }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function fadeOutLoader() {
   const el = document.getElementById('loadingScreen');
   el.style.opacity = '0';
-  setTimeout(() => el.style.display = 'none', 400);
-}
-function showLogin() {
-  document.getElementById('loginScreen').style.display = 'flex';
-}
-
-// ── SUPABASE TABLE INIT ───────────────────────────────────────
-// Tables are created via Supabase SQL editor (see setup guide)
-// This function just verifies connectivity
-async function initSupabaseTables() {
-  if (!sb) return;
-  // Test connection by querying doers table
-  await sb.from('doers').select('id').limit(1);
+  setTimeout(() => el.style.display = 'none', 500);
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────
-let loginTab = 'admin';
-function switchLoginTab(tab) {
-  loginTab = tab;
-  document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
-  document.getElementById('tabUser').classList.toggle('active', tab === 'user');
-  document.getElementById('loginUser').value = tab === 'admin' ? 'admin' : '';
+let _activeRole = 'admin';
+
+function switchRole(role) {
+  _activeRole = role;
+  document.querySelectorAll('.role-pill').forEach(p => p.classList.remove('active'));
+  document.getElementById('pill-' + role).classList.add('active');
+  const userEl = document.getElementById('loginUser');
+  if (role === 'admin')       userEl.value = 'admin';
+  else if (role === 'super_admin') userEl.value = 'superadmin';
+  else                        userEl.value = '';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginError').textContent = '';
-}
-
-async function doLogin() {
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
-  document.getElementById('loginError').textContent = '';
-
-  if (!u || !p) { document.getElementById('loginError').textContent = 'Please enter credentials.'; return; }
-
-  // Admin login
-  if (u === APP_CONFIG.ADMIN_USER && p === APP_CONFIG.ADMIN_PASS) {
-    SESSION = { role: 'admin', name: 'Administrator', dept: '' };
-    startApp();
-    return;
-  }
-
-  // User login — check against doers table
-  if (p === APP_CONFIG.USER_PASS) {
-    if (sb) {
-      const { data } = await sb.from('doers')
-        .select('*').ilike('name', u).limit(1);
-      if (data && data.length > 0) {
-        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id };
-        startApp();
-        return;
-      }
-    } else {
-      // No DB: demo mode
-      SESSION = { role: 'user', name: u, dept: 'Demo' };
-      startApp();
-      return;
-    }
-  }
-  document.getElementById('loginError').textContent = 'Invalid credentials. Check username/password.';
 }
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') doLogin();
 });
 
-function startApp() {
+async function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+
+  if (!u || !p) { errEl.textContent = 'Please enter username and password.'; return; }
+
+  // Admin
+  if (u === CFG.ADMIN_USER && p === CFG.ADMIN_PASS) {
+    SESSION = { role: 'admin', name: 'Administrator', dept: '' };
+    launchApp(); return;
+  }
+
+  // Super Admin
+  if (u === CFG.SUPERADMIN_USER && p === CFG.SUPERADMIN_PASS) {
+    SESSION = { role: 'super_admin', name: 'Super Administrator', dept: '' };
+    launchApp(); return;
+  }
+
+  // Normal User — match name in doers table
+  if (p === CFG.USER_PASS) {
+    if (sb) {
+      const { data } = await sb.from('doers').select('*').ilike('name', u).limit(1);
+      if (data && data.length > 0) {
+        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id };
+        launchApp(); return;
+      }
+    } else {
+      SESSION = { role: 'user', name: u, dept: 'Demo' };
+      launchApp(); return;
+    }
+  }
+
+  errEl.textContent = 'Invalid credentials. Check your username and password.';
+}
+
+function launchApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
-  document.getElementById('navRole').textContent = SESSION.role.toUpperCase();
-  document.getElementById('navUser').textContent = SESSION.name;
-  document.getElementById('adminMenuGroup').style.display = SESSION.role === 'admin' ? '' : 'none';
-  document.getElementById('userMenuGroup').style.display  = SESSION.role === 'user'  ? '' : 'none';
-  showPage(SESSION.role === 'admin' ? 'dashboard' : 'myTasks');
+
+  const roleMeta = {
+    admin:       { label: 'ADMIN',       cls: 'role-admin' },
+    super_admin: { label: 'SUPER ADMIN', cls: 'role-superadmin' },
+    user:        { label: 'USER',        cls: 'role-user' },
+  };
+  const m = roleMeta[SESSION.role] || roleMeta.user;
+  const badge = document.getElementById('navRoleBadge');
+  badge.textContent = m.label;
+  badge.className = 'nav-role-badge ' + m.cls;
+  document.getElementById('navUserName').textContent = SESSION.name;
+
+  const isAdmin = SESSION.role === 'admin' || SESSION.role === 'super_admin';
+  document.getElementById('adminMenuGroup').style.display = isAdmin ? '' : 'none';
+  document.getElementById('userMenuGroup').style.display  = isAdmin ? 'none' : '';
+
+  showPage(isAdmin ? 'dashboard' : 'myTasks');
 }
 
 function doLogout() {
@@ -652,28 +1183,58 @@ function doLogout() {
   document.getElementById('appShell').style.display = 'none';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginError').textContent = '';
-  showLogin();
+  document.getElementById('loginScreen').style.display = 'flex';
 }
 
 // ── PAGE ROUTING ──────────────────────────────────────────────
 function showPage(page) {
-  // Mobile Support: Auto hide sidebar on selection
-  const sidebar = document.getElementById('appSidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  if(sidebar) sidebar.classList.remove('show');
-  if(overlay) overlay.classList.remove('show');
-
+  closeSidebar();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById('page-' + page);
-  if (el) el.classList.add('active');
-  const m = document.getElementById('menu-' + page);
-  if (m) m.classList.add('active');
+  const pg = document.getElementById('page-' + page);
+  if (pg) pg.classList.add('active');
+  const mn = document.getElementById('menu-' + page);
+  if (mn) mn.classList.add('active');
+  // also handle aliased menu items
+  if (page === 'donelist') {
+    const m2 = document.getElementById('menu-myDone');
+    if (m2) m2.classList.add('active');
+  }
+  if (page === 'scoring') {
+    const m2 = document.getElementById('menu-myScoring');
+    if (m2) m2.classList.add('active');
+  }
   const loaders = {
-    dashboard: loadDashboard, doers: loadDoers, tasks: loadTasks,
-    master: loadMaster, donelist: loadDoneList, scoring: loadScoring, myTasks: loadMyTasks
+    dashboard: loadDashboard,
+    doers:     loadDoers,
+    tasks:     loadTasks,
+    master:    loadMaster,
+    donelist:  loadDoneList,
+    scoring:   loadScoring,
+    myTasks:   loadMyTasks,
   };
   if (loaders[page]) loaders[page]();
+}
+
+// ── SIDEBAR ────────────────────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById('appSidebar').classList.toggle('show');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('appSidebar').classList.remove('show');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+// ── DATE FORMATTING (yyyy/MM/dd) ──────────────────────────────
+function fmtDate(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  if (isNaN(dt)) return String(d);
+  const yyyy = dt.getFullYear();
+  const MM   = String(dt.getMonth() + 1).padStart(2, '0');
+  const dd   = String(dt.getDate()).padStart(2, '0');
+  return `${yyyy}/${MM}/${dd}`;
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
@@ -682,8 +1243,9 @@ async function loadDashboard() {
   const [{ count: dCount }, { data: master }, { data: done }] = await Promise.all([
     sb.from('doers').select('*', { count: 'exact', head: true }),
     sb.from('master_schedule').select('status, planned_date'),
-    sb.from('done_list').select('id', { count: 'exact', head: false }),
+    sb.from('done_list').select('id'),
   ]);
+
   const now = new Date();
   let pending = 0, overdue = 0;
   (master || []).forEach(r => {
@@ -691,71 +1253,80 @@ async function loadDashboard() {
       new Date(r.planned_date) < now ? overdue++ : pending++;
     }
   });
-  document.getElementById('st-doers').textContent   = dCount || 0;
+
+  document.getElementById('st-doers').textContent   = dCount  || 0;
   document.getElementById('st-done').textContent    = (done || []).length;
   document.getElementById('st-pending').textContent = pending;
   document.getElementById('st-overdue').textContent = overdue;
 
-  // Charts
   const { data: scoring } = await sb.from('scoring').select('*');
   const sc = scoring || [];
-  const onT = sc.filter(r => r.on_time).length;
+  const onT  = sc.filter(r => r.on_time).length;
   const late = sc.filter(r => !r.on_time).length;
-  renderComplianceChart({ labels: ['On Time', 'Late'], data: [onT, late] });
+
+  buildComplianceChart([onT, late]);
 
   const deptMap = {};
-  sc.forEach(r => { const d = r.department||'Unknown'; deptMap[d] = (deptMap[d]||0)+1; });
-  renderDeptChart({ labels: Object.keys(deptMap), data: Object.values(deptMap) });
-  renderLeaderboard(buildLeaderboard(sc), 'leaderboardEl');
+  sc.forEach(r => { const d = r.department || 'Unknown'; deptMap[d] = (deptMap[d] || 0) + 1; });
+  buildDeptChart(Object.keys(deptMap), Object.values(deptMap));
+
+  renderLeaderboard(buildLeaderboard(sc), 'dashLeaderboard');
 }
 
 function buildLeaderboard(scoring) {
   const map = {};
   (scoring || []).forEach(r => {
-    const n = r.doer_name || '';
-    if (!n) return;
-    if (!map[n]) map[n] = { name: n, dept: r.department||'', totalTasks: 0, onTime: 0, late: 0, score: 0 };
-    map[n].totalTasks++;
+    const n = r.doer_name || ''; if (!n) return;
+    if (!map[n]) map[n] = { name: n, dept: r.department || '', total: 0, onTime: 0, late: 0 };
+    map[n].total++;
     r.on_time ? map[n].onTime++ : map[n].late++;
   });
-  // Formula: (onTime / totalTasks * 100) - 100
-  // -100 = all late, 0 = all on time
   Object.values(map).forEach(p => {
-    p.score = p.totalTasks > 0
-      ? Math.round((p.onTime / p.totalTasks) * 100) - 100
-      : 0;
-    p.total = p.score; // alias for leaderboard display
+    p.score = p.total > 0 ? Math.round((p.onTime / p.total) * 100) - 100 : 0;
   });
   return Object.values(map).sort((a, b) => b.score - a.score);
 }
 
-function renderComplianceChart(d) {
-  const ctx = document.getElementById('chartCompliance').getContext('2d');
-  if (chartCompliance) chartCompliance.destroy();
-  chartCompliance = new Chart(ctx, { type: 'doughnut', data: { labels: d.labels, datasets: [{ data: d.data, backgroundColor: ['#1565C0','#C62828'], borderWidth: 0 }] }, options: { plugins: { legend: { position: 'bottom' } }, cutout: '65%' } });
-}
-function renderDeptChart(d) {
-  const ctx = document.getElementById('chartDept').getContext('2d');
-  if (chartDept) chartDept.destroy();
-  chartDept = new Chart(ctx, { type: 'bar', data: { labels: d.labels, datasets: [{ label: 'Tasks', data: d.data, backgroundColor: '#1976D2', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
-}
 function renderLeaderboard(data, containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
-  if (!data.length) { el.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:20px;">No data yet</div>'; return; }
-  el.innerHTML = data.slice(0,5).map((p, i) => {
-    const rc = i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    const scoreColor = p.total >= 0 ? 'var(--primary)' : 'var(--danger)';
-    return `<div class="score-card">
-      <div class="score-rank ${rc}">${i+1}</div>
-      <div style="flex:1;"><div style="font-weight:700;">${p.name}</div><div style="font-size:.76rem;color:var(--text-muted);">${p.dept}</div></div>
-      <div style="text-align:right;">
-        <div style="font-size:1.4rem;font-weight:700;color:${scoreColor};">${p.score}</div>
-        <div style="font-size:.7rem;color:var(--text-muted);">score (max 0)</div>
-        <div style="font-size:.72rem;margin-top:2px;"><span style="color:#2E7D32;">✓ ${p.onTime}</span> &nbsp; <span style="color:#C62828;">✗ ${p.late}</span></div>
+  if (!data.length) {
+    el.innerHTML = `<div class="empty-state"><i class="bi bi-trophy"></i><strong>No data yet</strong></div>`; return;
+  }
+  el.innerHTML = data.slice(0, 5).map((p, i) => {
+    const rankCls = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+    const scoreColor = p.score >= -30 ? 'var(--green)' : p.score >= -60 ? 'var(--amber)' : 'var(--red)';
+    return `<div class="lb-item">
+      <div class="lb-rank ${rankCls}">${i + 1}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="lb-name">${p.name}</div>
+        <div class="lb-dept">${p.dept}</div>
+      </div>
+      <div class="lb-score">
+        <div class="lb-score-val" style="color:${scoreColor};">${p.score}</div>
+        <div class="lb-score-meta">score · <span style="color:var(--green);">✓${p.onTime}</span> <span style="color:var(--red);">✗${p.late}</span></div>
       </div>
     </div>`;
   }).join('');
+}
+
+function buildComplianceChart(vals) {
+  const ctx = document.getElementById('chartCompliance').getContext('2d');
+  if (_chartCompliance) _chartCompliance.destroy();
+  _chartCompliance = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels: ['On Time', 'Late'], datasets: [{ data: vals, backgroundColor: ['#1A56DB', '#DC2626'], borderWidth: 0 }] },
+    options: { plugins: { legend: { position: 'bottom' } }, cutout: '65%' }
+  });
+}
+function buildDeptChart(labels, data) {
+  const ctx = document.getElementById('chartDept').getContext('2d');
+  if (_chartDept) _chartDept.destroy();
+  _chartDept = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Tasks', data, backgroundColor: '#1A56DB', borderRadius: 5 }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
 }
 
 // ── DOERS ─────────────────────────────────────────────────────
@@ -763,37 +1334,34 @@ async function loadDoers() {
   if (!sb) return;
   const { data } = await sb.from('doers').select('*').order('created_at', { ascending: true });
   DOERS_CACHE = data || [];
-  const tbody = document.getElementById('doerTbody');
-  tbody.innerHTML = DOERS_CACHE.map((r, i) => `
-     <tr>
-       <td>${i+1}</td>
-       <td><strong>${r.name||''}</strong></td>
-       <td>${r.department||''}</td>
-       <td><a href="mailto:${r.email}" style="color:var(--primary);">${r.email||''}</a></td>
-       <td>${r.phone||''}</td>
-       <td>${r.whatsapp||''}</td>
-       <td><span class="badge-usertype">${r.user_type||'User'}</span></td>
-       <td>
-         <button class="btn-sm-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
-         <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
-       </td>
-     </tr>`).join('');
+  document.getElementById('doerTbody').innerHTML = DOERS_CACHE.map((r, i) => `
+    <tr>
+      <td style="color:var(--ink-muted);font-family:'Space Mono',monospace;font-size:.75rem;">${i+1}</td>
+      <td><strong>${r.name || ''}</strong></td>
+      <td>${r.department || ''}</td>
+      <td><a href="mailto:${r.email}" style="color:var(--blue);">${r.email || ''}</a></td>
+      <td>${r.phone || ''}</td>
+      <td>${r.whatsapp || ''}</td>
+      <td><span class="badge badge-role">${r.user_type || 'User'}</span></td>
+      <td>
+        <button class="btn-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
+        <button class="btn-icon danger ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
+      </td>
+    </tr>`).join('');
 }
 
 function openDoerModal(id) {
   document.getElementById('doerEditId').value = id || '';
   if (id) {
-    const r = DOERS_CACHE.find(d => d.id === id);
-    if (r) {
-      document.getElementById('d_name').value  = r.name||'';
-      document.getElementById('d_dept').value  = r.department||'';
-      document.getElementById('d_email').value = r.email||'';
-      document.getElementById('d_phone').value = r.phone||'';
-      document.getElementById('d_wa').value    = r.whatsapp||'';
-      document.getElementById('d_usertype').value = r.user_type||'User';
-    }
+    const r = DOERS_CACHE.find(d => d.id === id) || {};
+    document.getElementById('d_name').value     = r.name || '';
+    document.getElementById('d_dept').value     = r.department || '';
+    document.getElementById('d_email').value    = r.email || '';
+    document.getElementById('d_phone').value    = r.phone || '';
+    document.getElementById('d_wa').value       = r.whatsapp || '';
+    document.getElementById('d_usertype').value = r.user_type || 'User';
   } else {
-    ['d_name','d_dept','d_email','d_phone','d_wa'].forEach(id => document.getElementById(id).value='');
+    ['d_name','d_dept','d_email','d_phone','d_wa'].forEach(i => document.getElementById(i).value = '');
     document.getElementById('d_usertype').value = 'User';
   }
   new bootstrap.Modal(document.getElementById('doerModal')).show();
@@ -802,23 +1370,23 @@ function editDoer(id) { openDoerModal(id); }
 
 async function saveDoer() {
   const name = document.getElementById('d_name').value.trim();
-  if (!name) { toast('Name is required','error'); return; }
+  if (!name) { toast('Name is required', 'error'); return; }
   const row = {
-    name, 
+    name,
     department: document.getElementById('d_dept').value.trim(),
-    email: document.getElementById('d_email').value.trim(),
-    phone: document.getElementById('d_phone').value.trim(),
-    whatsapp: document.getElementById('d_wa').value.trim(),
-    user_type: document.getElementById('d_usertype').value
+    email:      document.getElementById('d_email').value.trim(),
+    phone:      document.getElementById('d_phone').value.trim(),
+    whatsapp:   document.getElementById('d_wa').value.trim(),
+    user_type:  document.getElementById('d_usertype').value,
   };
   const id = document.getElementById('doerEditId').value;
   bootstrap.Modal.getInstance(document.getElementById('doerModal')).hide();
   if (id) {
     const { error } = await sb.from('doers').update(row).eq('id', id);
-    error ? toast('Update failed: '+error.message,'error') : toast('Doer updated','success');
+    error ? toast('Update failed: ' + error.message, 'error') : toast('Doer updated', 'success');
   } else {
     const { error } = await sb.from('doers').insert(row);
-    error ? toast('Insert failed: '+error.message,'error') : toast('Doer added','success');
+    error ? toast('Insert failed: ' + error.message, 'error') : toast('Doer added', 'success');
   }
   loadDoers();
 }
@@ -826,7 +1394,7 @@ async function saveDoer() {
 async function deleteDoer(id) {
   if (!confirm('Delete this doer?')) return;
   await sb.from('doers').delete().eq('id', id);
-  toast('Doer deleted','info');
+  toast('Doer deleted', 'info');
   loadDoers();
 }
 
@@ -835,36 +1403,33 @@ async function loadTasks() {
   if (!sb) return;
   const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
   TASKS_CACHE = data || [];
-  const tbody = document.getElementById('taskTbody');
-  tbody.innerHTML = TASKS_CACHE.map((r, i) => `
-     <tr>
-       <td>${r.id}</td>
-       <td><strong>${r.Task_Name||r.task_name||''}</strong></td>
-       <td>${r.Doer_Name||r.doer_name||''}</td>
-       <td>${r.Department||r.department||''}</td>
-       <td><span class="badge-freq">${r.Frequency||r.frequency||''}</span></td>
-       <td>${r.Start_Date||r.start_date||''}</td>
-       <td>
-         <button class="btn-sm-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
-         <button class="btn-sm-icon btn-danger-sm ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
-       </td>
-     </tr>`).join('');
+  document.getElementById('taskTbody').innerHTML = TASKS_CACHE.map(r => `
+    <tr>
+      <td style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--ink-muted);">${r.id}</td>
+      <td><strong>${r.Task_Name || r.task_name || ''}</strong></td>
+      <td>${r.Doer_Name || r.doer_name || ''}</td>
+      <td>${r.Department || r.department || ''}</td>
+      <td><span class="badge badge-freq">${r.Frequency || r.frequency || ''}</span></td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.Start_Date || r.start_date)}</td>
+      <td>
+        <button class="btn-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
+        <button class="btn-icon danger ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
+      </td>
+    </tr>`).join('');
 }
 
 async function openTaskModal(id) {
   await loadDoersForSelect();
   document.getElementById('taskEditId').value = id || '';
   if (id) {
-    const r = TASKS_CACHE.find(t => t.id === id);
-    if (r) {
-      document.getElementById('t_name').value = r.Task_Name||r.task_name||'';
-      document.getElementById('t_doer').value = r.Doer_Name||r.doer_name||'';
-      document.getElementById('t_dept').value = r.Department||r.department||'';
-      document.getElementById('t_freq').value = r.Frequency||r.frequency||'2W';
-      document.getElementById('t_date').value = r.Start_Date||r.start_date||'';
-    }
+    const r = TASKS_CACHE.find(t => t.id === id) || {};
+    document.getElementById('t_name').value = r.Task_Name || r.task_name || '';
+    document.getElementById('t_doer').value = r.Doer_Name || r.doer_name || '';
+    document.getElementById('t_dept').value = r.Department || r.department || '';
+    document.getElementById('t_freq').value = r.Frequency || r.frequency || '2W';
+    document.getElementById('t_date').value = r.Start_Date || r.start_date || '';
   } else {
-    ['t_name','t_dept'].forEach(id => document.getElementById(id).value='');
+    ['t_name','t_dept'].forEach(i => document.getElementById(i).value = '');
     document.getElementById('t_freq').value = '2W';
     document.getElementById('t_date').value = new Date().toISOString().split('T')[0];
   }
@@ -874,40 +1439,36 @@ function editTask(id) { openTaskModal(id); }
 
 async function loadDoersForSelect() {
   if (!sb) return;
-  const { data } = await sb.from('doers').select('name, department, Name, Department').order('name');
-  const sel = document.getElementById('t_doer');
-  sel.innerHTML = '<option value="">— Select Doer —</option>' +
-    (data||[]).map(d => {
-      const n = d.name||d.Name||''; const dep = d.department||d.Department||'';
-      return `<option value="${n}" data-dept="${dep}">${n} (${dep})</option>`;
-    }).join('');
+  const { data } = await sb.from('doers').select('name, department').order('name');
+  document.getElementById('t_doer').innerHTML =
+    '<option value="">— Select Doer —</option>' +
+    (data || []).map(d => `<option value="${d.name}" data-dept="${d.department || ''}">${d.name} (${d.department || ''})</option>`).join('');
 }
 
 function autoFillDept() {
-  const sel = document.getElementById('t_doer');
-  const opt = sel.selectedOptions[0];
-  document.getElementById('t_dept').value = opt ? (opt.dataset.dept||'') : '';
+  const opt = document.getElementById('t_doer').selectedOptions[0];
+  document.getElementById('t_dept').value = opt ? (opt.dataset.dept || '') : '';
 }
 
 async function saveTask() {
   const task_name = document.getElementById('t_name').value.trim();
   const doer_name = document.getElementById('t_doer').value;
-  if (!task_name || !doer_name) { toast('Task name and doer required','error'); return; }
+  if (!task_name || !doer_name) { toast('Task name and doer are required', 'error'); return; }
   const row = {
     Task_Name:  task_name,
     Doer_Name:  doer_name,
     Department: document.getElementById('t_dept').value.trim(),
     Frequency:  document.getElementById('t_freq').value,
-    Start_Date: document.getElementById('t_date').value
+    Start_Date: document.getElementById('t_date').value,
   };
   const id = document.getElementById('taskEditId').value;
   bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide();
   if (id) {
     const { error } = await sb.from('tasks').update(row).eq('id', id);
-    error ? toast('Update failed: '+error.message,'error') : toast('Task updated','success');
+    error ? toast('Update failed: ' + error.message, 'error') : toast('Task updated', 'success');
   } else {
     const { error } = await sb.from('tasks').insert(row);
-    error ? toast('Insert failed: '+error.message,'error') : toast('Task added','success');
+    error ? toast('Insert failed: ' + error.message, 'error') : toast('Task added', 'success');
   }
   loadTasks();
 }
@@ -915,92 +1476,91 @@ async function saveTask() {
 async function deleteTask(id) {
   if (!confirm('Delete this task?')) return;
   await sb.from('tasks').delete().eq('id', id);
-  toast('Task deleted','info');
+  toast('Task deleted', 'info');
   loadTasks();
 }
 
 // ── GENERATE MASTER ───────────────────────────────────────────
 async function generateMaster() {
-  if (!confirm('This will regenerate the entire Master schedule (2 years). Continue?')) return;
-  toast('Generating schedule...','info');
+  if (!confirm('This will regenerate the entire Master Schedule (2 years). Continue?')) return;
+  toast('Generating schedule…', 'info');
 
   const { data: tasks } = await sb.from('tasks').select('*');
-  if (!tasks || !tasks.length) { toast('No tasks found.','error'); return; }
+  if (!tasks || !tasks.length) { toast('No tasks found.', 'error'); return; }
 
-  // Clear existing master
   await sb.from('master_schedule').delete().neq('id', 0);
 
+  const FREQ_INTERVALS = { D:1, W:7, '2W':15, M:30, '2M':60, '3M':90, '6M':180, Y:365, '2Y':730 };
   const rows = [];
   for (const t of tasks) {
-    const startDate = t.Start_Date || t.start_date;
-    const freq      = t.Frequency  || t.frequency;
-    const dates = generateDates(new Date(startDate), freq, 730);
-    for (const d of dates) {
+    const start = new Date(t.Start_Date || t.start_date);
+    const freq  = (t.Frequency || t.frequency || '2W').toUpperCase();
+    const interval = FREQ_INTERVALS[freq] || 30;
+    const end = new Date(start.getTime() + 730 * 86400000);
+    let cur = new Date(start);
+    while (cur <= end) {
       rows.push({
         doer_name:    t.Doer_Name   || t.doer_name,
         department:   t.Department  || t.department,
         task_ref_id:  t.id,
         frequency:    freq,
         task_name:    t.Task_Name   || t.task_name,
-        planned_date: d.toISOString(),
-        actual_date:  null,
-        status:       null,
+        planned_date: cur.toISOString(),
+        actual_date:  null, status: null,
         air_pressure: null, gauge_check: null, spare_parts: null,
         damaged_parts: null, grease: null, bearing_bush: null,
-        change_repair: null, remarks: null
+        change_repair: null, remarks: null,
       });
+      cur = new Date(cur.getTime() + interval * 86400000);
     }
   }
 
-  // Insert in batches of 500
   for (let i = 0; i < rows.length; i += 500) {
-    const { error } = await sb.from('master_schedule').insert(rows.slice(i, i+500));
-    if (error) { toast('Error: '+error.message,'error'); return; }
+    const { error } = await sb.from('master_schedule').insert(rows.slice(i, i + 500));
+    if (error) { toast('Error: ' + error.message, 'error'); return; }
   }
-  toast(`Generated ${rows.length} schedule rows!`,'success');
+  toast(`✓ Generated ${rows.length} schedule rows!`, 'success');
   loadMaster();
-}
-
-function generateDates(startDate, freq, totalDays) {
-  const dates = [];
-  const end = new Date(startDate.getTime() + totalDays * 86400000);
-  const intervals = { D:1, W:7, '2W':15, M:30, '2M':60, '3M':90, '6M':180, Y:365, '2Y':730 };
-  const interval = intervals[(freq||'').toUpperCase()] || intervals[freq] || 30;
-  let cur = new Date(startDate);
-  while (cur <= end) { dates.push(new Date(cur)); cur.setDate(cur.getDate() + interval); }
-  return dates;
 }
 
 // ── MASTER DISPLAY ────────────────────────────────────────────
 async function loadMaster() {
   if (!sb) return;
   const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
-  // Use a fresh tbody
-  const t = document.getElementById('masterTbody');
-  t.innerHTML = '';
-  (data||[]).forEach(r => {
-    const st = (r.status||'').trim();
-    let badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>`
-              : st === 'Done Late'    ? `<span class="badge-late">${st}</span>`
-              : st ? `<span class="badge-ontime">${st}</span>`
-              : `<span class="badge-pending">Pending</span>`;
-    t.innerHTML += `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_ref_id||''}</td>
-       <td><span class="badge-freq">${r.frequency||''}</span></td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):''}</td><td>${badge}</td></tr>`;
-  });
+  document.getElementById('masterTbody').innerHTML = (data || []).map(r => {
+    const st = (r.status || '').trim();
+    const badge = st === 'Done On Time' ? `<span class="badge badge-ontime">${st}</span>`
+                : st === 'Done Late'    ? `<span class="badge badge-late">${st}</span>`
+                : st                   ? `<span class="badge badge-ontime">${st}</span>`
+                : `<span class="badge badge-pending">Pending</span>`;
+    return `<tr>
+      <td>${r.doer_name || ''}</td><td>${r.department || ''}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.75rem;">${r.task_ref_id || ''}</td>
+      <td><span class="badge badge-freq">${r.frequency || ''}</span></td>
+      <td>${r.task_name || ''}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.planned_date)}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${r.actual_date ? fmtDate(r.actual_date) : '—'}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ── DONE LIST ─────────────────────────────────────────────────
 async function loadDoneList() {
   if (!sb) return;
   const { data } = await sb.from('done_list').select('*').order('submitted_on', { ascending: false });
-  const tbody = document.getElementById('doneTbody');
-  tbody.innerHTML = (data||[]).map(r => {
-    const st = (r.status||'').trim();
-    const badge = st === 'Done On Time' ? `<span class="badge-ontime">${st}</span>` : `<span class="badge-late">${st}</span>`;
-    return `<tr><td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${badge}</td>
-       <td>${r.submitted_by||''}</td><td>${fmtDate(r.submitted_on)}</td></tr>`;
+  document.getElementById('doneTbody').innerHTML = (data || []).map(r => {
+    const st = (r.status || '').trim();
+    const badge = st === 'Done On Time' ? `<span class="badge badge-ontime">${st}</span>` : `<span class="badge badge-late">${st}</span>`;
+    return `<tr>
+      <td><strong>${r.doer_name || ''}</strong></td><td>${r.department || ''}</td>
+      <td>${r.task_name || ''}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.planned_date)}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.actual_date)}</td>
+      <td>${badge}</td>
+      <td>${r.submitted_by || ''}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.submitted_on)}</td>
+    </tr>`;
   }).join('');
 }
 
@@ -1009,157 +1569,175 @@ async function loadScoring() {
   if (!sb) return;
   const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
   const scoring = sc || [];
-
-  // Leaderboard
   const lb = buildLeaderboard(scoring);
   renderLeaderboard(lb, 'scoringLeaderboard');
 
-  // Score chart
   const ctx = document.getElementById('chartScore').getContext('2d');
-  if (chartScore) chartScore.destroy();
+  if (_chartScore) _chartScore.destroy();
   const top10 = lb.slice(0, 10);
-  chartScore = new Chart(ctx, {
+  _chartScore = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: top10.map(p => p.name),
-      datasets: [{ label: 'Score (%)', data: top10.map(p => p.score), backgroundColor: top10.map(p => p.score >= -50 ? '#1565C0' : '#C62828'), borderRadius: 6 }]
+      datasets: [{ label: 'Score', data: top10.map(p => p.score),
+        backgroundColor: top10.map(p => p.score >= -30 ? '#059669' : p.score >= -60 ? '#D97706' : '#DC2626'),
+        borderRadius: 5 }]
     },
     options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
   });
 
-  // Score table
-  const tbody = document.getElementById('scoreTbody');
-  tbody.innerHTML = scoring.map(r => `
-     <tr>
-       <td>${r.doer_name||''}</td><td>${r.department||''}</td><td>${r.task_name||''}</td>
-       <td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td>
-       <td>${r.on_time ? '<span class="badge-ontime">YES</span>' : '<span class="badge-late">NO</span>'}</td>
-       <td><span class="${r.on_time?'badge-ontime':'badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
-       <td>${fmtDate(r.submitted_on)}</td>
-     </tr>`).join('');
+  document.getElementById('scoreTbody').innerHTML = scoring.map(r => `
+    <tr>
+      <td>${r.doer_name || ''}</td><td>${r.department || ''}</td><td>${r.task_name || ''}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.planned_date)}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.actual_date)}</td>
+      <td>${r.on_time ? '<span class="badge badge-ontime">YES</span>' : '<span class="badge badge-late">NO</span>'}</td>
+      <td><span class="${r.on_time ? 'badge badge-ontime' : 'badge badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.submitted_on)}</td>
+    </tr>`).join('');
 }
 
 // ── MY TASKS (USER) ───────────────────────────────────────────
+// Filter logic equivalent to Excel:
+// =IFERROR(SORT(FILTER(Master!A:P, (H="")*(F < NOW()+10)), 6, TRUE), "")
+// Column H = status (index 7 in 0-based), Column F = planned_date (index 5 in 0-based)
+// Sort by planned_date ASC
 async function loadMyTasks() {
-  if (!sb) { showNoTaskMsg(); return; }
-  const now   = new Date();
-  const limit = new Date(now.getTime() + 10 * 86400000);
+  if (!sb) { renderNoTasks(); return; }
 
-  const { data } = await sb
+  const now   = new Date();
+  const limit = new Date(now.getTime() + 10 * 86400000); // NOW() + 10 days
+
+  // Supabase query equivalent:
+  // WHERE status IS NULL AND planned_date < (now + 10 days) ORDER BY planned_date ASC
+  const { data, error } = await sb
     .from('master_schedule')
     .select('*')
-    .ilike('doer_name', SESSION.name)
-    .is('status', null)
-    .lte('planned_date', limit.toISOString())
-    .order('planned_date', { ascending: true });
+    .ilike('doer_name', SESSION.name)  // match doer name (case-insensitive)
+    .is('status', null)                // Column H is empty/null
+    .lt('planned_date', limit.toISOString())  // Column F < NOW() + 10
+    .order('planned_date', { ascending: true }); // Sort by Column 6 (planned_date) ASC
 
+  if (error) { toast('Error loading tasks: ' + error.message, 'error'); return; }
+
+  window._pendingTasks = data || [];
   const el = document.getElementById('myTasksContainer');
-  const tasks = data || [];
 
-  if (!tasks.length) { showNoTaskMsg(); return; }
+  if (!window._pendingTasks.length) { renderNoTasks(); return; }
 
-  el.innerHTML = tasks.map(t => {
-    const planned = new Date(t.planned_date);
-    const overdue = planned < now;
-    const daysLeft = Math.round((planned - now) / 86400000);
-    return `<div class="card-table mb-3">
-      <div class="table-header d-flex flex-column flex-md-row gap-3 align-items-start align-items-md-center" style="background:${overdue?'#FFEBEE':'#E3F2FD'};">
-        <div class="flex-grow-1">
-          <div style="font-weight:700;color:${overdue?'#C62828':'var(--primary-dark)'};">
-            <i class="bi bi-gear-fill me-2"></i>${t.task_name}
-          </div>
-          <div style="font-size:.78rem;color:var(--text-muted);margin-top:3px;">
-            Dept: ${t.department} &nbsp;|&nbsp; Freq: <span class="badge-freq">${t.frequency}</span>
-            <br class="d-md-none"> Planned: <strong>${fmtDate(t.planned_date)}</strong>
-            ${overdue ? ' &nbsp;<span class="badge-late">OVERDUE</span>' : ` &nbsp;<span class="badge-pending">${daysLeft}d left</span>`}
+  el.innerHTML = window._pendingTasks.map(t => {
+    const planned  = new Date(t.planned_date);
+    const isOverdue = planned < now;
+    const daysLeft  = Math.round((planned - now) / 86400000);
+    const cardCls   = isOverdue ? 'overdue' : daysLeft <= 3 ? 'due-soon' : 'ok';
+
+    const dateBadgeColor = isOverdue
+      ? 'background:var(--red-pale);color:var(--red);'
+      : daysLeft <= 3
+        ? 'background:var(--amber-pale);color:var(--amber);'
+        : 'background:var(--green-pale);color:var(--green);';
+
+    const dayLabel = isOverdue
+      ? `OVERDUE ${Math.abs(daysLeft)}d`
+      : daysLeft === 0 ? 'TODAY'
+      : `${daysLeft}d left`;
+
+    return `<div class="task-card ${cardCls}">
+      <div class="task-head">
+        <div style="flex:1;min-width:0;">
+          <div class="task-name"><i class="bi bi-gear-fill me-2" style="color:var(--blue);"></i>${t.task_name}</div>
+          <div class="task-meta">
+            <span><i class="bi bi-building me-1"></i>${t.department}</span>
+            <span class="task-meta-sep">|</span>
+            <span class="badge badge-freq">${t.frequency}</span>
+            <span class="task-meta-sep">|</span>
+            <span><i class="bi bi-calendar3 me-1"></i><strong>${fmtDate(t.planned_date)}</strong></span>
+            <span class="task-date-chip" style="${dateBadgeColor}">${dayLabel}</span>
           </div>
         </div>
-        <div class="d-flex gap-2 w-100 w-md-auto justify-content-end">
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','email')" title="Send Email">
-            <i class="bi bi-envelope-fill" style="color:var(--primary);"></i>
+        <div class="task-actions">
+          <button class="btn-icon" title="Send Email Reminder" onclick="sendNotification('${t.id}','email')">
+            <i class="bi bi-envelope-fill" style="color:var(--blue);"></i>
           </button>
-          <button class="btn-sm-icon" onclick="sendNotification('${t.id}','whatsapp')" title="WhatsApp">
+          <button class="btn-icon" title="Send WhatsApp Reminder" onclick="sendNotification('${t.id}','whatsapp')">
             <i class="bi bi-whatsapp" style="color:#25D366;"></i>
           </button>
-          <button class="btn-success-custom" onclick="openSubmitModal('${t.id}')">
-             Complete
+          <button class="btn-success" onclick="openSubmitModal('${t.id}')">
+            <i class="bi bi-check2-circle"></i>Complete
           </button>
         </div>
       </div>
     </div>`;
   }).join('');
-
-  // Store tasks for submit
-  window._pendingTasks = tasks;
 }
 
-function showNoTaskMsg() {
+function renderNoTasks() {
   document.getElementById('myTasksContainer').innerHTML = `
-    <div style="text-align:center;padding:60px;color:var(--text-muted);">
-      <i class="bi bi-emoji-smile" style="font-size:3rem;color:var(--accent);"></i>
-      <div style="font-size:1.1rem;margin-top:12px;font-weight:600;">All caught up!</div>
-      <div style="font-size:.85rem;margin-top:4px;">No pending tasks in next 10 days.</div>
+    <div class="empty-state">
+      <i class="bi bi-emoji-smile"></i>
+      <strong>All caught up!</strong>
+      <span>No pending tasks in the next 10 days.</span>
     </div>`;
 }
 
 // ── SUBMIT TASK ───────────────────────────────────────────────
 function openSubmitModal(taskId) {
-  const t = (window._pendingTasks||[]).find(x => x.id == taskId);
+  const t = (window._pendingTasks || []).find(x => String(x.id) === String(taskId));
   if (!t) return;
   currentSubmitTask = t;
+
   const checks = [
-    { key:'air_pressure',   label:'M/C cleaning by air pressure' },
-    { key:'gauge_check',    label:'All gauge must be checking that M/C' },
-    { key:'spare_parts',    label:'All spare parts are checking and cleaning' },
-    { key:'damaged_parts',  label:'Damaged spare parts must be replaced or repairing' },
-    { key:'grease',         label:'The M/C must be greased and all bearing checked' },
-    { key:'bearing_bush',   label:'If any bearing and bush are damaged they must be replaced' },
+    { key: 'air_pressure',   label: 'M/C cleaning by air pressure' },
+    { key: 'gauge_check',    label: 'All gauges checked on machine' },
+    { key: 'spare_parts',    label: 'All spare parts checked and cleaned' },
+    { key: 'damaged_parts',  label: 'Damaged spare parts replaced or repaired' },
+    { key: 'grease',         label: 'Machine greased and all bearings checked' },
+    { key: 'bearing_bush',   label: 'Damaged bearings/bushes replaced' },
   ];
+
+  const options = ['', 'Done', 'Not Done', 'N/A'];
   document.getElementById('submitModalBody').innerHTML = `
-    <div style="background:var(--accent2);border-radius:8px;padding:12px 16px;margin-bottom:16px;">
-      <strong>${t.task_name}</strong><br>
-      <small style="color:var(--text-muted);">Planned: ${fmtDate(t.planned_date)} &nbsp;|&nbsp; Dept: ${t.department}</small>
+    <div style="background:var(--blue-pale);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:18px;border-left:3px solid var(--blue);">
+      <div style="font-weight:700;color:var(--ink);">${t.task_name}</div>
+      <div style="font-size:.78rem;color:var(--ink-muted);margin-top:4px;">
+        Planned: <strong style="font-family:'Space Mono',monospace;">${fmtDate(t.planned_date)}</strong>
+        &nbsp;·&nbsp; Dept: ${t.department}
+      </div>
     </div>
-    ${checks.map(c => `
-      <div class="check-item">
-        <select class="form-select form-select-sm" id="chk_${c.key}" style="width:130px;">
-          <option value="">—</option>
-          <option value="Done">Done</option>
-          <option value="Not Done">Not Done</option>
-          <option value="N/A">N/A</option>
-        </select>
-        <label style="font-size:.85rem;">${c.label}</label>
-      </div>`).join('')}
-    <div class="mt-3">
-      <label class="form-label">Change or Repair Parts Name</label>
-      <input type="text" class="form-control" id="chk_change_repair" placeholder="List parts if any"/>
+    <div style="margin-bottom:14px;">
+      ${checks.map(c => `
+        <div class="check-row">
+          <select class="form-select form-select-sm" id="chk_${c.key}" style="width:130px;flex-shrink:0;">
+            ${options.map(o => `<option value="${o}">${o || '—'}</option>`).join('')}
+          </select>
+          <label>${c.label}</label>
+        </div>`).join('')}
     </div>
-    <div class="mt-3">
-      <label class="form-label">Remarks</label>
-      <textarea class="form-control" id="chk_remarks" rows="2" placeholder="Any notes..."></textarea>
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label">Change / Repair Parts</label>
+        <input type="text" class="form-control" id="chk_change_repair" placeholder="List parts if any"/>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Remarks</label>
+        <textarea class="form-control" id="chk_remarks" rows="2" placeholder="Any additional notes…"></textarea>
+      </div>
     </div>`;
   new bootstrap.Modal(document.getElementById('submitModal')).show();
 }
 
 async function confirmSubmit() {
   if (!currentSubmitTask) return;
-  const t = currentSubmitTask;
+  const t   = currentSubmitTask;
   const now = new Date();
-  const planned = new Date(t.planned_date);
-
-  // On time = submitted before or on planned date (end of day)
-  const plannedEOD = new Date(planned);
+  const plannedEOD = new Date(t.planned_date);
   plannedEOD.setHours(23, 59, 59, 999);
   const onTime = now <= plannedEOD;
-  // score column stores 1=ontime, 0=late; leaderboard uses formula
-  const score  = onTime ? 1 : 0;
   const status = onTime ? 'Done On Time' : 'Done Late';
-
   const getV = id => { const el = document.getElementById(id); return el ? el.value : ''; };
 
-  const update = {
-    actual_date:   now.toISOString(),
-    status,
+  const extras = {
+    actual_date:   now.toISOString(), status,
     air_pressure:  getV('chk_air_pressure'),
     gauge_check:   getV('chk_gauge_check'),
     spare_parts:   getV('chk_spare_parts'),
@@ -1170,59 +1748,53 @@ async function confirmSubmit() {
     remarks:       getV('chk_remarks'),
   };
 
-  // 1. Update master_schedule
-  const { error: masterErr } = await sb.from('master_schedule').update(update).eq('id', t.id);
-  if (masterErr) { toast('Error updating master: '+masterErr.message,'error'); return; }
+  // 1. Update master_schedule row
+  const { error: e1 } = await sb.from('master_schedule').update(extras).eq('id', t.id);
+  if (e1) { toast('Error updating schedule: ' + e1.message, 'error'); return; }
 
   // 2. Insert into done_list
-  const { error: doneErr } = await sb.from('done_list').insert({
-    doer_name:    t.doer_name,
-    department:   t.department,
-    task_name:    t.task_name,
-    frequency:    t.frequency,
+  const { error: e2 } = await sb.from('done_list').insert({
+    doer_name: t.doer_name, department: t.department,
+    task_name: t.task_name, frequency: t.frequency,
     planned_date: t.planned_date,
-    actual_date:  now.toISOString(),
-    status,
-    submitted_by: SESSION.name,
-    submitted_on: now.toISOString(),
-    ...update
+    submitted_by: SESSION.name, submitted_on: now.toISOString(),
+    ...extras,
   });
-  if (doneErr) console.warn('done_list insert:', doneErr.message);
+  if (e2) console.warn('done_list:', e2.message);
 
   // 3. Insert into scoring
-  const { error: scoreErr } = await sb.from('scoring').insert({
-    doer_name:    t.doer_name,
-    department:   t.department,
-    task_name:    t.task_name,
+  const { error: e3 } = await sb.from('scoring').insert({
+    doer_name: t.doer_name, department: t.department,
+    task_name: t.task_name,
     planned_date: t.planned_date,
-    actual_date:  now.toISOString(),
-    on_time:      onTime,
-    score,
+    actual_date: now.toISOString(),
+    on_time: onTime, score: onTime ? 1 : 0,
     submitted_on: now.toISOString(),
   });
-  if (scoreErr) console.warn('scoring insert:', scoreErr.message);
+  if (e3) console.warn('scoring:', e3.message);
 
   bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
-  toast(`Task submitted! Score: ${onTime?'+':''}${score} (${status})`, onTime?'success':'error');
+  toast(`Task submitted — ${status}`, onTime ? 'success' : 'error');
   loadMyTasks();
 }
 
 // ── NOTIFICATIONS ─────────────────────────────────────────────
 async function sendNotification(taskId, type) {
-  const t = (window._pendingTasks||[]).find(x => x.id == taskId);
+  const t = (window._pendingTasks || []).find(x => String(x.id) === String(taskId));
   if (!t) return;
   const { data: doers } = await sb.from('doers').select('*').ilike('name', t.doer_name).limit(1);
   const doer = doers && doers[0];
-  if (!doer) { toast('Doer contact not found','error'); return; }
+  if (!doer) { toast('Doer contact not found', 'error'); return; }
 
   if (type === 'email') {
-    if (!doer.email) { toast('No email on file','error'); return; }
-    toast(`Email reminder sent to ${doer.email}`, 'success');
-    // In production: call a backend API / Supabase Edge Function to send email
+    if (!doer.email) { toast('No email address on file', 'error'); return; }
+    toast(`Email reminder → ${doer.email}`, 'success');
   } else {
-    const phone = (doer.whatsapp||'').replace(/\D/g,'');
-    if (!phone) { toast('No WhatsApp number on file','error'); return; }
-    const msg = encodeURIComponent(`Hello ${t.doer_name}, pending maintenance task:\n*Task:* ${t.task_name}\n*Planned:* ${fmtDate(t.planned_date)}\nPlease complete on time. — CheckList`);
+    const phone = (doer.whatsapp || '').replace(/\D/g, '');
+    if (!phone) { toast('No WhatsApp number on file', 'error'); return; }
+    const msg = encodeURIComponent(
+      `Hello ${t.doer_name},\n\nYou have a pending maintenance task:\n*Task:* ${t.task_name}\n*Planned:* ${fmtDate(t.planned_date)}\n*Dept:* ${t.department}\n\nPlease complete it on time.\n— CheckList`
+    );
     window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
   }
 }
@@ -1231,24 +1803,17 @@ async function sendNotification(taskId, type) {
 async function exportCsv(table) {
   if (!sb) return;
   const { data } = await sb.from(table).select('*');
-  if (!data || !data.length) { toast('No data to export','error'); return; }
+  if (!data || !data.length) { toast('No data to export', 'error'); return; }
   const keys = Object.keys(data[0]);
-  const csv  = [keys.join(','), ...data.map(r => keys.map(k => `"${r[k]??''}"`).join(','))].join('\n');
+  const csv  = [keys.join(','), ...data.map(r => keys.map(k => `"${r[k] ?? ''}"`).join(','))].join('\n');
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
-  a.download = table + '_export.csv';
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = `${table}_export.csv`;
   a.click();
-  toast('CSV downloaded','success');
+  toast('CSV downloaded', 'success');
 }
 
-// ── HELPERS ───────────────────────────────────────────────────
-function fmtDate(d) {
-  if (!d) return '';
-  const dt = new Date(d);
-  if (isNaN(dt)) return String(d);
-  return dt.toLocaleDateString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric' });
-}
-
+// ── FILTER TABLE ──────────────────────────────────────────────
 function filterTable(tableId, query) {
   const q = query.toLowerCase();
   document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
@@ -1256,22 +1821,18 @@ function filterTable(tableId, query) {
   });
 }
 
-function toast(msg, type='info') {
-  const icons = { success:'bi-check-circle-fill', error:'bi-x-circle-fill', info:'bi-info-circle-fill' };
-  const colors = { success:'#2E7D32', error:'#C62828', info:'#1565C0' };
+// ── TOAST ──────────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+  const icons = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', info: 'bi-info-circle-fill' };
   const div = document.createElement('div');
-  div.className = `app-toast toast-${type}`;
-  div.innerHTML = `<i class="bi ${icons[type]||icons.info}" style="color:${colors[type]};font-size:1.1rem;"></i> ${msg}`;
-  document.getElementById('toastContainer').appendChild(div);
-  setTimeout(() => div.remove(), 4500);
-}
-
-// Mobile Toggle Functionality
-function toggleSidebar() {
-  const sidebar = document.getElementById('appSidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  sidebar.classList.toggle('show');
-  overlay.classList.toggle('show');
+  div.className = `app-toast t-${type}`;
+  div.innerHTML = `<i class="bi ${icons[type] || icons.info} t-icon"></i><span>${msg}</span>`;
+  document.getElementById('toastWrap').appendChild(div);
+  setTimeout(() => {
+    div.style.transition = 'opacity .3s';
+    div.style.opacity = '0';
+    setTimeout(() => div.remove(), 300);
+  }, 4000);
 }
 </script>
 </body>
