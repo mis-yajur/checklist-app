@@ -904,7 +904,7 @@ body {
       <div class="page" id="page-myTasks">
         <div class="pg-header">
           <div class="pg-title">My Pending Tasks</div>
-          <div class="pg-sub">Tasks where status is empty &amp; planned date is within the next 10 days — sorted ascending by date</div>
+          <div class="pg-sub" id="myTasksSub">Tasks where <code style="background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;">status</code> is empty &amp; <code style="background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;">planned_date</code> &lt; today + 10 days — sorted by date ascending</div>
         </div>
         <div id="myTasksContainer"></div>
       </div>
@@ -1539,27 +1539,59 @@ async function loadScoring() {
 // ── MY TASKS (USER) ───────────────────────────────────────────
 // Filter logic equivalent to Excel:
 // =IFERROR(SORT(FILTER(Master!A:P, (H="")*(F < NOW()+10)), 6, TRUE), "")
-// Column H = status (index 7 in 0-based), Column F = planned_date (index 5 in 0-based)
-// Sort by planned_date ASC
+// Column H = status  →  NULL or empty string ""
+// Column F = planned_date  →  < NOW() + 10 days
+// Sorted by planned_date ASC
 async function loadMyTasks() {
   if (!sb) { renderNoTasks(); return; }
 
-  const now   = new Date();
-  const limit = new Date(now.getTime() + 10 * 86400000); // NOW() + 10 days
+  const el = document.getElementById('myTasksContainer');
+  const subEl = document.getElementById('myTasksSub');
 
-  // Supabase query equivalent:
-  // WHERE status IS NULL AND planned_date < (now + 10 days) ORDER BY planned_date ASC
+  // Show loading
+  el.innerHTML = `<div style="text-align:center;padding:48px;color:var(--ink-muted);">
+    <div class="load-ring" style="margin:0 auto 12px;border-top-color:var(--blue);"></div>
+    <span style="font-size:.85rem;">Loading tasks for <strong>${SESSION.name}</strong>…</span>
+  </div>`;
+
+  if (subEl) subEl.innerHTML = `Showing tasks for <strong style="color:var(--blue);">${SESSION.name}</strong> — status empty &amp; planned_date &lt; today + 10 days`;
+
+  const now   = new Date();
+  const limit = new Date(now.getTime() + 10 * 86400000);
+
+  // Step 1: Pull ALL rows from master_schedule where planned_date < limit
+  // We fetch regardless of doer_name to avoid case/whitespace mismatch issues
+  // Then filter client-side for this user's name + status empty/null
   const { data, error } = await sb
     .from('master_schedule')
     .select('*')
-    .ilike('doer_name', SESSION.name)  // match doer name (case-insensitive)
-    .is('status', null)                // Column H is empty/null
-    .lt('planned_date', limit.toISOString())  // Column F < NOW() + 10
-    .order('planned_date', { ascending: true }); // Sort by Column 6 (planned_date) ASC
+    .lt('planned_date', limit.toISOString())   // Column F < NOW() + 10
+    .order('planned_date', { ascending: true }); // Sort by planned_date ASC
 
-  if (error) { toast('Error loading tasks: ' + error.message, 'error'); return; }
+  if (error) {
+    toast('Error loading tasks: ' + error.message, 'error');
+    document.getElementById('myTasksContainer').innerHTML = `
+      <div class="empty-state">
+        <i class="bi bi-exclamation-circle" style="color:var(--red);"></i>
+        <strong>Error loading tasks</strong>
+        <span style="color:var(--red);font-size:.78rem;">${error.message}</span>
+      </div>`;
+    return;
+  }
 
-  window._pendingTasks = data || [];
+  const sessionNameLower = (SESSION.name || '').trim().toLowerCase();
+
+  // Step 2: Client-side filter
+  // Column H (status) must be NULL, undefined, or empty string ""
+  // Column F (planned_date) already filtered server-side
+  // Doer name must match SESSION.name (case-insensitive, trimmed)
+  const filtered = (data || []).filter(r => {
+    const statusEmpty = r.status === null || r.status === undefined || r.status === '';
+    const nameMatch   = (r.doer_name || '').trim().toLowerCase() === sessionNameLower;
+    return statusEmpty && nameMatch;
+  });
+
+  window._pendingTasks = filtered;
   const el = document.getElementById('myTasksContainer');
 
   if (!window._pendingTasks.length) { renderNoTasks(); return; }
@@ -1611,11 +1643,12 @@ async function loadMyTasks() {
 }
 
 function renderNoTasks() {
+  const sessionNameLower = (SESSION.name || '').trim().toLowerCase();
   document.getElementById('myTasksContainer').innerHTML = `
     <div class="empty-state">
       <i class="bi bi-emoji-smile"></i>
       <strong>All caught up!</strong>
-      <span>No pending tasks in the next 10 days.</span>
+      <span>No pending tasks in the next 10 days for <strong>${SESSION.name}</strong>.</span>
     </div>`;
 }
 
