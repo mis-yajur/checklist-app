@@ -1568,7 +1568,7 @@ async function loadMyTasks() {
         <div style="flex:1;min-width:0;">
           <div class="task-name">
             <i class="bi bi-gear-fill me-2" style="color:var(--blue);"></i>${t.task_name || t.Task_Name} 
-            ${isProsun ? `<span style="font-size:0.7rem; color:var(--blue); font-family:'Space Mono'; margin-left:10px;">DOER: ${t.doer_name || t.Doer_Name}</span>` : ''}
+            ${isUser ? `<span style="font-size:0.7rem; color:var(--blue); font-family:'Space Mono'; margin-left:10px;">DOER: ${t.doer_name || t.Doer_Name}</span>` : ''}
           </div>
           <div class="task-meta">
             <span><i class="bi bi-building me-1"></i>${t.department || t.Department}</span>
