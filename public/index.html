@@ -1038,7 +1038,7 @@ async function doLogin() {
     launchApp(); return;
   }
 
-  if (u.toLowerCase() === 'prosun' && p === CFG.USER_PASS) {
+  if (u.toLowerCase() === 'user' && p === CFG.USER_PASS) {
      SESSION = { role: 'user', name: 'Prosun', dept: 'Monitoring' };
      launchApp(); return;
   }
