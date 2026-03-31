@@ -677,7 +677,7 @@ body {
     <div class="nav-brand">&#9745; Check<span>List</span></div>
     
     <div class="nav-menu-container" id="topNavMenu">
-      <!-- ADMIN + SUPER ADMIN menus -->
+      <!-- ADMIN menus -->
       <div id="adminNavGroup" class="d-flex align-items-center">
         <div class="nav-item active" id="menu-dashboard" onclick="showPage('dashboard')"><i class="bi bi-speedometer2"></i>Dashboard</div>
         <div class="nav-item" id="menu-doers" onclick="showPage('doers')"><i class="bi bi-people-fill"></i>Doers</div>
@@ -686,12 +686,12 @@ body {
         <div class="nav-item" id="menu-donelist" onclick="showPage('donelist')"><i class="bi bi-check2-all"></i>Done List</div>
         <div class="nav-item" id="menu-scoring" onclick="showPage('scoring')"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
-      <!-- USER menu -->
+      <!-- USER / SUPER ADMIN menu -->
       <div id="userNavGroup" class="d-flex align-items-center" style="display:none;">
         <div class="nav-item active" id="menu-myTasks" onclick="showPage('myTasks')"><i class="bi bi-card-checklist"></i>My Tasks</div>
         <div class="nav-item" id="menu-myDone" onclick="showPage('donelist')"><i class="bi bi-check2-all"></i>Done List</div>
-        <!-- Scoring Hidden for User Section by script -->
-        <div class="nav-item" id="menu-myScoring" onclick="showPage('scoring')" style="display:none;"><i class="bi bi-trophy-fill"></i>Scoring</div>
+        <!-- Scoring logic handled by Script -->
+        <div class="nav-item" id="menu-myScoring" onclick="showPage('scoring')"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
     </div>
 
@@ -1029,13 +1029,19 @@ async function doLogin() {
     launchApp(); return;
   }
 
-  // Super Admin
+  // Super Admin (General)
   if (u === CFG.SUPERADMIN_USER && p === CFG.SUPERADMIN_PASS) {
     SESSION = { role: 'super_admin', name: 'Super Administrator', dept: '' };
     launchApp(); return;
   }
 
-  // Special User: Prosun (Sees all, non-editable)
+  // LOGIC: Swapan Kr Ghorai is Super Admin (and a Doer)
+  if (u === 'Swapan Kr Ghorai' && p === 'Super@1234') {
+    SESSION = { role: 'super_admin', name: 'Swapan Kr Ghorai', dept: 'Yarn Division' };
+    launchApp(); return;
+  }
+
+  // LOGIC: Prosun is a User (and Monitoring Observer)
   if (u.toLowerCase() === 'prosun' && p === CFG.USER_PASS) {
      SESSION = { role: 'user', name: 'Prosun', dept: 'Monitoring' };
      launchApp(); return;
@@ -1073,16 +1079,16 @@ function launchApp() {
   badge.className = 'nav-role-badge ' + m.cls;
   document.getElementById('navUserName').textContent = SESSION.name;
 
-  const isAdmin = SESSION.role === 'admin' || SESSION.role === 'super_admin';
+  const isAdmin = SESSION.role === 'admin';
+  const isSuper = SESSION.role === 'super_admin';
   
   // Show proper nav group
   document.getElementById('adminNavGroup').style.display = isAdmin ? 'flex' : 'none';
   document.getElementById('userNavGroup').style.display  = isAdmin ? 'none' : 'flex';
 
-  // HIDE Scoring for regular User role
-  if (!isAdmin) {
-      document.getElementById('menu-myScoring').style.display = 'none';
-  }
+  // LOGIC: Super Admin (Swapan) sees Scoring, User (Prosun) does not
+  const isUserOnly = (SESSION.name.toLowerCase() === 'prosun');
+  document.getElementById('menu-myScoring').style.display = (isSuper && !isUserOnly) ? 'flex' : 'none';
 
   showPage(isAdmin ? 'dashboard' : 'myTasks');
 }
@@ -1102,7 +1108,6 @@ function showPage(page) {
   const pg = document.getElementById('page-' + page);
   if (pg) pg.classList.add('active');
   
-  // Highlighting active nav item (accounting for aliases)
   const menuIds = ['menu-' + page];
   if (page === 'donelist') menuIds.push('menu-myDone');
   if (page === 'scoring') menuIds.push('menu-myScoring');
@@ -1500,6 +1505,7 @@ async function loadMyTasks() {
   if (!sb) { renderNoTasks(); return; }
 
   const el = document.getElementById('myTasksContainer');
+  // LOGIC: Check if logged in user is Prosun (Monitoring Observer)
   const isProsun = (SESSION.name || '').toLowerCase() === 'prosun';
 
   el.innerHTML = `<div style="text-align:center;padding:48px;color:var(--ink-muted);"><div class="load-ring" style="margin:0 auto 12px;border-top-color:var(--blue);"></div><span style="font-size:.85rem;">Loading tasks…</span></div>`;
@@ -1512,11 +1518,15 @@ async function loadMyTasks() {
   if (error) { toast(error.message, 'error'); return; }
 
   const sessionNameLower = (SESSION.name || '').trim().toLowerCase();
+  
+  // LOGIC: Filter tasks
+  // Prosun sees all tasks where status is empty.
+  // Others (like Swapan Kr Ghorai) see only their own tasks where status is empty.
   const filtered = (data || []).filter(r => {
     const statusEmpty = (r.status || '').trim() === '';
-    if (isProsun) return statusEmpty;
+    if (isProsun) return statusEmpty; // Observer View
     const rowDoer = (r.doer_name || r.Doer_Name || '').trim().toLowerCase();
-    return statusEmpty && (rowDoer === sessionNameLower);
+    return statusEmpty && (rowDoer === sessionNameLower); // Doer View
   });
 
   window._pendingTasks = filtered;
@@ -1527,12 +1537,14 @@ async function loadMyTasks() {
     const isOverdue = planned < now;
     const daysLeft  = Math.round((planned - now) / 86400000);
     const dateBadgeColor = isOverdue ? 'background:var(--red-pale);color:var(--red);' : daysLeft <= 3 ? 'background:var(--amber-pale);color:var(--amber);' : 'background:var(--green-pale);color:var(--green);';
+    
+    // LOGIC: Non-Editable for Prosun, Editable for others (like Swapan)
     const completeButton = isProsun ? '' : `<button class="btn-success" onclick="openSubmitModal('${t.id}')"><i class="bi bi-check2-circle"></i>Complete</button>`;
 
     return `<div class="task-card ${isOverdue ? 'overdue' : daysLeft <= 3 ? 'due-soon' : 'ok'}">
       <div class="task-head">
         <div style="flex:1;min-width:0;">
-          <div class="task-name"><i class="bi bi-gear-fill me-2" style="color:var(--blue);"></i>${t.task_name || t.Task_Name} ${isProsun ? `<span style="font-size:0.7rem; color:var(--blue); margin-left:10px;">DOER: ${t.doer_name || t.Doer_Name}</span>` : ''}</div>
+          <div class="task-name"><i class="bi bi-gear-fill me-2" style="color:var(--blue);"></i>${t.task_name || t.Task_Name} ${isProsun ? `<span style="font-size:0.7rem; color:var(--blue); margin-left:10px; border:1px solid var(--blue); padding:2px 6px; border-radius:4px;">DOER: ${t.doer_name || t.Doer_Name}</span>` : ''}</div>
           <div class="task-meta">
             <span><i class="bi bi-building me-1"></i>${t.department || t.Department}</span>
             <span class="badge badge-freq">${t.frequency || t.Frequency}</span>
@@ -1551,7 +1563,7 @@ async function loadMyTasks() {
 }
 
 function renderNoTasks() {
-  document.getElementById('myTasksContainer').innerHTML = `<div class="empty-state"><i class="bi bi-emoji-smile"></i><strong>All caught up!</strong><span>No pending tasks.</span></div>`;
+  document.getElementById('myTasksContainer').innerHTML = `<div class="empty-state"><i class="bi bi-emoji-smile"></i><strong>All caught up!</strong><span>No pending tasks for ${SESSION.name}.</span></div>`;
 }
 
 // ── SUBMIT TASK ───────────────────────────────────────────────
