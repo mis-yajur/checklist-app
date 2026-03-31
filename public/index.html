@@ -1494,7 +1494,7 @@ async function loadMyTasks() {
 
   const el = document.getElementById('myTasksContainer');
   const subEl = document.getElementById('myTasksSub');
-  const isProsun = (SESSION.name || '').toLowerCase() === 'prosun';
+  const isUser = (SESSION.name || '').toLowerCase() === 'user';
 
   el.innerHTML = `<div style="text-align:center;padding:48px;color:var(--ink-muted);">
     <div class="load-ring" style="margin:0 auto 12px;border-top-color:var(--blue);"></div>
