@@ -42,7 +42,7 @@
   --shadow-sm:  0 2px 8px rgba(10,14,26,.08), 0 1px 3px rgba(10,14,26,.05);
   --shadow-md:  0 4px 16px rgba(10,14,26,.10), 0 2px 6px rgba(10,14,26,.06);
   --shadow-lg:  0 8px 32px rgba(10,14,26,.13), 0 4px 10px rgba(10,14,26,.07);
-  --nav-h:      auto;
+  --nav-h:      auto; /* Changed from 60px to auto to accommodate two rows */
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -107,7 +107,7 @@ body {
   position: fixed; inset: 0;
   background: var(--paper);
   align-items: center; justify-content: center;
-  z-index: 2000;
+  z-index: 1000;
   overflow: hidden;
 }
 #loginScreen::before {
@@ -193,14 +193,34 @@ body {
   width: 100%;
   padding: 11px;
   background: var(--blue);
-  color: #fff; border: none;
+  color: #fff;
+  border: none;
   border-radius: var(--radius-sm);
-  font-size: .9rem; font-weight: 700;
-  cursor: pointer; font-family: 'DM Sans', sans-serif;
-  transition: all .2s; letter-spacing: .3px;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .2s;
+  letter-spacing: .3px;
   margin-top: 4px;
 }
 .btn-login:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,86,219,.3); }
+.login-hint {
+  font-size: .74rem;
+  color: var(--ink-muted);
+  text-align: center;
+  margin-top: 14px;
+  line-height: 1.5;
+}
+.login-hint strong { color: var(--blue); font-weight: 600; }
+.login-error {
+  color: var(--red);
+  font-size: .8rem;
+  text-align: center;
+  min-height: 20px;
+  margin-top: 8px;
+  font-weight: 500;
+}
 
 /* ── NAVBAR ─────────────────────────────────────────────── */
 .app-navbar {
@@ -209,11 +229,13 @@ body {
   position: sticky; top: 0; z-index: 1100;
   box-shadow: var(--shadow-sm);
 }
-.nav-top-row {
+
+.navbar-brand-row {
   display: flex; align-items: center;
   padding: 10px 20px;
   border-bottom: 1px solid var(--border);
 }
+
 .nav-brand {
   font-family: 'DM Serif Display', serif;
   color: var(--ink);
@@ -221,34 +243,6 @@ body {
   flex-shrink: 0;
 }
 .nav-brand span { color: var(--blue); }
-
-.nav-menu-row {
-  display: flex;
-  padding: 0 10px;
-  overflow-x: auto;
-  white-space: nowrap;
-  background: #fff;
-  scrollbar-width: none; /* Firefox */
-}
-.nav-menu-row::-webkit-scrollbar { display: none; }
-
-.nav-item {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 12px 16px;
-  font-size: .85rem; font-weight: 600;
-  color: var(--ink-soft);
-  cursor: pointer;
-  transition: all .2s;
-  border-bottom: 3px solid transparent;
-  user-select: none;
-}
-.nav-item i { font-size: 1rem; }
-.nav-item:hover { color: var(--blue); background: var(--blue-pale); }
-.nav-item.active {
-  color: var(--blue);
-  border-bottom-color: var(--blue);
-}
-
 .nav-role-badge {
   font-size: .65rem;
   font-weight: 700;
@@ -257,6 +251,7 @@ body {
   padding: 3px 9px;
   border-radius: 99px;
   margin-left: 10px;
+  flex-shrink: 0;
 }
 .role-admin      { background: var(--blue-pale);  color: var(--blue);  border: 1px solid rgba(26,86,219,.2); }
 .role-superadmin { background: var(--gold-pale);  color: var(--gold);  border: 1px solid rgba(217,119,6,.25); }
@@ -265,79 +260,382 @@ body {
   color: var(--ink-muted);
   font-size: .8rem;
   font-weight: 500;
+  flex-shrink: 0;
 }
 .btn-nav-logout {
   background: var(--paper);
   border: 1px solid var(--border);
   color: var(--ink-soft);
   border-radius: var(--radius-sm);
-  padding: 6px 12px;
-  font-size: .78rem; font-weight: 600;
-  cursor: pointer; transition: all .2s;
+  padding: 6px 14px;
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'DM Sans', sans-serif;
   display: flex; align-items: center; gap: 6px;
+  flex-shrink: 0;
 }
 .btn-nav-logout:hover { background: var(--red-pale); border-color: var(--red); color: var(--red); }
 
+/* ── NEW TOP MENU STYLES ── */
+.navbar-menu-row {
+  display: flex;
+  background: var(--surface);
+  overflow-x: auto;
+  padding: 0 10px;
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+}
+.navbar-menu-row::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome */
+
+.nav-menu-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 18px;
+  cursor: pointer;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  transition: all .2s;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  user-select: none;
+}
+.nav-menu-item i { font-size: 1rem; width: 18px; flex-shrink: 0; }
+.nav-menu-item:hover { color: var(--blue); background: var(--blue-pale); }
+.nav-menu-item.active { 
+  color: var(--blue); 
+  border-bottom-color: var(--blue);
+  background: var(--blue-pale);
+}
+
 /* ── LAYOUT ─────────────────────────────────────────────── */
-.main-content { padding: 28px 28px 40px; max-width: 1400px; margin: 0 auto; }
+.app-layout {
+  display: block; /* Changed from flex */
+}
+
+/* ── MAIN ─────────────────────────────────────────────────── */
+.main-content { padding: 28px 28px 40px; overflow-x: hidden; min-width: 0; }
 .page { display: none; }
 .page.active { display: block; animation: pageFade .25s ease; }
 @keyframes pageFade { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-/* (Keep all existing styles for stats, cards, tables, etc.) */
 .pg-header { margin-bottom: 24px; }
-.pg-title { font-family: 'DM Serif Display', serif; font-size: 1.65rem; color: var(--ink); }
+.pg-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.65rem;
+  color: var(--ink);
+  letter-spacing: -.3px;
+}
 .pg-sub { color: var(--ink-muted); font-size: .82rem; margin-top: 3px; }
+
+/* ── STAT CARDS ──────────────────────────────────────────── */
 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
 .stat-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 20px; box-shadow: var(--shadow-xs); position: relative; overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow .2s, transform .2s;
+  position: relative; overflow: hidden;
 }
-.stat-card.blue::before  { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: var(--blue); }
-.stat-card.green::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: var(--green); }
-.stat-card.amber::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: var(--amber); }
-.stat-card.red::before   { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: var(--red); }
-.stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: 12px; }
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.stat-card.blue::before  { background: linear-gradient(90deg, var(--blue), var(--blue-light)); }
+.stat-card.green::before { background: linear-gradient(90deg, var(--green), #34D399); }
+.stat-card.amber::before { background: linear-gradient(90deg, var(--amber), #FBBF24); }
+.stat-card.red::before   { background: linear-gradient(90deg, var(--red), #F87171); }
+.stat-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
 .stat-val { font-size: 2rem; font-weight: 700; color: var(--ink); line-height: 1; font-family: 'Space Mono', monospace; }
 .stat-lbl { font-size: .73rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 600; }
-.card-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-xs); overflow: hidden; margin-bottom: 18px; }
-.card-head { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-.card-head-title { font-weight: 700; color: var(--ink); font-size: .9rem; display: flex; align-items: center; gap: 8px; }
-.search-input { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 7px 12px; font-size: .82rem; outline: none; width: 160px; }
+
+/* ── CARD TABLE ──────────────────────────────────────────── */
+.card-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.card-head {
+  padding: 14px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.card-head-title {
+  font-weight: 700;
+  color: var(--ink);
+  font-size: .9rem;
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+.card-head-title i { color: var(--blue); }
+.search-input {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 12px;
+  font-size: .82rem;
+  color: var(--ink);
+  outline: none;
+  font-family: 'DM Sans', sans-serif;
+  width: 160px;
+  transition: border .2s, box-shadow .2s;
+}
+.search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,86,219,.08); }
+
 .tbl-scroll { max-height: 440px; overflow-y: auto; }
 .data-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
-.data-table thead th { background: var(--paper); color: var(--ink-muted); font-size: .68rem; text-transform: uppercase; padding: 9px 14px; position: sticky; top: 0; border-bottom: 2px solid var(--border-mid); }
-.data-table tbody td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--ink-soft); }
-.badge { border-radius: 99px; padding: 3px 10px; font-size: .7rem; font-weight: 700; }
-.badge-ontime { background: var(--green-pale); color: var(--green); }
-.badge-late { background: var(--red-pale); color: var(--red); }
+.data-table thead th {
+  background: var(--paper);
+  color: var(--ink-muted);
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  padding: 9px 14px;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  white-space: nowrap;
+  position: sticky; top: 0;
+  border-right: 1px solid var(--border);
+  border-bottom: 2px solid var(--border-mid);
+}
+.data-table thead th:last-child { border-right: none; }
+.data-table tbody td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink-soft);
+  vertical-align: middle;
+}
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr { transition: background .12s; }
+.data-table tbody tr:hover td { background: var(--blue-pale); }
+.data-table tbody tr:hover td:first-child { border-left: 3px solid var(--blue); }
+
+/* ── BADGES ──────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+.badge-ontime  { background: var(--green-pale); color: var(--green); }
+.badge-late    { background: var(--red-pale);   color: var(--red); }
 .badge-pending { background: var(--amber-pale); color: var(--amber); }
-.badge-freq { background: var(--blue-pale); color: var(--blue); font-family: 'Space Mono', monospace; }
-.btn-primary { background: var(--blue); color: #fff; border: none; border-radius: var(--radius-sm); padding: 8px 18px; font-size: .83rem; font-weight: 700; cursor: pointer; }
-.btn-success { background: var(--green); color: #fff; border: none; border-radius: var(--radius-sm); padding: 8px 18px; font-size: .83rem; font-weight: 700; cursor: pointer; }
-.btn-icon { background: var(--paper); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 10px; cursor: pointer; }
-.btn-generate { background: linear-gradient(135deg, #1A56DB 0%, #0891B2 100%); color: #fff; border: none; border-radius: var(--radius); padding: 14px 40px; font-weight: 800; cursor: pointer; }
+.badge-overdue { background: var(--red-pale);   color: var(--red); }
+.badge-freq    { background: var(--blue-pale);  color: var(--blue); font-family: 'Space Mono', monospace; }
+.badge-role    { background: var(--teal-pale);  color: var(--teal); }
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--blue);
+  color: #fff; border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  font-size: .83rem; font-weight: 700;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all .2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 3px 10px rgba(26,86,219,.3); }
+
+.btn-success {
+  background: var(--green);
+  color: #fff; border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  font-size: .83rem; font-weight: 700;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all .2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-success:hover { background: #047857; transform: translateY(-1px); }
+
+.btn-icon {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: all .18s;
+  color: var(--ink-soft);
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.btn-icon:hover { background: var(--blue-pale); border-color: var(--blue); color: var(--blue); }
+.btn-icon.danger:hover { background: var(--red-pale); border-color: var(--red); color: var(--red); }
+
+.btn-generate {
+  background: linear-gradient(135deg, #1A56DB 0%, #0891B2 100%);
+  color: #fff; border: none;
+  border-radius: var(--radius);
+  padding: 14px 40px;
+  font-size: .95rem; font-weight: 800;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all .25s;
+  display: inline-flex; align-items: center; gap: 10px;
+  box-shadow: 0 6px 24px rgba(26,86,219,.35);
+  letter-spacing: .5px;
+}
+.btn-generate:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 32px rgba(26,86,219,.45); }
+
+/* ── CHART GRID ──────────────────────────────────────────── */
 .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
-.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-.lb-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
-.lb-rank { font-family: 'DM Serif Display', serif; font-size: 1.3rem; width: 32px; text-align: center; color: var(--ink-muted); }
-.lb-score-val { font-size: 1.4rem; font-weight: 700; font-family: 'Space Mono', monospace; }
-.task-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 14px; padding: 14px 18px; }
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-xs);
+}
+.chart-title {
+  font-weight: 700; color: var(--ink);
+  font-size: .87rem; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 7px;
+}
+.chart-title i { color: var(--blue); }
+
+/* ── LEADERBOARD ─────────────────────────────────────────── */
+.lb-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.lb-item:last-child { border-bottom: none; padding-bottom: 0; }
+.lb-rank {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem;
+  width: 32px; text-align: center; flex-shrink: 0;
+  color: var(--ink-muted);
+}
+.lb-rank.r1 { color: #D97706; }
+.lb-rank.r2 { color: #6B7DB3; }
+.lb-rank.r3 { color: #A87040; }
+.lb-name { font-weight: 700; color: var(--ink); font-size: .87rem; }
+.lb-dept { font-size: .74rem; color: var(--ink-muted); margin-top: 1px; }
+.lb-score {
+  margin-left: auto; text-align: right;
+  font-family: 'Space Mono', monospace;
+}
+.lb-score-val { font-size: 1.4rem; font-weight: 700; }
+.lb-score-meta { font-size: .67rem; color: var(--ink-muted); }
+
+/* ── MY TASKS (USER) ─────────────────────────────────────── */
+.task-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+  transition: box-shadow .2s;
+}
+.task-card:hover { box-shadow: var(--shadow-sm); }
 .task-card.overdue { border-left: 4px solid var(--red); }
 .task-card.due-soon { border-left: 4px solid var(--amber); }
 .task-card.ok { border-left: 4px solid var(--green); }
-.modal-header { background: var(--ink); color: #fff; }
-.toast-wrap { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-.app-toast { background: var(--ink); border-radius: var(--radius-sm); padding: 12px 16px; color: #D0DCF5; font-size: .83rem; border: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 10px; }
+.task-head {
+  padding: 14px 18px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.task-name { font-weight: 700; color: var(--ink); font-size: .95rem; }
+.task-meta { font-size: .78rem; color: var(--ink-muted); margin-top: 5px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.task-meta-sep { color: var(--border-mid); }
+.task-date-chip {
+  font-family: 'Space Mono', monospace;
+  font-size: .72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px;
+}
+.task-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
 
+/* ── EMPTY STATE ─────────────────────────────────────────── */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--ink-muted);
+}
+.empty-state i { font-size: 3rem; color: var(--border-mid); display: block; margin-bottom: 12px; }
+.empty-state strong { color: var(--ink-soft); font-size: 1rem; display: block; }
+.empty-state span { font-size: .83rem; }
+
+/* ── MODAL ───────────────────────────────────────────────── */
+.modal-content { border: none; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); }
+.modal-header {
+  background: var(--ink);
+  color: #fff; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 16px 22px;
+}
+.modal-header .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.15rem; }
+.modal-header .btn-close { filter: invert(1); opacity: .6; }
+.modal-header .btn-close:hover { opacity: 1; }
+.form-label { font-size: .78rem; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+.form-control, .form-select {
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  padding: 9px 12px; font-size: .86rem; color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  transition: border .2s, box-shadow .2s;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,86,219,.10); outline: none;
+}
+.check-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+}
+.check-row:last-of-type { border-bottom: none; }
+.check-row label { font-size: .83rem; color: var(--ink-soft); flex: 1; }
+
+/* ── TOAST ───────────────────────────────────────────────── */
+.toast-wrap { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.app-toast {
+  background: var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  min-width: 260px;
+  max-width: 340px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn .3s ease;
+  font-size: .83rem; font-weight: 500;
+  color: #D0DCF5;
+  border: 1px solid rgba(255,255,255,.08);
+}
+@keyframes toastIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.t-icon { font-size: 1rem; flex-shrink: 0; }
+.t-success .t-icon { color: #34D399; }
+.t-error   .t-icon { color: #F87171; }
+.t-info    .t-icon { color: #60A5FA; }
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .chart-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
-  .nav-top-row { flex-wrap: wrap; gap: 10px; }
-  .main-content { padding: 16px 14px; }
+  .main-content { padding: 16px 14px 32px; }
+  .login-grid { grid-template-columns: 1fr; height: auto; }
+  .login-form-wrap { padding: 32px 24px; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .stat-val { font-size: 1.5rem; }
+  .btn-generate { padding: 12px 24px; font-size: .88rem; }
+  .task-head { flex-direction: column; }
+  .task-actions { width: 100%; }
 }
 </style>
 </head>
@@ -386,8 +684,8 @@ body {
 <!-- APP SHELL -->
 <div id="appShell" style="display:none;">
   <nav class="app-navbar">
-    <!-- Top Row: Brand & Info -->
-    <div class="nav-top-row">
+    <!-- Top Row -->
+    <div class="navbar-brand-row">
       <div class="nav-brand">&#9745; Check<span>List</span></div>
       <span class="nav-role-badge" id="navRoleBadge"></span>
       <div class="ms-auto d-flex align-items-center gap-3">
@@ -396,29 +694,29 @@ body {
       </div>
     </div>
     
-    <!-- Bottom Row: Navigation Menu -->
-    <div class="nav-menu-row">
-      <!-- Admin/Super Admin Menu -->
-      <div id="adminMenuGroup" class="d-flex">
-        <div class="nav-item active" id="menu-dashboard" onclick="showPage('dashboard')"><i class="bi bi-speedometer2"></i>Dashboard</div>
-        <div class="nav-item" id="menu-doers" onclick="showPage('doers')"><i class="bi bi-people-fill"></i>Doers</div>
-        <div class="nav-item" id="menu-tasks" onclick="showPage('tasks')"><i class="bi bi-list-task"></i>Tasks</div>
-        <div class="nav-item" id="menu-master" onclick="showPage('master')"><i class="bi bi-table"></i>Master Schedule</div>
-        <div class="nav-item" id="menu-donelist" onclick="showPage('donelist')"><i class="bi bi-check2-all"></i>Done List</div>
-        <div class="nav-item" id="menu-scoring" onclick="showPage('scoring')"><i class="bi bi-trophy-fill"></i>Scoring</div>
+    <!-- Menu Row (Replaces Sidebar) -->
+    <div class="navbar-menu-row">
+      <!-- ADMIN + SUPER ADMIN menus -->
+      <div id="adminMenuGroup" style="display:flex;">
+        <div class="nav-menu-item active" id="menu-dashboard" onclick="showPage('dashboard')"><i class="bi bi-speedometer2"></i>Dashboard</div>
+        <div class="nav-menu-item" id="menu-doers" onclick="showPage('doers')"><i class="bi bi-people-fill"></i>Doers</div>
+        <div class="nav-menu-item" id="menu-tasks" onclick="showPage('tasks')"><i class="bi bi-list-task"></i>Tasks</div>
+        <div class="nav-menu-item" id="menu-master" onclick="showPage('master')"><i class="bi bi-table"></i>Master Schedule</div>
+        <div class="nav-menu-item" id="menu-donelist" onclick="showPage('donelist')"><i class="bi bi-check2-all"></i>Done List</div>
+        <div class="nav-menu-item" id="menu-scoring" onclick="showPage('scoring')"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
-      <!-- User Menu -->
-      <div id="userMenuGroup" class="d-flex" style="display:none;">
-        <div class="nav-item active" id="menu-myTasks" onclick="showPage('myTasks')"><i class="bi bi-card-checklist"></i>My Tasks</div>
-        <div class="nav-item" id="menu-myDone" onclick="showPage('donelist')"><i class="bi bi-check2-all"></i>Done List</div>
-        <div class="nav-item" id="menu-myScoring" onclick="showPage('scoring')"><i class="bi bi-trophy-fill"></i>Scoring</div>
+      <!-- USER menu -->
+      <div id="userMenuGroup" style="display:none;">
+        <div class="nav-menu-item active" id="menu-myTasks" onclick="showPage('myTasks')"><i class="bi bi-card-checklist"></i>My Tasks</div>
+        <div class="nav-menu-item" id="menu-myDone" onclick="showPage('donelist')"><i class="bi bi-check2-all"></i>Done List</div>
+        <div class="nav-menu-item" id="menu-myScoring" onclick="showPage('scoring')"><i class="bi bi-trophy-fill"></i>Scoring</div>
       </div>
     </div>
   </nav>
 
-  <main class="main-content">
-      <!-- (Keep all existing pages here) -->
-      
+  <div class="app-layout">
+    <main class="main-content">
+
       <!-- ── DASHBOARD ──────────────────────────────────── -->
       <div class="page active" id="page-dashboard">
         <div class="pg-header">
@@ -546,7 +844,7 @@ body {
       <!-- ── SCORING ─────────────────────────────────────── -->
       <div class="page" id="page-scoring">
         <div class="pg-header d-flex align-items-start justify-content-between flex-wrap gap-3">
-          <div><div class="pg-title">Scoring &amp; Leaderboard</div><div class="pg-sub">Score formula: (On-Time / Total × 100) − 100</div></div>
+          <div><div class="pg-title">Scoring &amp; Leaderboard</div><div class="pg-sub">Score formula: (On-Time / Total × 100) − 100 · range: −100 (all late) to 0 (all on time)</div></div>
           <button class="btn-icon" onclick="exportCsv('scoring')"><i class="bi bi-download"></i>CSV</button>
         </div>
         <div class="row g-3 mb-3">
@@ -571,29 +869,100 @@ body {
         </div>
       </div>
 
-      <!-- ── MY TASKS ────────────────────────────────────── -->
+      <!-- ── MY TASKS (READ-ONLY USER VIEW) ─────────────── -->
       <div class="page" id="page-myTasks">
         <div class="pg-header">
           <div class="pg-title">My Pending Tasks</div>
-          <div class="pg-sub" id="myTasksSub">Pending tasks for you in the next 10 days</div>
+          <div class="pg-sub" id="myTasksSub">Tasks where <code style="background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;">status</code> is empty &amp; <code style="background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;">planned_date</code> &lt; today + 10 days — sorted by date ascending</div>
         </div>
         <div id="myTasksContainer"></div>
       </div>
 
-  </main>
+    </main>
+  </div>
 </div>
 
-<!-- MODALS (Keep all existing modals exactly as they were) -->
-<div class="modal fade" id="doerModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Doer Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4"><input type="hidden" id="doerEditId"/><div class="row g-3"><div class="col-md-6"><label class="form-label">Full Name *</label><input type="text" class="form-control" id="d_name"/></div><div class="col-md-6"><label class="form-label">Department *</label><input type="text" class="form-control" id="d_dept"/></div><div class="col-md-6"><label class="form-label">Email</label><input type="email" class="form-control" id="d_email"/></div><div class="col-md-6"><label class="form-label">Phone</label><input type="text" class="form-control" id="d_phone"/></div><div class="col-md-6"><label class="form-label">WhatsApp</label><input type="text" class="form-control" id="d_wa"/></div><div class="col-md-6"><label class="form-label">User Type</label><select class="form-select" id="d_usertype"><option value="User">User</option><option value="Super Admin">Super Admin</option><option value="Admin">Admin</option></select></div></div></div><div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn-primary" onclick="saveDoer()">Save Doer</button></div></div></div></div>
-<div class="modal fade" id="taskModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Task Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4"><input type="hidden" id="taskEditId"/><div class="row g-3"><div class="col-12"><label class="form-label">Task Name *</label><input type="text" class="form-control" id="t_name"/></div><div class="col-md-6"><label class="form-label">Assign Doer *</label><select class="form-select" id="t_doer" onchange="autoFillDept()"></select></div><div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control" id="t_dept"/></div><div class="col-md-6"><label class="form-label">Frequency *</label><select class="form-select" id="t_freq"><option value="D">Daily</option><option value="W">Weekly</option><option value="2W">Fortnightly</option><option value="M">Monthly</option><option value="2M">Every 2 Months</option><option value="3M">Every 3 Months</option><option value="6M">Half Yearly</option><option value="Y">Yearly</option></select></div><div class="col-md-6"><label class="form-label">Start Date *</label><input type="date" class="form-control" id="t_date"/></div></div></div><div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn-primary" onclick="saveTask()">Save Task</button></div></div></div></div>
-<div class="modal fade" id="submitModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Complete Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4" id="submitModalBody"></div><div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn-success" onclick="confirmSubmit()">Submit Completion</button></div></div></div></div>
+<!-- ── DOER MODAL ──────────────────────────────────────────── -->
+<div class="modal fade" id="doerModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Doer Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body p-4">
+      <input type="hidden" id="doerEditId"/>
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label">Full Name *</label><input type="text" class="form-control" id="d_name" placeholder="e.g. Swapan Kr Ghorai"/></div>
+        <div class="col-md-6"><label class="form-label">Department *</label><input type="text" class="form-control" id="d_dept" placeholder="e.g. Yarn Division"/></div>
+        <div class="col-md-6"><label class="form-label">Email Address</label><input type="email" class="form-control" id="d_email" placeholder="name@company.com"/></div>
+        <div class="col-md-6"><label class="form-label">Phone Number</label><input type="text" class="form-control" id="d_phone" placeholder="+91 9000000000"/></div>
+        <div class="col-md-6"><label class="form-label">WhatsApp (with country code)</label><input type="text" class="form-control" id="d_wa" placeholder="919000000000"/></div>
+        <div class="col-md-6">
+          <label class="form-label">User Type</label>
+          <select class="form-select" id="d_usertype">
+            <option value="User">User</option>
+            <option value="Super Admin">Super Admin</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn-primary" onclick="saveDoer()"><i class="bi bi-check-lg"></i>Save Doer</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ── TASK MODAL ──────────────────────────────────────────── -->
+<div class="modal fade" id="taskModal" tabindex="-1">
+  <div class="modal-dialog modal-lg"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-list-task me-2"></i>Task Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body p-4">
+      <input type="hidden" id="taskEditId"/>
+      <div class="row g-3">
+        <div class="col-12"><label class="form-label">Task Name *</label><input type="text" class="form-control" id="t_name" placeholder="e.g. B. Card-1 Machine Maintenance"/></div>
+        <div class="col-md-6"><label class="form-label">Assign Doer *</label><select class="form-select" id="t_doer" onchange="autoFillDept()"><option value="">— Select Doer —</option></select></div>
+        <div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control" id="t_dept" placeholder="Auto-filled from doer"/></div>
+        <div class="col-md-6">
+          <label class="form-label">Frequency *</label>
+          <select class="form-select" id="t_freq">
+            <option value="D">Daily (D)</option>
+            <option value="W">Weekly (W)</option>
+            <option value="2W" selected>Fortnightly / 15 days (2W)</option>
+            <option value="M">Monthly (M)</option>
+            <option value="2M">Every 2 Months (2M)</option>
+            <option value="3M">Every 3 Months (3M)</option>
+            <option value="6M">Half Yearly (6M)</option>
+            <option value="Y">Yearly (Y)</option>
+            <option value="2Y">Every 2 Years (2Y)</option>
+          </select>
+        </div>
+        <div class="col-md-6"><label class="form-label">Start Date *</label><input type="date" class="form-control" id="t_date"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn-primary" onclick="saveTask()"><i class="bi bi-check-lg"></i>Save Task</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ── SUBMIT TASK MODAL ───────────────────────────────────── -->
+<div class="modal fade" id="submitModal" tabindex="-1">
+  <div class="modal-dialog modal-lg"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-clipboard2-check me-2"></i>Complete Task</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body p-4" id="submitModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      <button class="btn-success" onclick="confirmSubmit()"><i class="bi bi-check2-circle"></i>Submit Completion</button>
+    </div>
+  </div></div>
+</div>
 
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
-//  CHECKLIST — Logic Core (Untouched logic, just routing)
+//  CHECKLIST — Logic Core (As Per Original)
 // ═══════════════════════════════════════════════════════════════
 
 const SUPABASE_URL  = "https://xfecmmhabdjnudqfyrqz.supabase.co";
@@ -619,10 +988,14 @@ window.addEventListener('load', async () => {
   setStatus("Connecting to database…");
   try {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    setStatus("Verifying connection…");
     await sb.from('doers').select('id').limit(1);
     setStatus("Ready!");
     await sleep(350);
-  } catch(e) { setStatus("⚠ " + e.message); }
+  } catch(e) {
+    setStatus("⚠ " + e.message);
+    await sleep(2000);
+  }
   fadeOutLoader();
   document.getElementById('loginScreen').style.display = 'flex';
 });
@@ -637,226 +1010,755 @@ function fadeOutLoader() {
 
 // ── LOGIN ─────────────────────────────────────────────────────
 let _activeRole = 'admin';
+
 function switchRole(role) {
   _activeRole = role;
   document.querySelectorAll('.role-pill').forEach(p => p.classList.remove('active'));
   document.getElementById('pill-' + role).classList.add('active');
-  document.getElementById('loginUser').value = role === 'admin' ? 'admin' : (role === 'super_admin' ? 'superadmin' : '');
+  const userEl = document.getElementById('loginUser');
+  if (role === 'admin')       userEl.value = 'admin';
+  else if (role === 'super_admin') userEl.value = 'superadmin';
+  else                        userEl.value = '';
   document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').textContent = '';
 }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') doLogin();
+});
 
 async function doLogin() {
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value;
-  if (!u || !p) return;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+
+  if (!u || !p) { errEl.textContent = 'Please enter username and password.'; return; }
 
   if (u === CFG.ADMIN_USER && p === CFG.ADMIN_PASS) {
-    SESSION = { role: 'admin', name: 'Administrator' }; launchApp(); return;
+    SESSION = { role: 'admin', name: 'Administrator', dept: '' };
+    launchApp(); return;
   }
+
   if (u === CFG.SUPERADMIN_USER && p === CFG.SUPERADMIN_PASS) {
-    SESSION = { role: 'super_admin', name: 'Super Administrator' }; launchApp(); return;
+    SESSION = { role: 'super_admin', name: 'Super Administrator', dept: '' };
+    launchApp(); return;
   }
+
+  if (u.toLowerCase() === 'prosun' && p === CFG.USER_PASS) {
+     SESSION = { role: 'user', name: 'Prosun', dept: 'Monitoring' };
+     launchApp(); return;
+  }
+
   if (p === CFG.USER_PASS) {
-    const { data } = await sb.from('doers').select('*').ilike('name', u).limit(1);
-    if (data && data.length > 0) { SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id }; launchApp(); return; }
+    if (sb) {
+      const { data } = await sb.from('doers').select('*').ilike('name', u).limit(1);
+      if (data && data.length > 0) {
+        SESSION = { role: 'user', name: data[0].name, dept: data[0].department, id: data[0].id };
+        launchApp(); return;
+      }
+    } else {
+      SESSION = { role: 'user', name: u, dept: 'Demo' };
+      launchApp(); return;
+    }
   }
-  document.getElementById('loginError').textContent = 'Invalid credentials.';
+
+  errEl.textContent = 'Invalid credentials. Check your username and password.';
 }
 
 function launchApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
+
+  const roleMeta = {
+    admin:       { label: 'ADMIN',       cls: 'role-admin' },
+    super_admin: { label: 'SUPER ADMIN', cls: 'role-superadmin' },
+    user:        { label: 'USER',        cls: 'role-user' },
+  };
+  const m = roleMeta[SESSION.role] || roleMeta.user;
+  const badge = document.getElementById('navRoleBadge');
+  badge.textContent = m.label;
+  badge.className = 'nav-role-badge ' + m.cls;
   document.getElementById('navUserName').textContent = SESSION.name;
-  
+
   const isAdmin = SESSION.role === 'admin' || SESSION.role === 'super_admin';
   document.getElementById('adminMenuGroup').style.display = isAdmin ? 'flex' : 'none';
   document.getElementById('userMenuGroup').style.display  = isAdmin ? 'none' : 'flex';
-  
-  const badge = document.getElementById('navRoleBadge');
-  badge.textContent = SESSION.role.toUpperCase().replace('_', ' ');
-  badge.className = 'nav-role-badge ' + (SESSION.role === 'admin' ? 'role-admin' : (SESSION.role === 'super_admin' ? 'role-superadmin' : 'role-user'));
 
   showPage(isAdmin ? 'dashboard' : 'myTasks');
 }
 
-function doLogout() { SESSION = {}; location.reload(); }
-
-// ── ROUTING ───────────────────────────────────────────────────
-function showPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(s => s.classList.remove('active'));
-  
-  const pg = document.getElementById('page-' + page);
-  if (pg) pg.classList.add('active');
-  
-  const mn = document.getElementById('menu-' + page);
-  if (mn) mn.classList.add('active');
-  
-  // Extra mapping for aliases
-  if(page === 'donelist') document.getElementById('menu-myDone')?.classList.add('active');
-  if(page === 'scoring')  document.getElementById('menu-myScoring')?.classList.add('active');
-
-  if (page === 'dashboard') loadDashboard();
-  if (page === 'doers') loadDoers();
-  if (page === 'tasks') loadTasks();
-  if (page === 'master') loadMaster();
-  if (page === 'donelist') loadDoneList();
-  if (page === 'scoring') loadScoring();
-  if (page === 'myTasks') loadMyTasks();
+function doLogout() {
+  SESSION = {};
+  document.getElementById('appShell').style.display = 'none';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('loginScreen').style.display = 'flex';
 }
 
-// ── THE REST OF YOUR FUNCTIONS (REMAINING EXACTLY THE SAME) ──
-function fmtDate(d) { if (!d) return ''; const dt = new Date(d); return isNaN(dt) ? d : `${dt.getFullYear()}/${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}`; }
+// ── PAGE ROUTING ──────────────────────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-menu-item').forEach(s => s.classList.remove('active'));
+  const pg = document.getElementById('page-' + page);
+  if (pg) pg.classList.add('active');
+  const mn = document.getElementById('menu-' + page);
+  if (mn) mn.classList.add('active');
+  if (page === 'donelist') {
+    const m2 = document.getElementById('menu-myDone');
+    if (m2) m2.classList.add('active');
+  }
+  if (page === 'scoring') {
+    const m2 = document.getElementById('menu-myScoring');
+    if (m2) m2.classList.add('active');
+  }
+  const loaders = {
+    dashboard: loadDashboard,
+    doers:     loadDoers,
+    tasks:     loadTasks,
+    master:    loadMaster,
+    donelist:  loadDoneList,
+    scoring:   loadScoring,
+    myTasks:   loadMyTasks,
+  };
+  if (loaders[page]) loaders[page]();
+}
 
+// ── DATE FORMATTING (yyyy/MM/dd) ──────────────────────────────
+function fmtDate(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  if (isNaN(dt)) return String(d);
+  const yyyy = dt.getFullYear();
+  const MM   = String(dt.getMonth() + 1).padStart(2, '0');
+  const dd   = String(dt.getDate()).padStart(2, '0');
+  return `${yyyy}/${MM}/${dd}`;
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
 async function loadDashboard() {
+  if (!sb) return;
   const [{ count: dCount }, { data: master }, { data: done }] = await Promise.all([
     sb.from('doers').select('*', { count: 'exact', head: true }),
     sb.from('master_schedule').select('status, planned_date'),
     sb.from('done_list').select('id'),
   ]);
-  const now = new Date(); let pending = 0, overdue = 0;
-  (master || []).forEach(r => { if (!r.status) { new Date(r.planned_date) < now ? overdue++ : pending++; } });
-  document.getElementById('st-doers').textContent = dCount || 0;
-  document.getElementById('st-done').textContent = (done || []).length;
+
+  const now = new Date();
+  let pending = 0, overdue = 0;
+  (master || []).forEach(r => {
+    if (!r.status) {
+      new Date(r.planned_date) < now ? overdue++ : pending++;
+    }
+  });
+
+  document.getElementById('st-doers').textContent   = dCount  || 0;
+  document.getElementById('st-done').textContent    = (done || []).length;
   document.getElementById('st-pending').textContent = pending;
   document.getElementById('st-overdue').textContent = overdue;
-  const { data: sc } = await sb.from('scoring').select('*');
-  buildComplianceChart([ (sc||[]).filter(r=>r.on_time).length, (sc||[]).filter(r=>!r.on_time).length ]);
+
+  const { data: scoring } = await sb.from('scoring').select('*');
+  const sc = scoring || [];
+  const onT  = sc.filter(r => r.on_time).length;
+  const late = sc.filter(r => !r.on_time).length;
+
+  buildComplianceChart([onT, late]);
+
+  const deptMap = {};
+  sc.forEach(r => { const d = r.department || 'Unknown'; deptMap[d] = (deptMap[d] || 0) + 1; });
+  buildDeptChart(Object.keys(deptMap), Object.values(deptMap));
+
   renderLeaderboard(buildLeaderboard(sc), 'dashLeaderboard');
 }
 
-function buildLeaderboard(sc) {
+function buildLeaderboard(scoring) {
   const map = {};
-  (sc || []).forEach(r => {
-    if (!map[r.doer_name]) map[r.doer_name] = { name: r.doer_name, dept: r.department, total: 0, onTime: 0 };
-    map[r.doer_name].total++; if(r.on_time) map[r.doer_name].onTime++;
+  (scoring || []).forEach(r => {
+    const n = r.doer_name || ''; if (!n) return;
+    if (!map[n]) map[n] = { name: n, dept: r.department || '', total: 0, onTime: 0, late: 0 };
+    map[n].total++;
+    r.on_time ? map[n].onTime++ : map[n].late++;
   });
-  return Object.values(map).map(p => ({ ...p, score: p.total > 0 ? Math.round((p.onTime / p.total) * 100) - 100 : 0 })).sort((a,b)=>b.score-a.score);
+  Object.values(map).forEach(p => {
+    p.score = p.total > 0 ? Math.round((p.onTime / p.total) * 100) - 100 : 0;
+  });
+  return Object.values(map).sort((a, b) => b.score - a.score);
 }
 
-function renderLeaderboard(data, id) {
-  const el = document.getElementById(id); if(!el) return;
-  el.innerHTML = data.slice(0,5).map((p,i)=>`<div class="lb-item"><div class="lb-rank">${i+1}</div><div style="flex:1;"><b>${p.name}</b><br><small>${p.dept}</small></div><div class="lb-score-val">${p.score}</div></div>`).join('');
+function renderLeaderboard(data, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!data.length) {
+    el.innerHTML = `<div class="empty-state"><i class="bi bi-trophy"></i><strong>No data yet</strong></div>`; return;
+  }
+  el.innerHTML = data.slice(0, 5).map((p, i) => {
+    const rankCls = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+    const scoreColor = p.score >= -30 ? 'var(--green)' : p.score >= -60 ? 'var(--amber)' : 'var(--red)';
+    return `<div class="lb-item">
+      <div class="lb-rank ${rankCls}">${i + 1}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="lb-name">${p.name}</div>
+        <div class="lb-dept">${p.dept}</div>
+      </div>
+      <div class="lb-score">
+        <div class="lb-score-val" style="color:${scoreColor};">${p.score}</div>
+        <div class="lb-score-meta">score · <span style="color:var(--green);">✓${p.onTime}</span> <span style="color:var(--red);">✗${p.late}</span></div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function buildComplianceChart(v) {
+function buildComplianceChart(vals) {
   const ctx = document.getElementById('chartCompliance').getContext('2d');
   if (_chartCompliance) _chartCompliance.destroy();
-  _chartCompliance = new Chart(ctx, { type:'doughnut', data:{ labels:['On Time','Late'], datasets:[{data:v, backgroundColor:['#1A56DB','#DC2626']}] } });
+  _chartCompliance = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels: ['On Time', 'Late'], datasets: [{ data: vals, backgroundColor: ['#1A56DB', '#DC2626'], borderWidth: 0 }] },
+    options: { plugins: { legend: { position: 'bottom' } }, cutout: '65%' }
+  });
+}
+function buildDeptChart(labels, data) {
+  const ctx = document.getElementById('chartDept').getContext('2d');
+  if (_chartDept) _chartDept.destroy();
+  _chartDept = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Tasks', data, backgroundColor: '#1A56DB', borderRadius: 5 }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
 }
 
+// ── DOERS ─────────────────────────────────────────────────────
 async function loadDoers() {
-  const { data } = await sb.from('doers').select('*').order('name');
+  if (!sb) return;
+  const { data } = await sb.from('doers').select('*').order('created_at', { ascending: true });
   DOERS_CACHE = data || [];
-  document.getElementById('doerTbody').innerHTML = DOERS_CACHE.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.department}</td><td>${r.email}</td><td>${r.phone}</td><td>${r.whatsapp}</td><td>${r.user_type}</td><td><button class="btn-icon" onclick="openDoerModal('${r.id}')"><i class="bi bi-pencil"></i></button></td></tr>`).join('');
+  document.getElementById('doerTbody').innerHTML = DOERS_CACHE.map((r, i) => `
+    <tr>
+      <td style="color:var(--ink-muted);font-family:'Space Mono',monospace;font-size:.75rem;">${i+1}</td>
+      <td><strong>${r.name || ''}</strong></td>
+      <td>${r.department || ''}</td>
+      <td><a href="mailto:${r.email}" style="color:var(--blue);">${r.email || ''}</a></td>
+      <td>${r.phone || ''}</td>
+      <td>${r.whatsapp || ''}</td>
+      <td><span class="badge badge-role">${r.user_type || 'User'}</span></td>
+      <td>
+        <button class="btn-icon" onclick="editDoer('${r.id}')"><i class="bi bi-pencil"></i></button>
+        <button class="btn-icon danger ms-1" onclick="deleteDoer('${r.id}')"><i class="bi bi-trash"></i></button>
+      </td>
+    </tr>`).join('');
 }
 
 function openDoerModal(id) {
-  const r = DOERS_CACHE.find(x=>x.id==id) || {};
   document.getElementById('doerEditId').value = id || '';
-  document.getElementById('d_name').value = r.name || '';
-  document.getElementById('d_dept').value = r.department || '';
+  if (id) {
+    const r = DOERS_CACHE.find(d => d.id === id) || {};
+    document.getElementById('d_name').value     = r.name || '';
+    document.getElementById('d_dept').value     = r.department || '';
+    document.getElementById('d_email').value    = r.email || '';
+    document.getElementById('d_phone').value    = r.phone || '';
+    document.getElementById('d_wa').value       = r.whatsapp || '';
+    document.getElementById('d_usertype').value = r.user_type || 'User';
+  } else {
+    ['d_name','d_dept','d_email','d_phone','d_wa'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('d_usertype').value = 'User';
+  }
   new bootstrap.Modal(document.getElementById('doerModal')).show();
 }
+function editDoer(id) { openDoerModal(id); }
 
 async function saveDoer() {
-  const row = { name: document.getElementById('d_name').value, department: document.getElementById('d_dept').value };
+  const name = document.getElementById('d_name').value.trim();
+  if (!name) { toast('Name is required', 'error'); return; }
+  const row = {
+    name,
+    department: document.getElementById('d_dept').value.trim(),
+    email:      document.getElementById('d_email').value.trim(),
+    phone:      document.getElementById('d_phone').value.trim(),
+    whatsapp:   document.getElementById('d_wa').value.trim(),
+    user_type:  document.getElementById('d_usertype').value,
+  };
   const id = document.getElementById('doerEditId').value;
-  if(id) await sb.from('doers').update(row).eq('id', id); else await sb.from('doers').insert(row);
-  bootstrap.Modal.getInstance(document.getElementById('doerModal')).hide(); loadDoers();
+  bootstrap.Modal.getInstance(document.getElementById('doerModal')).hide();
+  if (id) {
+    const { error } = await sb.from('doers').update(row).eq('id', id);
+    error ? toast('Update failed: ' + error.message, 'error') : toast('Doer updated', 'success');
+  } else {
+    const { error } = await sb.from('doers').insert(row);
+    error ? toast('Insert failed: ' + error.message, 'error') : toast('Doer added', 'success');
+  }
+  loadDoers();
 }
 
+async function deleteDoer(id) {
+  if (!confirm('Delete this doer?')) return;
+  await sb.from('doers').delete().eq('id', id);
+  toast('Doer deleted', 'info');
+  loadDoers();
+}
+
+// ── TASKS ─────────────────────────────────────────────────────
 async function loadTasks() {
-  const { data } = await sb.from('tasks').select('*');
+  if (!sb) return;
+  const { data } = await sb.from('tasks').select('*').order('id', { ascending: true });
   TASKS_CACHE = data || [];
-  document.getElementById('taskTbody').innerHTML = TASKS_CACHE.map(r=>`<tr><td>${r.id}</td><td>${r.Task_Name||r.task_name}</td><td>${r.Doer_Name||r.doer_name}</td><td>${r.Department||r.department}</td><td>${r.Frequency||r.frequency}</td><td>${fmtDate(r.Start_Date||r.start_date)}</td><td><button class="btn-icon" onclick="openTaskModal(${r.id})"><i class="bi bi-pencil"></i></button></td></tr>`).join('');
+  document.getElementById('taskTbody').innerHTML = TASKS_CACHE.map(r => `
+    <tr>
+      <td style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--ink-muted);">${r.id}</td>
+      <td><strong>${r.Task_Name || r.task_name || ''}</strong></td>
+      <td>${r.Doer_Name || r.doer_name || ''}</td>
+      <td>${r.Department || r.department || ''}</td>
+      <td><span class="badge badge-freq">${r.Frequency || r.frequency || ''}</span></td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.Start_Date || r.start_date)}</td>
+      <td>
+        <button class="btn-icon" onclick="editTask(${r.id})"><i class="bi bi-pencil"></i></button>
+        <button class="btn-icon danger ms-1" onclick="deleteTask(${r.id})"><i class="bi bi-trash"></i></button>
+      </td>
+    </tr>`).join('');
 }
 
 async function openTaskModal(id) {
-  const { data } = await sb.from('doers').select('name, department');
-  document.getElementById('t_doer').innerHTML = data.map(d=>`<option value="${d.name}" data-dept="${d.department}">${d.name}</option>`).join('');
-  const r = TASKS_CACHE.find(x=>x.id==id) || {};
+  await loadDoersForSelect();
   document.getElementById('taskEditId').value = id || '';
-  document.getElementById('t_name').value = r.Task_Name || r.task_name || '';
+  if (id) {
+    const r = TASKS_CACHE.find(t => t.id === id) || {};
+    document.getElementById('t_name').value = r.Task_Name || r.task_name || '';
+    document.getElementById('t_doer').value = r.Doer_Name || r.doer_name || '';
+    document.getElementById('t_dept').value = r.Department || r.department || '';
+    document.getElementById('t_freq').value = r.Frequency || r.frequency || '2W';
+    document.getElementById('t_date').value = r.Start_Date || r.start_date || '';
+  } else {
+    ['t_name','t_dept'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('t_freq').value = '2W';
+    document.getElementById('t_date').value = new Date().toISOString().split('T')[0];
+  }
   new bootstrap.Modal(document.getElementById('taskModal')).show();
+}
+function editTask(id) { openTaskModal(id); }
+
+async function loadDoersForSelect() {
+  if (!sb) return;
+  const { data } = await sb.from('doers').select('name, department').order('name');
+  document.getElementById('t_doer').innerHTML =
+    '<option value="">— Select Doer —</option>' +
+    (data || []).map(d => `<option value="${d.name}" data-dept="${d.department || ''}">${d.name} (${d.department || ''})</option>`).join('');
 }
 
 function autoFillDept() {
   const opt = document.getElementById('t_doer').selectedOptions[0];
-  document.getElementById('t_dept').value = opt ? opt.dataset.dept : '';
+  document.getElementById('t_dept').value = opt ? (opt.dataset.dept || '') : '';
 }
 
 async function saveTask() {
-  const row = { Task_Name: document.getElementById('t_name').value, Doer_Name: document.getElementById('t_doer').value, Department: document.getElementById('t_dept').value, Frequency: document.getElementById('t_freq').value, Start_Date: document.getElementById('t_date').value };
-  if(document.getElementById('taskEditId').value) await sb.from('tasks').update(row).eq('id', document.getElementById('taskEditId').value);
-  else await sb.from('tasks').insert(row);
-  bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide(); loadTasks();
+  const task_name = document.getElementById('t_name').value.trim();
+  const doer_name = document.getElementById('t_doer').value;
+  if (!task_name || !doer_name) { toast('Task name and doer are required', 'error'); return; }
+  const row = {
+    Task_Name:  task_name,
+    Doer_Name:  doer_name,
+    Department: document.getElementById('t_dept').value.trim(),
+    Frequency:  document.getElementById('t_freq').value,
+    Start_Date: document.getElementById('t_date').value,
+  };
+  const id = document.getElementById('taskEditId').value;
+  bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide();
+  if (id) {
+    const { error } = await sb.from('tasks').update(row).eq('id', id);
+    error ? toast('Update failed: ' + error.message, 'error') : toast('Task updated', 'success');
+  } else {
+    const { error } = await sb.from('tasks').insert(row);
+    error ? toast('Insert failed: ' + error.message, 'error') : toast('Task added', 'success');
+  }
+  loadTasks();
 }
 
+async function deleteTask(id) {
+  if (!confirm('Delete this task?')) return;
+  await sb.from('tasks').delete().eq('id', id);
+  toast('Task deleted', 'info');
+  loadTasks();
+}
+
+// ── GENERATE MASTER ───────────────────────────────────────────
 async function generateMaster() {
-  if(!confirm('Generate 2-year schedule?')) return;
+  if (!confirm('This will regenerate the entire Master Schedule (2 years). Continue?')) return;
+  toast('Generating schedule…', 'info');
+
   const { data: tasks } = await sb.from('tasks').select('*');
+  if (!tasks || !tasks.length) { toast('No tasks found.', 'error'); return; }
+
   await sb.from('master_schedule').delete().neq('id', 0);
+
+  const FREQ_INTERVALS = { D:1, W:7, '2W':15, M:30, '2M':60, '3M':90, '6M':180, Y:365, '2Y':730 };
   const rows = [];
-  tasks.forEach(t => {
-    let cur = new Date(t.Start_Date||t.start_date);
-    for(let i=0; i<20; i++) { // Simplified for demo
-      rows.push({ doer_name: t.Doer_Name||t.doer_name, task_name: t.Task_Name||t.task_name, planned_date: cur.toISOString(), department: t.Department||t.department });
-      cur.setDate(cur.getDate() + 15);
+  for (const t of tasks) {
+    const start = new Date(t.Start_Date || t.start_date);
+    const freq  = (t.Frequency || t.frequency || '2W').toUpperCase();
+    const interval = FREQ_INTERVALS[freq] || 30;
+    const end = new Date(start.getTime() + 730 * 86400000);
+    let cur = new Date(start);
+    while (cur <= end) {
+      rows.push({
+        doer_name:    t.Doer_Name   || t.doer_name,
+        department:   t.Department  || t.department,
+        task_ref_id:  t.id,
+        frequency:    freq,
+        task_name:    t.Task_Name   || t.task_name,
+        planned_date: cur.toISOString(),
+        actual_date:  null, status: null,
+        air_pressure: null, gauge_check: null, spare_parts: null,
+        damaged_parts: null, grease: null, bearing_bush: null,
+        change_repair: null, remarks: null,
+      });
+      cur = new Date(cur.getTime() + interval * 86400000);
+    }
+  }
+
+  for (let i = 0; i < rows.length; i += 500) {
+    const { error } = await sb.from('master_schedule').insert(rows.slice(i, i + 500));
+    if (error) { toast('Error: ' + error.message, 'error'); return; }
+  }
+  toast(`✓ Generated ${rows.length} schedule rows!`, 'success');
+  loadMaster();
+}
+
+// ── MASTER DISPLAY ────────────────────────────────────────────
+async function loadMaster() {
+  if (!sb) return;
+  const { data } = await sb.from('master_schedule').select('*').order('planned_date', { ascending: true });
+  document.getElementById('masterTbody').innerHTML = (data || []).map(r => {
+    const st = (r.status || '').trim();
+    const badge = st === 'Done On Time' ? `<span class="badge badge-ontime">${st}</span>`
+                : st === 'Done Late'    ? `<span class="badge badge-late">${st}</span>`
+                : st                   ? `<span class="badge badge-ontime">${st}</span>`
+                : `<span class="badge badge-pending">Pending</span>`;
+    return `<tr>
+      <td>${r.doer_name || ''}</td><td>${r.department || ''}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.75rem;">${r.task_ref_id || ''}</td>
+      <td><span class="badge badge-freq">${r.frequency || ''}</span></td>
+      <td>${r.task_name || ''}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.planned_date)}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${r.actual_date ? fmtDate(r.actual_date) : '—'}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── DONE LIST ─────────────────────────────────────────────────
+async function loadDoneList() {
+  if (!sb) return;
+  const { data } = await sb.from('done_list').select('*').order('submitted_on', { ascending: false });
+  document.getElementById('doneTbody').innerHTML = (data || []).map(r => {
+    const st = (r.status || '').trim();
+    const badge = st === 'Done On Time' ? `<span class="badge badge-ontime">${st}</span>` : `<span class="badge badge-late">${st}</span>`;
+    return `<tr>
+      <td><strong>${r.doer_name || ''}</strong></td><td>${r.department || ''}</td>
+      <td>${r.task_name || ''}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.planned_date)}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.actual_date)}</td>
+      <td>${badge}</td>
+      <td>${r.submitted_by || ''}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.submitted_on)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── SCORING ───────────────────────────────────────────────────
+async function loadScoring() {
+  if (!sb) return;
+  const { data: sc } = await sb.from('scoring').select('*').order('submitted_on', { ascending: false });
+  const scoring = sc || [];
+  const lb = buildLeaderboard(scoring);
+  renderLeaderboard(lb, 'scoringLeaderboard');
+
+  const ctx = document.getElementById('chartScore').getContext('2d');
+  if (_chartScore) _chartScore.destroy();
+  const top10 = lb.slice(0, 10);
+  _chartScore = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: top10.map(p => p.name),
+      datasets: [{ label: 'Score', data: top10.map(p => p.score),
+        backgroundColor: top10.map(p => p.score >= -30 ? '#059669' : p.score >= -60 ? '#D97706' : '#DC2626'),
+        borderRadius: 5 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
+  });
+
+  document.getElementById('scoreTbody').innerHTML = scoring.map(r => `
+    <tr>
+      <td>${r.doer_name || ''}</td><td>${r.department || ''}</td><td>${r.task_name || ''}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.planned_date)}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.actual_date)}</td>
+      <td>${r.on_time ? '<span class="badge badge-ontime">YES</span>' : '<span class="badge badge-late">NO</span>'}</td>
+      <td><span class="${r.on_time ? 'badge badge-ontime' : 'badge badge-late'}">${r.on_time ? 'On Time' : 'Late'}</span></td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem;">${fmtDate(r.submitted_on)}</td>
+    </tr>`).join('');
+}
+
+// ── MY TASKS (USER) ───────────────────────────────────────────
+async function loadMyTasks() {
+  if (!sb) { renderNoTasks(); return; }
+
+  const el = document.getElementById('myTasksContainer');
+  const subEl = document.getElementById('myTasksSub');
+  const isProsun = (SESSION.name || '').toLowerCase() === 'prosun';
+
+  el.innerHTML = `<div style="text-align:center;padding:48px;color:var(--ink-muted);">
+    <div class="load-ring" style="margin:0 auto 12px;border-top-color:var(--blue);"></div>
+    <span style="font-size:.85rem;">Loading tasks for <strong>${SESSION.name}</strong>…</span>
+  </div>`;
+
+  if (subEl) {
+     subEl.innerHTML = isProsun 
+     ? `Showing <strong style="color:var(--blue);">Monitoring View (Read-Only)</strong> — All pending tasks within 10 days`
+     : `Showing tasks for <strong style="color:var(--blue);">${SESSION.name}</strong> — status empty &amp; planned_date &lt; today + 10 days`;
+  }
+
+  const now   = new Date();
+  const limit = new Date(now.getTime() + 10 * 86400000);
+
+  const { data, error } = await sb
+    .from('master_schedule')
+    .select('*')
+    .lt('planned_date', limit.toISOString())
+    .order('planned_date', { ascending: true });
+
+  if (error) {
+    toast('Error loading tasks: ' + error.message, 'error');
+    el.innerHTML = `<div class="empty-state"><i class="bi bi-exclamation-circle" style="color:var(--red);"></i><strong>Error loading tasks</strong></div>`;
+    return;
+  }
+
+  const sessionNameLower = (SESSION.name || '').trim().toLowerCase();
+
+  const filtered = (data || []).filter(r => {
+    const statusVal = r.status || '';
+    const statusEmpty = statusVal.trim() === '';
+    
+    if (isProsun) {
+        return statusEmpty;
+    } else {
+        const rowDoer = (r.doer_name || r.Doer_Name || '').trim().toLowerCase();
+        return statusEmpty && (rowDoer === sessionNameLower);
     }
   });
-  await sb.from('master_schedule').insert(rows);
-  toast('Schedule Generated', 'success'); loadMaster();
+
+  window._pendingTasks = filtered;
+
+  if (!filtered.length) { renderNoTasks(); return; }
+
+  el.innerHTML = filtered.map(t => {
+    const planned  = new Date(t.planned_date);
+    const isOverdue = planned < now;
+    const daysLeft  = Math.round((planned - now) / 86400000);
+    const cardCls   = isOverdue ? 'overdue' : daysLeft <= 3 ? 'due-soon' : 'ok';
+
+    const dateBadgeColor = isOverdue
+      ? 'background:var(--red-pale);color:var(--red);'
+      : daysLeft <= 3
+        ? 'background:var(--amber-pale);color:var(--amber);'
+        : 'background:var(--green-pale);color:var(--green);';
+
+    const dayLabel = isOverdue
+      ? `OVERDUE ${Math.abs(daysLeft)}d`
+      : daysLeft === 0 ? 'TODAY'
+      : `${daysLeft}d left`;
+
+    const completeButton = isProsun ? '' : `
+      <button class="btn-success" onclick="openSubmitModal('${t.id}')">
+        <i class="bi bi-check2-circle"></i>Complete
+      </button>
+    `;
+
+    return `<div class="task-card ${cardCls}">
+      <div class="task-head">
+        <div style="flex:1;min-width:0;">
+          <div class="task-name">
+            <i class="bi bi-gear-fill me-2" style="color:var(--blue);"></i>${t.task_name || t.Task_Name} 
+            ${isProsun ? `<span style="font-size:0.7rem; color:var(--blue); font-family:'Space Mono'; margin-left:10px;">DOER: ${t.doer_name || t.Doer_Name}</span>` : ''}
+          </div>
+          <div class="task-meta">
+            <span><i class="bi bi-building me-1"></i>${t.department || t.Department}</span>
+            <span class="task-meta-sep">|</span>
+            <span class="badge badge-freq">${t.frequency || t.Frequency}</span>
+            <span class="task-meta-sep">|</span>
+            <span><i class="bi bi-calendar3 me-1"></i><strong>${fmtDate(t.planned_date)}</strong></span>
+            <span class="task-date-chip" style="${dateBadgeColor}">${dayLabel}</span>
+          </div>
+        </div>
+        <div class="task-actions">
+          <button class="btn-icon" title="Send Email Reminder" onclick="sendNotification('${t.id}','email')">
+            <i class="bi bi-envelope-fill" style="color:var(--blue);"></i>
+          </button>
+          <button class="btn-icon" title="Send WhatsApp Reminder" onclick="sendNotification('${t.id}','whatsapp')">
+            <i class="bi bi-whatsapp" style="color:#25D366;"></i>
+          </button>
+          ${completeButton}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-async function loadMaster() {
-  const { data } = await sb.from('master_schedule').select('*').order('planned_date');
-  document.getElementById('masterTbody').innerHTML = data.map(r=>`<tr><td>${r.doer_name}</td><td>${r.department}</td><td>${r.task_ref_id||''}</td><td>${r.frequency||''}</td><td>${r.task_name}</td><td>${fmtDate(r.planned_date)}</td><td>${r.actual_date?fmtDate(r.actual_date):'—'}</td><td>${r.status||'Pending'}</td></tr>`).join('');
+function renderNoTasks() {
+  document.getElementById('myTasksContainer').innerHTML = `
+    <div class="empty-state">
+      <i class="bi bi-emoji-smile"></i>
+      <strong>All caught up!</strong>
+      <span>No pending tasks in the next 10 days for <strong>${SESSION.name}</strong>.</span>
+    </div>`;
 }
 
-async function loadDoneList() {
-  const { data } = await sb.from('done_list').select('*').order('submitted_on', {ascending:false});
-  document.getElementById('doneTbody').innerHTML = data.map(r=>`<tr><td>${r.doer_name}</td><td>${r.department}</td><td>${r.task_name}</td><td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${r.status}</td><td>${r.submitted_by}</td><td>${fmtDate(r.submitted_on)}</td></tr>`).join('');
-}
+// ── SUBMIT TASK ───────────────────────────────────────────────
+function openSubmitModal(taskId) {
+  const t = (window._pendingTasks || []).find(x => String(x.id) === String(taskId));
+  if (!t) return;
+  currentSubmitTask = t;
 
-async function loadScoring() {
-  const { data } = await sb.from('scoring').select('*').order('submitted_on', {ascending:false});
-  document.getElementById('scoreTbody').innerHTML = data.map(r=>`<tr><td>${r.doer_name}</td><td>${r.department}</td><td>${r.task_name}</td><td>${fmtDate(r.planned_date)}</td><td>${fmtDate(r.actual_date)}</td><td>${r.on_time?'YES':'NO'}</td><td>${r.on_time?0:-100}</td><td>${fmtDate(r.submitted_on)}</td></tr>`).join('');
-}
+  const checks = [
+    { key: 'air_pressure',   label: 'M/C cleaning by air pressure' },
+    { key: 'gauge_check',    label: 'All gauges checked on machine' },
+    { key: 'spare_parts',    label: 'All spare parts checked and cleaned' },
+    { key: 'damaged_parts',  label: 'Damaged spare parts replaced or repaired' },
+    { key: 'grease',         label: 'Machine greased and all bearings checked' },
+    { key: 'bearing_bush',   label: 'Damaged bearings/bushes replaced' },
+  ];
 
-async function loadMyTasks() {
-  const now = new Date(); const limit = new Date(now.getTime() + 10*86400000);
-  const { data } = await sb.from('master_schedule').select('*').is('status', null).lt('planned_date', limit.toISOString()).ilike('doer_name', SESSION.name);
-  window._pendingTasks = data || [];
-  document.getElementById('myTasksContainer').innerHTML = (data||[]).map(t=>`<div class="task-card ${new Date(t.planned_date)<now?'overdue':'ok'}"><h5>${t.task_name}</h5><p>Planned: ${fmtDate(t.planned_date)}</p><button class="btn-success" onclick="openSubmitModal('${t.id}')">Complete</button></div>`).join('');
-}
-
-function openSubmitModal(id) {
-  currentSubmitTask = window._pendingTasks.find(x=>x.id==id);
-  document.getElementById('submitModalBody').innerHTML = `<p>Completing: <b>${currentSubmitTask.task_name}</b></p><textarea id="chk_remarks" class="form-control" placeholder="Remarks"></textarea>`;
+  const options = ['', 'Done', 'Not Done', 'N/A'];
+  document.getElementById('submitModalBody').innerHTML = `
+    <div style="background:var(--blue-pale);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:18px;border-left:3px solid var(--blue);">
+      <div style="font-weight:700;color:var(--ink);">${t.task_name || t.Task_Name}</div>
+      <div style="font-size:.78rem;color:var(--ink-muted);margin-top:4px;">
+        Planned: <strong style="font-family:'Space Mono',monospace;">${fmtDate(t.planned_date)}</strong>
+        &nbsp;·&nbsp; Dept: ${t.department || t.Department}
+      </div>
+    </div>
+    <div style="margin-bottom:14px;">
+      ${checks.map(c => `
+        <div class="check-row">
+          <select class="form-select form-select-sm" id="chk_${c.key}" style="width:130px;flex-shrink:0;">
+            ${options.map(o => `<option value="${o}">${o || '—'}</option>`).join('')}
+          </select>
+          <label>${c.label}</label>
+        </div>`).join('')}
+    </div>
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label">Change / Repair Parts</label>
+        <input type="text" class="form-control" id="chk_change_repair" placeholder="List parts if any"/>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Remarks</label>
+        <textarea class="form-control" id="chk_remarks" rows="2" placeholder="Any additional notes…"></textarea>
+      </div>
+    </div>`;
   new bootstrap.Modal(document.getElementById('submitModal')).show();
 }
 
 async function confirmSubmit() {
-  const now = new Date(); const onTime = now <= new Date(currentSubmitTask.planned_date);
-  const upd = { actual_date: now.toISOString(), status: onTime?'Done On Time':'Done Late', remarks: document.getElementById('chk_remarks').value };
-  await sb.from('master_schedule').update(upd).eq('id', currentSubmitTask.id);
-  await sb.from('done_list').insert({ ...upd, doer_name:currentSubmitTask.doer_name, task_name:currentSubmitTask.task_name, planned_date:currentSubmitTask.planned_date, submitted_by:SESSION.name, submitted_on:now.toISOString(), department:currentSubmitTask.department });
-  await sb.from('scoring').insert({ doer_name:currentSubmitTask.doer_name, task_name:currentSubmitTask.task_name, on_time:onTime, planned_date:currentSubmitTask.planned_date, actual_date:now.toISOString(), department:currentSubmitTask.department, submitted_on:now.toISOString() });
-  bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide(); loadMyTasks();
+  if (!currentSubmitTask) return;
+  const t   = currentSubmitTask;
+  const now = new Date();
+  const plannedEOD = new Date(t.planned_date);
+  plannedEOD.setHours(23, 59, 59, 999);
+  const onTime = now <= plannedEOD;
+  const status = onTime ? 'Done On Time' : 'Done Late';
+  const getV = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+
+  const extras = {
+    actual_date:   now.toISOString(), status,
+    air_pressure:  getV('chk_air_pressure'),
+    gauge_check:   getV('chk_gauge_check'),
+    spare_parts:   getV('chk_spare_parts'),
+    damaged_parts: getV('chk_damaged_parts'),
+    grease:        getV('chk_grease'),
+    bearing_bush:  getV('chk_bearing_bush'),
+    change_repair: getV('chk_change_repair'),
+    remarks:       getV('chk_remarks'),
+  };
+
+  const { error: e1 } = await sb.from('master_schedule').update(extras).eq('id', t.id);
+  if (e1) { toast('Error updating schedule: ' + e1.message, 'error'); return; }
+
+  const { error: e2 } = await sb.from('done_list').insert({
+    doer_name: t.doer_name || t.Doer_Name, department: t.department || t.Department,
+    task_name: t.task_name || t.Task_Name, frequency: t.frequency || t.Frequency,
+    planned_date: t.planned_date,
+    submitted_by: SESSION.name, submitted_on: now.toISOString(),
+    ...extras,
+  });
+  if (e2) console.warn('done_list:', e2.message);
+
+  const { error: e3 } = await sb.from('scoring').insert({
+    doer_name: t.doer_name || t.Doer_Name, department: t.department || t.Department,
+    task_name: t.task_name || t.Task_Name,
+    planned_date: t.planned_date,
+    actual_date: now.toISOString(),
+    on_time: onTime, score: onTime ? 1 : 0,
+    submitted_on: now.toISOString(),
+  });
+  if (e3) console.warn('scoring:', e3.message);
+
+  bootstrap.Modal.getInstance(document.getElementById('submitModal')).hide();
+  toast(`Task submitted — ${status}`, onTime ? 'success' : 'error');
+  loadMyTasks();
 }
 
-function filterTable(id, q) { const query = q.toLowerCase(); document.querySelectorAll(`#${id} tbody tr`).forEach(tr => { tr.style.display = tr.textContent.toLowerCase().includes(query) ? '' : 'none'; }); }
+// ── NOTIFICATIONS ─────────────────────────────────────────────
+async function sendNotification(taskId, type) {
+  const t = (window._pendingTasks || []).find(x => String(x.id) === String(taskId));
+  if (!t) return;
+  const { data: doers } = await sb.from('doers').select('*').ilike('name', t.doer_name || t.Doer_Name).limit(1);
+  const doer = doers && doers[0];
+  if (!doer) { toast('Doer contact not found', 'error'); return; }
 
-function toast(msg, type) {
-  const div = document.createElement('div'); div.className = `app-toast t-${type}`; div.innerHTML = msg;
-  document.getElementById('toastWrap').appendChild(div); setTimeout(()=>div.remove(), 3000);
+  if (type === 'email') {
+    if (!doer.email) { toast('No email address on file', 'error'); return; }
+    toast(`Email reminder → ${doer.email}`, 'success');
+  } else {
+    const phone = (doer.whatsapp || '').replace(/\D/g, '');
+    if (!phone) { toast('No WhatsApp number on file', 'error'); return; }
+    const msg = encodeURIComponent(
+      `Hello ${t.doer_name || t.Doer_Name},\n\nYou have a pending maintenance task:\n*Task:* ${t.task_name || t.Task_Name}\n*Planned:* ${fmtDate(t.planned_date)}\n*Dept:* ${t.department || t.Department}\n\nPlease complete it on time.\n— CheckList`
+    );
+    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+  }
 }
 
+// ── CSV EXPORT ────────────────────────────────────────────────
 async function exportCsv(table) {
+  if (!sb) return;
   const { data } = await sb.from(table).select('*');
-  const csv = [Object.keys(data[0]).join(','), ...data.map(r=>Object.values(r).join(','))].join('\n');
-  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`${table}.csv`; a.click();
+  if (!data || !data.length) { toast('No data to export', 'error'); return; }
+  const keys = Object.keys(data[0]);
+  const csv  = [keys.join(','), ...data.map(r => keys.map(k => `"${r[k] ?? ''}"`).join(','))].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = `${table}_export.csv`;
+  a.click();
+  toast('CSV downloaded', 'success');
+}
+
+// ── FILTER TABLE ──────────────────────────────────────────────
+function filterTable(tableId, query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+  const icons = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', info: 'bi-info-circle-fill' };
+  const div = document.createElement('div');
+  div.className = `app-toast t-${type}`;
+  div.innerHTML = `<i class="bi ${icons[type] || icons.info} t-icon"></i><span>${msg}</span>`;
+  document.getElementById('toastWrap').appendChild(div);
+  setTimeout(() => {
+    div.style.transition = 'opacity .3s';
+    div.style.opacity = '0';
+    setTimeout(() => div.remove(), 300);
+  }, 4000);
 }
 </script>
 </body>
