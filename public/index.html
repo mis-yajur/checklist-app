@@ -1,3 +1,5 @@
+--- START OF FILE Paste March 31, 2026 - 12:21PM ---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -669,7 +671,12 @@ body {
         <input type="password" class="lf-input" id="loginPass" placeholder="Enter password" autocomplete="current-password"/>
       </div>
       <button class="btn-login" onclick="doLogin()"><i class="bi bi-box-arrow-in-right me-2"></i>Sign In</button>
-      <div class="login-error" id="loginError"></div>      
+      <div class="login-error" id="loginError"></div>
+      <div class="login-hint">
+        Admin: <strong>admin / Admin@1234</strong><br>
+        Super Admin: <strong>superadmin / Super@1234</strong><br>
+        User: <em>doer name</em> / <strong>User@1234</strong>
+      </div>
     </div>
   </div>
 </div>
@@ -1038,8 +1045,8 @@ async function doLogin() {
     launchApp(); return;
   }
 
-  if (u.toLowerCase() === 'user' && p === CFG.USER_PASS) {
-     SESSION = { role: 'user', name: 'User', dept: 'Monitoring' };
+  if (u.toLowerCase() === 'prosun' && p === CFG.USER_PASS) {
+     SESSION = { role: 'user', name: 'Prosun', dept: 'Monitoring' };
      launchApp(); return;
   }
 
@@ -1494,7 +1501,7 @@ async function loadMyTasks() {
 
   const el = document.getElementById('myTasksContainer');
   const subEl = document.getElementById('myTasksSub');
-  const isUser = (SESSION.name || '').toLowerCase() === 'user';
+  const isProsun = (SESSION.name || '').toLowerCase() === 'prosun';
 
   el.innerHTML = `<div style="text-align:center;padding:48px;color:var(--ink-muted);">
     <div class="load-ring" style="margin:0 auto 12px;border-top-color:var(--blue);"></div>
@@ -1502,7 +1509,7 @@ async function loadMyTasks() {
   </div>`;
 
   if (subEl) {
-     subEl.innerHTML = isUser 
+     subEl.innerHTML = isProsun 
      ? `Showing <strong style="color:var(--blue);">Monitoring View (Read-Only)</strong> — All pending tasks within 10 days`
      : `Showing tasks for <strong style="color:var(--blue);">${SESSION.name}</strong> — status empty &amp; planned_date &lt; today + 10 days`;
   }
@@ -1528,7 +1535,7 @@ async function loadMyTasks() {
     const statusVal = r.status || '';
     const statusEmpty = statusVal.trim() === '';
     
-    if (isUser) {
+    if (isProsun) {
         return statusEmpty;
     } else {
         const rowDoer = (r.doer_name || r.Doer_Name || '').trim().toLowerCase();
@@ -1557,7 +1564,7 @@ async function loadMyTasks() {
       : daysLeft === 0 ? 'TODAY'
       : `${daysLeft}d left`;
 
-    const completeButton = isUser ? '' : `
+    const completeButton = isProsun ? '' : `
       <button class="btn-success" onclick="openSubmitModal('${t.id}')">
         <i class="bi bi-check2-circle"></i>Complete
       </button>
@@ -1568,7 +1575,7 @@ async function loadMyTasks() {
         <div style="flex:1;min-width:0;">
           <div class="task-name">
             <i class="bi bi-gear-fill me-2" style="color:var(--blue);"></i>${t.task_name || t.Task_Name} 
-            ${isUser ? `<span style="font-size:0.7rem; color:var(--blue); font-family:'Space Mono'; margin-left:10px;">DOER: ${t.doer_name || t.Doer_Name}</span>` : ''}
+            ${isProsun ? `<span style="font-size:0.7rem; color:var(--blue); font-family:'Space Mono'; margin-left:10px;">DOER: ${t.doer_name || t.Doer_Name}</span>` : ''}
           </div>
           <div class="task-meta">
             <span><i class="bi bi-building me-1"></i>${t.department || t.Department}</span>
