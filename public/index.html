@@ -1,3 +1,5 @@
+--- START OF FILE Paste March 31, 2026 - 11:43AM ---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1078,6 +1080,12 @@ async function doLogin() {
     launchApp(); return;
   }
 
+  // Special User: Prosun (Sees all, non-editable)
+  if (u.toLowerCase() === 'prosun' && p === CFG.USER_PASS) {
+     SESSION = { role: 'user', name: 'Prosun', dept: 'Monitoring' };
+     launchApp(); return;
+  }
+
   // Normal User — match name in doers table
   if (p === CFG.USER_PASS) {
     if (sb) {
@@ -1537,12 +1545,14 @@ async function loadScoring() {
 }
 
 // ── MY TASKS (USER) ───────────────────────────────────────────
-// LOGIC: planned_date < NOW()+10 and status is NULL and name matches SESSION
+// LOGIC: planned_date < NOW()+10 and status is NULL
+// IF name is 'Prosun', show ALL doers, but non-editable.
 async function loadMyTasks() {
   if (!sb) { renderNoTasks(); return; }
 
   const el = document.getElementById('myTasksContainer');
   const subEl = document.getElementById('myTasksSub');
+  const isProsun = (SESSION.name || '').toLowerCase() === 'prosun';
 
   // Loading state
   el.innerHTML = `<div style="text-align:center;padding:48px;color:var(--ink-muted);">
@@ -1550,10 +1560,16 @@ async function loadMyTasks() {
     <span style="font-size:.85rem;">Loading tasks for <strong>${SESSION.name}</strong>…</span>
   </div>`;
 
+  if (subEl) {
+     subEl.innerHTML = isProsun 
+     ? `Showing <strong style="color:var(--blue);">Monitoring View (Read-Only)</strong> — All pending tasks within 10 days`
+     : `Showing tasks for <strong style="color:var(--blue);">${SESSION.name}</strong> — status empty &amp; planned_date &lt; today + 10 days`;
+  }
+
   const now   = new Date();
   const limit = new Date(now.getTime() + 10 * 86400000);
 
-  // Fetch all tasks from master_schedule occurring within next 10 days
+  // Fetch all tasks occurring within next 10 days
   const { data, error } = await sb
     .from('master_schedule')
     .select('*')
@@ -1568,16 +1584,19 @@ async function loadMyTasks() {
 
   const sessionNameLower = (SESSION.name || '').trim().toLowerCase();
 
-  // Filter: status is empty AND doer_name matches (case-insensitive check for both snake_case and PascalCase columns)
+  // Filter Logic:
+  // 1. Status must be empty.
+  // 2. If 'Prosun', don't check name. If not 'Prosun', check if name matches Doer.
   const filtered = (data || []).filter(r => {
     const statusVal = r.status || '';
     const statusEmpty = statusVal.trim() === '';
     
-    // Check both common column casings found in Supabase schemas
-    const rowDoer = (r.doer_name || r.Doer_Name || '').trim().toLowerCase();
-    const nameMatch = rowDoer === sessionNameLower;
-    
-    return statusEmpty && nameMatch;
+    if (isProsun) {
+        return statusEmpty; // Prosun sees everything that is empty
+    } else {
+        const rowDoer = (r.doer_name || r.Doer_Name || '').trim().toLowerCase();
+        return statusEmpty && (rowDoer === sessionNameLower);
+    }
   });
 
   window._pendingTasks = filtered;
@@ -1601,10 +1620,20 @@ async function loadMyTasks() {
       : daysLeft === 0 ? 'TODAY'
       : `${daysLeft}d left`;
 
+    // Prosun sees all tasks but cannot edit (No Complete Button)
+    const completeButton = isProsun ? '' : `
+      <button class="btn-success" onclick="openSubmitModal('${t.id}')">
+        <i class="bi bi-check2-circle"></i>Complete
+      </button>
+    `;
+
     return `<div class="task-card ${cardCls}">
       <div class="task-head">
         <div style="flex:1;min-width:0;">
-          <div class="task-name"><i class="bi bi-gear-fill me-2" style="color:var(--blue);"></i>${t.task_name || t.Task_Name}</div>
+          <div class="task-name">
+            <i class="bi bi-gear-fill me-2" style="color:var(--blue);"></i>${t.task_name || t.Task_Name} 
+            ${isProsun ? `<span style="font-size:0.7rem; color:var(--blue); font-family:'Space Mono'; margin-left:10px;">DOER: ${t.doer_name || t.Doer_Name}</span>` : ''}
+          </div>
           <div class="task-meta">
             <span><i class="bi bi-building me-1"></i>${t.department || t.Department}</span>
             <span class="task-meta-sep">|</span>
@@ -1621,9 +1650,7 @@ async function loadMyTasks() {
           <button class="btn-icon" title="Send WhatsApp Reminder" onclick="sendNotification('${t.id}','whatsapp')">
             <i class="bi bi-whatsapp" style="color:#25D366;"></i>
           </button>
-          <button class="btn-success" onclick="openSubmitModal('${t.id}')">
-            <i class="bi bi-check2-circle"></i>Complete
-          </button>
+          ${completeButton}
         </div>
       </div>
     </div>`;
