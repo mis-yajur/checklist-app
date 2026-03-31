@@ -1502,7 +1502,7 @@ async function loadMyTasks() {
   </div>`;
 
   if (subEl) {
-     subEl.innerHTML = isProsun 
+     subEl.innerHTML = isUser 
      ? `Showing <strong style="color:var(--blue);">Monitoring View (Read-Only)</strong> — All pending tasks within 10 days`
      : `Showing tasks for <strong style="color:var(--blue);">${SESSION.name}</strong> — status empty &amp; planned_date &lt; today + 10 days`;
   }
@@ -1528,7 +1528,7 @@ async function loadMyTasks() {
     const statusVal = r.status || '';
     const statusEmpty = statusVal.trim() === '';
     
-    if (isProsun) {
+    if (isUser) {
         return statusEmpty;
     } else {
         const rowDoer = (r.doer_name || r.Doer_Name || '').trim().toLowerCase();
